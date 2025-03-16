@@ -1,12 +1,9 @@
 #include <iostream>
-#include "game.h"
+#include "Game_Stat.h"
 
 using namespace std;
 
-int main(int argc, char* argv[]){
-    Game game;
-    if (game.running){
-        game.run();
-    }
-    return 0;
+int main(int argc, char* argv[])
+{
+
 }
