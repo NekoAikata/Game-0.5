@@ -3,3 +3,11 @@
 	<iostream>
 	<SDL.h>
 
+1742109322 source:c:\users\admin\documents\code test\game 0.5\main.cpp
+	<iostream>
+	"game.h"
+
+1742109564 c:\users\admin\documents\code test\game 0.5\game.h
+	<SDL.h>
+	<SDL_image.h>
+
