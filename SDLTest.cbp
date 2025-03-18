@@ -32,6 +32,15 @@
 			<Add option="-Wall" />
 			<Add option="-fexceptions" />
 		</Compiler>
+<<<<<<< Updated upstream
+=======
+		<Unit filename="CFuntion.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="Game_Stat.c">
+			<Option compilerVar="CC" />
+		</Unit>
+>>>>>>> Stashed changes
 		<Unit filename="main.cpp" />
 		<Extensions>
 			<lib_finder disable_auto="1" />
