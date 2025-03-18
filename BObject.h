@@ -14,6 +14,7 @@ public:
 
     bool LoadImg(std::string path, SDL_Renderer* screen);
     void Render(SDL_Renderer* design, const SDL_Rect* clip = NULL);
+    void Free();
 protected:
     SDL_Texture* texture;
     SDL_Rect o_rect
