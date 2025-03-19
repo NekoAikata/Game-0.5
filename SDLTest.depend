@@ -3,11 +3,28 @@
 	<iostream>
 	<SDL.h>
 
-1742109322 source:c:\users\admin\documents\code test\game 0.5\main.cpp
+1742341095 source:c:\users\admin\documents\code test\game 0.5\main.cpp
 	<iostream>
-	"game.h"
+	"Game_Stat.h"
+	"BObject.h"
 
 1742109564 c:\users\admin\documents\code test\game 0.5\game.h
 	<SDL.h>
 	<SDL_image.h>
+
+1742341703 c:\users\admin\documents\code test\game 0.5\game_stat.h
+	<SDL.h>
+	<SDL_image.h>
+	<string>
+
+1742339147 c:\users\admin\documents\code test\game 0.5\bobject.h
+	"Game_Stat.h"
+	<string>
+
+1742339154 source:c:\users\admin\documents\code test\game 0.5\bobject.cpp
+	"BObject.h"
+
+1742139131 source:c:\users\admin\documents\code test\game 0.5\game_stat.cpp
+	"Game_Stat.h"
+	<iostream>
 

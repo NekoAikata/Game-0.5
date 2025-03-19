@@ -1,6 +1,6 @@
 #include "BObject.h"
 
-Object::BaseObject()
+BaseObject::BaseObject()
 {
     texture = NULL;
     rect.x = 0;
@@ -9,12 +9,12 @@ Object::BaseObject()
     rect.h = 0;
 }
 
-Object::~BaseObject()
+BaseObject::~BaseObject()
 {
     Free();
 }
 
-bool Object::LoadImg(std::string path, SDL_Renderer* screen)
+bool BaseObject::LoadImg(std::string path, SDL_Renderer* screen)
 {
     SDL_Texture* new_texture = NULL;
 
@@ -34,13 +34,13 @@ bool Object::LoadImg(std::string path, SDL_Renderer* screen)
     return texture!=NULL;
 }
 
-void Object::Render(SDL_Renderer* design, const SDL_Rect* clip/* = NULL*/)
+void BaseObject::Render(SDL_Renderer* design, const SDL_Rect* clip/* = NULL*/)
 {
     SDL_Rect renderquad = {rect.x, rect.y, rect.w, rect.h};
     SDL_RenderCopy(design, texture, clip, &renderquad);
 }
 
-void Object::Free()
+void BaseObject::Free()
 {
     if(texture != NULL)
     {
