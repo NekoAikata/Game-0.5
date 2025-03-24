@@ -13,7 +13,7 @@ public:
     SDL_Rect GetRect() const {return rect;}
     SDL_Texture* GetTexture() const {return texture;}
 
-    bool LoadImg(std::string path, SDL_Renderer* screen);
+    virtual bool LoadImg(std::string path, SDL_Renderer* screen);
     void Render(SDL_Renderer* design, const SDL_Rect* clip = NULL);
     void Free();
 protected:

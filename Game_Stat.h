@@ -35,4 +35,12 @@ struct Map
     char* File_name;
 };
 
+struct Input_action
+{
+    int left;
+    int right;
+    int up;
+    int down;
+};
+
 #endif // COMMON_GAME_STAT_

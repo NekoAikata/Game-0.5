@@ -36,6 +36,8 @@
 		<Unit filename="BObject.h" />
 		<Unit filename="Game_Stat.cpp" />
 		<Unit filename="Game_Stat.h" />
+		<Unit filename="Main_o.cpp" />
+		<Unit filename="Main_o.h" />
 		<Unit filename="Map.cpp" />
 		<Unit filename="Map.h" />
 		<Unit filename="main.cpp" />
