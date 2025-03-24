@@ -1,6 +1,7 @@
 #include <iostream>
 #include "Game_Stat.h"
 #include "BObject.h"
+#include "Map.h"
 
 BaseObject background;
 
@@ -56,6 +57,11 @@ int main(int argc, char* argv[])
     {
         return -1;
     }
+
+    GameMap Game_map;
+    Game_map.LoadMap("map/map.dat");
+    Game_map.LoadTiles(renderer);
+
     bool quitG = false;
     while (!quitG)
     {
@@ -70,6 +76,7 @@ int main(int argc, char* argv[])
         SDL_RenderClear(renderer);
 
         background.Render(renderer, NULL);
+        Game_map.DrawMap(renderer);
 
         SDL_RenderPresent(renderer);
     }

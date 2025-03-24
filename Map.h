@@ -1,7 +1,7 @@
 #ifndef GAME_MAP
 #define GAME_MAP
 
-#include "Game_Stat.h"\
+#include "Game_Stat.h"
 #include "BObject.h"
 #include <fstream>
 
