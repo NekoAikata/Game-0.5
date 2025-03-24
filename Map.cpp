@@ -9,21 +9,21 @@ void GameMap::LoadMap (char* name)
 
     game_map.max_x = 0;
     game_map.max_y = 0;
-    for (int i = 0; i < MAX_MAP_X; i++)
+    for (int i = 0; i < MAX_MAP_Y; i++)
     {
-        for (int j = 0; j< MAX_MAP_Y; j++)
+        for (int j = 0; j< MAX_MAP_X; j++)
         {
             InputFile >> game_map.tile[i][j];
             int val = game_map.tile[i][j];
             if (val > 0)
             {
-                if (i > game_map.max_x)
+                if (i > game_map.max_y)
                 {
-                    game_map.max_x = i;
+                    game_map.max_y = i;
                 }
-                if (j > game_map.max_y)
+                if (j > game_map.max_x)
                 {
-                    game_map.max_y = j;
+                    game_map.max_x = j;
                 }
             }
         }
@@ -74,7 +74,7 @@ void GameMap::DrawMap (SDL_Renderer* screen)
         map_x = game_map.start_y/TILE_SIZE;
         for (int j =x1;j<x2;j+=TILE_SIZE)
         {
-            int val=game_map.tile[map_x][map_y];
+            int val=game_map.tile[map_y][map_x];
             if (val >0)
             {
                 TileMap[val].SetRect(j, i);

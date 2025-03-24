@@ -59,7 +59,7 @@ int main(int argc, char* argv[])
     }
 
     GameMap Game_map;
-    Game_map.LoadMap("map//map.dat");
+    Game_map.LoadMap("map/map.dat");
     Game_map.LoadTiles(renderer);
 
     bool quitG = false;
