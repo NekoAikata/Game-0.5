@@ -17,7 +17,7 @@ MainObject::~MainObject()
 
 }
 
-bool MainObject::LoadImg(std::string path, SDL_Renderer* screen) : BaseObject::LoadImg()
+bool MainObject::LoadImg(std::string path, SDL_Renderer* screen)
 {
     bool ret = BaseObject::LoadImg(path, screen);
 
@@ -74,24 +74,24 @@ void MainObject::Clip()
     }
 }
 
-MainObject::Show(SDL_Renderer* screen)
+bool MainObject::Show(SDL_Renderer* des)
 {
     if (status_character == UP)
     {
-        LoadImg( ,des);
+        LoadImg(" " ,des);
     }
 
     else if (status_character == LEFT)
     {
-        LoadImg( ,des);
+        LoadImg(" " ,des);
     }
 
     else if (status_character == RIGHT)
     {
-        LoadImg( ,des);
+        LoadImg(" " ,des);
     }
     else {
-        LoadImg( ,des);
+        LoadImg(" " ,des);
     }
 
     if (Store_action.left == 1 || Store_action.right == 1)
@@ -101,5 +101,44 @@ MainObject::Show(SDL_Renderer* screen)
     else{
         frame_num = 0;
     }
-    rect.x
+    rect.x = x_pos;
+    rect.y = y_pos;
+
+    SDL_Rect* current_clip = &frame_clip[frame_num];
+
+    SDL_Rect renderQuad = {rect.x, rect.y, width_frame, height_frame};
+    SDL_RenderCopy(des, texture, current_clip, &renderQuad);
+}
+
+void MainObject::HandleEvent(SDL_Event event, SDL_Renderer* screen)
+{
+    if(event.type == SDL_KEYDOWN)
+    {
+        switch (event.key.keysym.sym)
+        {
+        case SDLK_UP:
+            {
+                status_character = UP;
+                Store_action.up = 1;
+            }
+        case SDLK_DOWN:
+            {
+                status_character = DOWN;
+                Store_action.down = 1;
+            }
+        case SDLK_RIGHT:
+            {
+                status_character = RIGHT;
+                Store_action.right = 1;
+            }
+        case SDLK_LEFT:
+            {
+                status_character = LEFT;
+                Store_action.left = 1;
+            }
+        }
+    } else if(event.type == SDL_KEYUP)
+    {
+
+    }
 }

@@ -19,7 +19,7 @@ public:
     };
 
     bool LoadImg(std::string path, SDL_Renderer* screen);
-    bool Show(SDL_Renderer* design);
+    bool Show(SDL_Renderer* des);
     void HandleEvent(SDL_Event events, SDL_Renderer* screen);
     void Clip();
 
