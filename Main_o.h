@@ -33,7 +33,7 @@ private:
     int width_frame;
     int height_frame;
 
-    SDL_Rect frame_clip[8];
+    SDL_Rect frame_clip[6];
     Input_action Store_action;
     int frame_num;
     int status_character;

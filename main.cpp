@@ -34,7 +34,7 @@ bool InitDataSuccess()
 
 bool LoadBG()
 {
-    bool ret = background.LoadImg("Img//grass.png", renderer);
+    bool ret = background.LoadImg("img//grass.png", renderer);
     return ret;
 }
 
@@ -64,7 +64,7 @@ int main(int argc, char* argv[])
     Game_map.LoadTiles(renderer);
 
     MainObject Player1;
-    Player1.LoadImg("img//", renderer);
+    Player1.LoadImg("img//player_sdown.png", renderer);
     Player1.Clip();
 
     bool quitG = false;
@@ -84,8 +84,9 @@ int main(int argc, char* argv[])
         background.Render(renderer, NULL);
         Game_map.DrawMap(renderer);
 
-        SDL_RenderPresent(renderer);
         Player1.Show(renderer);
+
+        SDL_RenderPresent(renderer);
     }
     close();
     return 0;

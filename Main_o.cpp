@@ -23,7 +23,7 @@ bool MainObject::LoadImg(std::string path, SDL_Renderer* screen)
 
     if (ret)
     {
-        width_frame = rect.w/8;
+        width_frame = rect.w/6;
         height_frame = rect.h;
     }
 }
@@ -62,7 +62,7 @@ void MainObject::Clip()
         frame_clip[5].h = height_frame;
         frame_clip[5].w = width_frame;
 
-        frame_clip[6].x = 6*width_frame;
+        /*frame_clip[6].x = 6*width_frame;
         frame_clip[6].y = 0;
         frame_clip[6].h = height_frame;
         frame_clip[6].w = width_frame;
@@ -70,7 +70,7 @@ void MainObject::Clip()
         frame_clip[7].x = 7*width_frame;
         frame_clip[7].y = 0;
         frame_clip[7].h = height_frame;
-        frame_clip[7].w = width_frame;
+        frame_clip[7].w = width_frame;*/
     }
 }
 
@@ -78,27 +78,32 @@ bool MainObject::Show(SDL_Renderer* des)
 {
     if (status_character == UP)
     {
-        LoadImg(" " ,des);
+        LoadImg("img//player_up.png" ,des);
     }
 
     else if (status_character == LEFT)
     {
-        LoadImg(" " ,des);
+        LoadImg("img//player_left.png" ,des);
     }
 
     else if (status_character == RIGHT)
     {
-        LoadImg(" " ,des);
+        LoadImg("img//player_right.png" ,des);
     }
     else {
-        LoadImg(" " ,des);
+        LoadImg("img//player_down.png" ,des);
     }
 
-    if (Store_action.left == 1 || Store_action.right == 1)
+    if (Store_action.left == 1 || Store_action.right == 1 || Store_action.up == 1 || Store_action.down == 1)
     {
         frame_num++;
     }
     else{
+        frame_num = 0;
+    }
+
+    if (frame_num >= 6)
+    {
         frame_num = 0;
     }
     rect.x = x_pos;
@@ -120,25 +125,51 @@ void MainObject::HandleEvent(SDL_Event event, SDL_Renderer* screen)
             {
                 status_character = UP;
                 Store_action.up = 1;
+                break;
             }
         case SDLK_DOWN:
             {
                 status_character = DOWN;
                 Store_action.down = 1;
+                break;
             }
         case SDLK_RIGHT:
             {
                 status_character = RIGHT;
                 Store_action.right = 1;
+                break;
             }
         case SDLK_LEFT:
             {
                 status_character = LEFT;
                 Store_action.left = 1;
+                break;
             }
         }
     } else if(event.type == SDL_KEYUP)
     {
-
+        switch (event.key.keysym.sym)
+        {
+        case SDLK_UP:
+            {
+                Store_action.up = 0;
+                break;
+            }
+        case SDLK_DOWN:
+            {
+                Store_action.down = 0;
+                break;
+            }
+        case SDLK_RIGHT:
+            {
+                Store_action.right = 0;
+                break;
+            }
+        case SDLK_LEFT:
+            {
+                Store_action.left = 0;
+                break;
+            }
+        }
     }
 }

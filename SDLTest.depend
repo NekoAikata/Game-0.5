@@ -3,22 +3,23 @@
 	<iostream>
 	<SDL.h>
 
-1742842509 source:c:\users\admin\documents\code test\game 0.5\main.cpp
+1743089828 source:c:\users\admin\documents\code test\game 0.5\main.cpp
 	<iostream>
 	"Game_Stat.h"
 	"BObject.h"
 	"Map.h"
+	"Main_o.h"
 
 1742109564 c:\users\admin\documents\code test\game 0.5\game.h
 	<SDL.h>
 	<SDL_image.h>
 
-1742842495 c:\users\admin\documents\code test\game 0.5\game_stat.h
+1742846431 c:\users\admin\documents\code test\game 0.5\game_stat.h
 	<SDL.h>
 	<SDL_image.h>
 	<string>
 
-1742339147 c:\users\admin\documents\code test\game 0.5\bobject.h
+1742846431 c:\users\admin\documents\code test\game 0.5\bobject.h
 	"Game_Stat.h"
 	<string>
 
@@ -29,12 +30,12 @@
 	"Game_Stat.h"
 	<iostream>
 
-1742842042 c:\users\admin\documents\code test\game 0.5\map.h
+1742846426 c:\users\admin\documents\code test\game 0.5\map.h
 	"Game_Stat.h"
 	"BObject.h"
 	<fstream>
 
-1742842495 source:c:\users\admin\documents\code test\game 0.5\map.cpp
+1742846426 source:c:\users\admin\documents\code test\game 0.5\map.cpp
 	"Map.h"
 
 1742357048 source:d:\quoc anh\game-0.5\bobject.cpp
@@ -67,4 +68,11 @@
 1742870342 d:\quoc anh\game-0.5\main_o.h
 	"BObject.h"
 	"Game_Stat.h"
+
+1743085648 c:\users\admin\documents\code test\game 0.5\main_o.h
+	"BObject.h"
+	"Game_Stat.h"
+
+1743090177 source:c:\users\admin\documents\code test\game 0.5\main_o.cpp
+	"Main_o.h"
 
