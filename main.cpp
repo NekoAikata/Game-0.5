@@ -2,6 +2,7 @@
 #include "Game_Stat.h"
 #include "BObject.h"
 #include "Map.h"
+#include "Main_o.h"
 
 BaseObject background;
 
@@ -33,7 +34,7 @@ bool InitDataSuccess()
 
 bool LoadBG()
 {
-    bool ret = background.LoadImg("Img//grass.png", renderer);
+    bool ret = background.LoadImg("img//grass.png", renderer);
     return ret;
 }
 
@@ -62,6 +63,10 @@ int main(int argc, char* argv[])
     Game_map.LoadMap("map/map.dat");
     Game_map.LoadTiles(renderer);
 
+    MainObject Player1;
+    Player1.LoadImg("img//player_sdown.png", renderer);
+    Player1.Clip();
+
     bool quitG = false;
     while (!quitG)
     {
@@ -71,11 +76,19 @@ int main(int argc, char* argv[])
             {
                 quitG=true;
             }
+            Player1.HandleEvent(event, renderer);
         }
         SDL_SetRenderDrawColor(renderer, RENDER_DRAW_COLOR, RENDER_DRAW_COLOR, RENDER_DRAW_COLOR, RENDER_DRAW_COLOR);
         SDL_RenderClear(renderer);
 
         background.Render(renderer, NULL);
+        Map map_data = Game_map.GetMap();
+
+        Player1.SetMapXY(map_data.start_x, map_data.start_y);
+        Player1.DoPlayer(map_data);
+        Player1.Show(renderer);
+
+        Game_map.SetMap(map_data);
         Game_map.DrawMap(renderer);
 
         SDL_RenderPresent(renderer);
