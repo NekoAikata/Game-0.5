@@ -21,6 +21,7 @@ const int RENDER_DRAW_COLOR = 0xff;
 #define TILE_SIZE 64
 #define MAX_MAP_X 13
 #define MAX_MAP_Y 400
+#define BLANK_MAP 0
 
 struct Map
 {

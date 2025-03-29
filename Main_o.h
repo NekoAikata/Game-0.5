@@ -4,6 +4,7 @@
 #include "BObject.h"
 #include "Game_Stat.h"
 
+#define PLAYER_SPEED 0.5
 class MainObject : public BaseObject
 {
 public:
@@ -23,6 +24,11 @@ public:
     void HandleEvent(SDL_Event events, SDL_Renderer* screen);
     void Clip();
 
+    void DoPlayer(Map& map_data);
+    void CheckMap(Map& map_data);
+    void SetMapXY(const int x, const int y) {mapvalue_x = x; mapvalue_y = y;}
+    void MapMove(Map& map_data);
+
 private:
     float x_val;
     float y_val;
@@ -37,6 +43,9 @@ private:
     Input_action Store_action;
     int frame_num;
     int status_character;
+
+    int mapvalue_x;
+    int mapvalue_y;
 
 };
 

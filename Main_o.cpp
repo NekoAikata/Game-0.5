@@ -4,12 +4,18 @@ MainObject::MainObject()
 {
     x_val = 0;
     y_val = 0;
-    x_pos = 0;
-    y_pos = 0;
+    x_pos = 6*TILE_SIZE;
+    y_pos = TILE_SIZE;
     width_frame = 0;
     height_frame = 0;
     frame_num = 0;
     status_character = -1;
+    Store_action.down = 0;
+    Store_action.up = 0;
+    Store_action.left = 0;
+    Store_action.right = 0;
+    mapvalue_x = 0;
+    mapvalue_y = 0;
 }
 
 MainObject::~MainObject()
@@ -106,8 +112,8 @@ bool MainObject::Show(SDL_Renderer* des)
     {
         frame_num = 0;
     }
-    rect.x = x_pos;
-    rect.y = y_pos;
+    rect.x = x_pos - mapvalue_x;
+    rect.y = y_pos - mapvalue_y;
 
     SDL_Rect* current_clip = &frame_clip[frame_num];
 
@@ -171,5 +177,126 @@ void MainObject::HandleEvent(SDL_Event event, SDL_Renderer* screen)
                 break;
             }
         }
+    }
+}
+
+void MainObject::DoPlayer(Map& map_data)
+{
+    x_val = 0;
+    y_val = 0;
+    if (Store_action.left == 1)
+    {
+        x_val-=PLAYER_SPEED;
+    }
+    else if (Store_action.right == 1)
+    {
+        x_val+=PLAYER_SPEED;
+    }
+    else if (Store_action.up == 1)
+    {
+        y_val-=PLAYER_SPEED;
+    }
+    else if (Store_action.down == 1)
+    {
+        y_val+=PLAYER_SPEED;
+    }
+    CheckMap(map_data);
+    MapMove(map_data);
+}
+
+void MainObject::CheckMap(Map& map_data)
+{
+    int x1 = 0, x2 = 0;
+    int y1 = 0, y2 = 0;
+    //Check chieu ngang
+    int height_min = height_frame < TILE_SIZE ? height_frame : TILE_SIZE;
+    x1 = (x_pos + x_val)/TILE_SIZE;
+    x2 = (x_pos + x_val + width_frame - 1)/TILE_SIZE;
+    y1 = (y_pos)/TILE_SIZE;
+    y2 = (y_pos + height_min - 1)/TILE_SIZE;
+
+    if (x1 >=0 && x2 <= MAX_MAP_X && y1 >=0 && y2 <= MAX_MAP_Y)
+    {
+        if (x_val > 0)
+        {
+            if (map_data.tile[y1][x2] != BLANK_MAP || map_data.tile[y2][x2]!=BLANK_MAP)
+            {
+                x_pos = x2*TILE_SIZE - width_frame - 1;
+                x_val=0;
+            }
+        }
+        else if (x_val < 0)
+        {
+            if (map_data.tile[y1][x1] !=BLANK_MAP || map_data.tile[y2][x1]!=BLANK_MAP)
+            {
+                x_pos = (x1+1)*TILE_SIZE;
+                x_val = 0;
+            }
+        }
+    }
+    //Check chieu doc
+    int width_min = width_frame < TILE_SIZE ? width_frame : TILE_SIZE;
+    x1 = (x_pos)/TILE_SIZE;
+    x2 = (x_pos + width_min - 1)/TILE_SIZE;
+    y1 = (y_pos + y_val)/TILE_SIZE;
+    y2 = (y_pos + y_val + height_frame - 1)/TILE_SIZE;
+    if (x1 >=0 && x2 <= MAX_MAP_X && y1 >=0 && y2 <= MAX_MAP_Y)
+    {
+        if (y_val > 0)
+        {
+            if (map_data.tile[y2][x2] != BLANK_MAP || map_data.tile[y2][x1]!=BLANK_MAP)
+            {
+                y_pos = y2*TILE_SIZE - height_frame - 1;
+                y_val=0;
+            }
+        }
+        else if (y_val < 0)
+        {
+            if (map_data.tile[y1][x1]!=BLANK_MAP || map_data.tile[y1][x2]!=BLANK_MAP)
+            {
+                y_pos = (y1+1)*TILE_SIZE;
+                y_val = 0;
+            }
+        }
+    }
+    x_pos += x_val;
+    y_pos +=y_val;
+    if (x_pos < 0)
+    {
+        x_pos=0;
+    }
+    else if (x_pos + width_frame > map_data.max_x)
+    {
+        x_pos = map_data.max_x - width_frame - 1;
+    }
+    if (y_pos < 0)
+    {
+        y_pos=0;
+    }
+    else if (y_pos + height_frame > map_data.max_y)
+    {
+        y_pos = map_data.max_y - height_frame - 1;
+    }
+}
+
+void MainObject::MapMove(Map& map_data)
+{
+    map_data.start_x = x_pos - (SCREEN_WIDTH/2);
+    if (map_data.start_x < 0)
+    {
+        map_data.start_x = 0;
+    }
+    else if (map_data.start_x + SCREEN_WIDTH >= map_data.max_x)
+    {
+        map_data.start_x = map_data.max_x - SCREEN_WIDTH;
+    }
+    map_data.start_y = y_pos - (SCREEN_HEIGHT/2);
+    if (map_data.start_y < 0)
+    {
+        map_data.start_y = 0;
+    }
+    else if (map_data.start_y + SCREEN_HEIGHT >= map_data.max_y)
+    {
+        map_data.start_y = map_data.max_y - SCREEN_HEIGHT;
     }
 }

@@ -82,9 +82,14 @@ int main(int argc, char* argv[])
         SDL_RenderClear(renderer);
 
         background.Render(renderer, NULL);
-        Game_map.DrawMap(renderer);
+        Map map_data = Game_map.GetMap();
 
+        Player1.SetMapXY(map_data.start_x, map_data.start_y);
+        Player1.DoPlayer(map_data);
         Player1.Show(renderer);
+
+        Game_map.SetMap(map_data);
+        Game_map.DrawMap(renderer);
 
         SDL_RenderPresent(renderer);
     }
