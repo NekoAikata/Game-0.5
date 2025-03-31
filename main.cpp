@@ -3,6 +3,7 @@
 #include "BObject.h"
 #include "Map.h"
 #include "Main_o.h"
+#include "Timer.h"
 
 BaseObject background;
 
@@ -54,6 +55,7 @@ void close()
 
 int main(int argc, char* argv[])
 {
+    Timer game_timer;
     if (!InitDataSuccess() || !LoadBG())
     {
         return -1;
@@ -64,12 +66,13 @@ int main(int argc, char* argv[])
     Game_map.LoadTiles(renderer);
 
     MainObject Player1;
-    Player1.LoadImg("img//player_sdown.png", renderer);
+    Player1.LoadImg("img//player_down.png", renderer);
     Player1.Clip();
 
     bool quitG = false;
     while (!quitG)
     {
+        game_timer.start();
         while(SDL_PollEvent(&event) != 0)
         {
             if(event.type == SDL_QUIT)
@@ -87,11 +90,23 @@ int main(int argc, char* argv[])
         Player1.SetMapXY(map_data.start_x, map_data.start_y);
         Player1.DoPlayer(map_data);
         Player1.Show(renderer);
+        Player1.GetValue();
 
         Game_map.SetMap(map_data);
         Game_map.DrawMap(renderer);
 
         SDL_RenderPresent(renderer);
+        int real_timer = game_timer.get_tick();
+        int time_per_frame = 1000/FRAME_PER_SECOND;
+
+        if (real_timer < time_per_frame)
+        {
+            int delay_time = time_per_frame - real_timer;
+            if (delay_time >= 0)
+            {
+                SDL_Delay(delay_time);
+            }
+        }
     }
     close();
     return 0;

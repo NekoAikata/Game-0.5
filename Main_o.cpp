@@ -82,25 +82,11 @@ void MainObject::Clip()
 
 bool MainObject::Show(SDL_Renderer* des)
 {
-    if (status_character == UP)
-    {
-        LoadImg("img//player_up.png" ,des);
-    }
-
-    else if (status_character == LEFT)
-    {
-        LoadImg("img//player_left.png" ,des);
-    }
-
-    else if (status_character == RIGHT)
-    {
-        LoadImg("img//player_right.png" ,des);
-    }
-    else {
-        LoadImg("img//player_down.png" ,des);
-    }
-
-    if (Store_action.left == 1 || Store_action.right == 1 || Store_action.up == 1 || Store_action.down == 1)
+    UpdateImg(des);
+    if (Store_action.left == 1 ||
+        Store_action.right == 1 ||
+        Store_action.up == 1 ||
+        Store_action.down == 1)
     {
         frame_num++;
     }
@@ -131,24 +117,28 @@ void MainObject::HandleEvent(SDL_Event event, SDL_Renderer* screen)
             {
                 status_character = UP;
                 Store_action.up = 1;
+                Store_action.down = 0;
                 break;
             }
         case SDLK_DOWN:
             {
                 status_character = DOWN;
                 Store_action.down = 1;
+                Store_action.up = 0;
                 break;
             }
         case SDLK_RIGHT:
             {
                 status_character = RIGHT;
                 Store_action.right = 1;
+                Store_action.left = 0;
                 break;
             }
         case SDLK_LEFT:
             {
                 status_character = LEFT;
                 Store_action.left = 1;
+                Store_action.right = 0;
                 break;
             }
         }
@@ -180,6 +170,27 @@ void MainObject::HandleEvent(SDL_Event event, SDL_Renderer* screen)
     }
 }
 
+void MainObject::UpdateImg(SDL_Renderer* des)
+{
+    if (status_character == UP)
+    {
+        LoadImg("img//player_up.png" ,des);
+    }
+
+    else if (status_character == LEFT)
+    {
+        LoadImg("img//player_left.png" ,des);
+    }
+
+    else if (status_character == RIGHT)
+    {
+        LoadImg("img//player_right.png" ,des);
+    }
+    else {
+        LoadImg("img//player_down.png" ,des);
+    }
+}
+
 void MainObject::DoPlayer(Map& map_data)
 {
     x_val = 0;
@@ -188,15 +199,15 @@ void MainObject::DoPlayer(Map& map_data)
     {
         x_val-=PLAYER_SPEED;
     }
-    else if (Store_action.right == 1)
+    if (Store_action.right == 1)
     {
         x_val+=PLAYER_SPEED;
     }
-    else if (Store_action.up == 1)
+    if (Store_action.up == 1)
     {
         y_val-=PLAYER_SPEED;
     }
-    else if (Store_action.down == 1)
+    if (Store_action.down == 1)
     {
         y_val+=PLAYER_SPEED;
     }

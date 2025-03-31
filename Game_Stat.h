@@ -4,11 +4,13 @@
 #include <SDL.h>
 #include <SDL_image.h>
 #include <string>
+#include <iostream>
 
 static SDL_Window* window = NULL;
 static SDL_Renderer* renderer = NULL;
 static SDL_Event event;
 
+const int FRAME_PER_SECOND = 50;
 const int SCREEN_WIDTH = 832;
 const int SCREEN_HEIGHT = 1024;
 const int BPP = 32;
