@@ -3,10 +3,11 @@
 
 #include "BObject.h"
 #include "Game_Stat.h"
-#include <vector>
-#include <algorithm>
+#include "Slash.h"
 
 #define PLAYER_SPEED 6
+#define PLAYER_ATTACK 1500
+
 class MainObject : public BaseObject
 {
 public:
@@ -34,6 +35,7 @@ public:
     void GetValue() {std::cout << y_pos << std::endl;}
 
 private:
+    Slash Basic_attack;
     float x_val;
     float y_val;
 

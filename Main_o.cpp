@@ -109,62 +109,74 @@ bool MainObject::Show(SDL_Renderer* des)
 
 void MainObject::HandleEvent(SDL_Event event, SDL_Renderer* screen)
 {
+    Timer Cooldown_check
     if(event.type == SDL_KEYDOWN)
     {
         switch (event.key.keysym.sym)
         {
-        case SDLK_UP:
+        case SDLK_w:
             {
                 status_character = UP;
                 Store_action.up = 1;
                 Store_action.down = 0;
                 break;
             }
-        case SDLK_DOWN:
+        case SDLK_s:
             {
                 status_character = DOWN;
                 Store_action.down = 1;
                 Store_action.up = 0;
                 break;
             }
-        case SDLK_RIGHT:
+        case SDLK_d:
             {
                 status_character = RIGHT;
                 Store_action.right = 1;
                 Store_action.left = 0;
                 break;
             }
-        case SDLK_LEFT:
+        case SDLK_a:
             {
                 status_character = LEFT;
                 Store_action.left = 1;
                 Store_action.right = 0;
                 break;
             }
+        case SDLK_j:
+            {
+                Slash* Attack = new Slash();
+                Attack ->LoadImg(" ",screen);
+                Attack ->SetRect(this ->rect.x, this->rect.y)
+                Attack ->set_attack(true);
+            }
         }
     } else if(event.type == SDL_KEYUP)
     {
         switch (event.key.keysym.sym)
         {
-        case SDLK_UP:
+        case SDLK_w:
             {
                 Store_action.up = 0;
                 break;
             }
-        case SDLK_DOWN:
+        case SDLK_s:
             {
                 Store_action.down = 0;
                 break;
             }
-        case SDLK_RIGHT:
+        case SDLK_d:
             {
                 Store_action.right = 0;
                 break;
             }
-        case SDLK_LEFT:
+        case SDLK_a:
             {
                 Store_action.left = 0;
                 break;
+            }
+        case SDLK_j:
+            {
+
             }
         }
     }

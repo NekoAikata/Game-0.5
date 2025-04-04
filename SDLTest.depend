@@ -40,36 +40,38 @@
 1743408866 source:c:\users\admin\documents\code test\game 0.5\map.cpp
 	"Map.h"
 
-1742357048 source:d:\quoc anh\game-0.5\bobject.cpp
+1743464953 source:d:\quoc anh\game-0.5\bobject.cpp
 	"BObject.h"
 
 1742864368 d:\quoc anh\game-0.5\bobject.h
 	"Game_Stat.h"
 	<string>
 
-1742864368 d:\quoc anh\game-0.5\game_stat.h
+1743465268 d:\quoc anh\game-0.5\game_stat.h
 	<SDL.h>
 	<SDL_image.h>
 	<string>
+	<iostream>
 
 1742257657 source:d:\quoc anh\game-0.5\game_stat.cpp
 	"Game_Stat.h"
 	<iostream>
 
-1742864368 source:d:\quoc anh\game-0.5\map.cpp
+1743464953 source:d:\quoc anh\game-0.5\map.cpp
 	"Map.h"
 
-1742864368 d:\quoc anh\game-0.5\map.h
+1743464914 d:\quoc anh\game-0.5\map.h
 	"Game_Stat.h"
 	"BObject.h"
 	<fstream>
 
-1742870377 source:d:\quoc anh\game-0.5\main_o.cpp
+1743464953 source:d:\quoc anh\game-0.5\main_o.cpp
 	"Main_o.h"
 
-1742870342 d:\quoc anh\game-0.5\main_o.h
+1743466765 d:\quoc anh\game-0.5\main_o.h
 	"BObject.h"
 	"Game_Stat.h"
+	"Slash.h"
 
 1743428901 c:\users\admin\documents\code test\game 0.5\main_o.h
 	"BObject.h"
@@ -85,4 +87,22 @@
 	"Game_Stat.h"
 
 1743409958 c:\users\admin\documents\code test\game 0.5\timer.h
+
+1743464953 source:d:\quoc anh\game-0.5\main.cpp
+	<iostream>
+	"Game_Stat.h"
+	"BObject.h"
+	"Map.h"
+	"Main_o.h"
+	"Timer.h"
+
+1743464953 d:\quoc anh\game-0.5\timer.h
+
+1743464953 source:d:\quoc anh\game-0.5\timer.cpp
+	"Timer.h"
+	"Game_Stat.h"
+
+1743466776 d:\quoc anh\game-0.5\slash.h
+	"Game_Stat.h"
+	"BObject.h"
 
