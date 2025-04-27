@@ -10,7 +10,7 @@ static SDL_Window* window = NULL;
 static SDL_Renderer* renderer = NULL;
 static SDL_Event event;
 
-const int FRAME_PER_SECOND = 50;
+const int FRAME_PER_SECOND = 24;
 const int SCREEN_WIDTH = 640;
 const int SCREEN_HEIGHT = 704;
 const int BPP = 32;
@@ -23,7 +23,9 @@ const int RENDER_DRAW_COLOR = 0xff;
 #define TILE_SIZE 64
 #define MAX_MAP_X 13
 #define MAX_MAP_Y 400
+
 #define BLANK_MAP 0
+#define TREASURE 4
 
 struct Map
 {

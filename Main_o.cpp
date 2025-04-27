@@ -1,4 +1,5 @@
 #include "Main_o.h"
+#include "Timer.h"
 
 MainObject::MainObject()
 {
@@ -16,6 +17,7 @@ MainObject::MainObject()
     Store_action.right = 0;
     mapvalue_x = 0;
     mapvalue_y = 0;
+    frame_delay = 0;
 }
 
 MainObject::~MainObject()
@@ -29,9 +31,16 @@ bool MainObject::LoadImg(std::string path, SDL_Renderer* screen)
 
     if (ret)
     {
-        width_frame = rect.w/6;
         height_frame = rect.h;
+        if (BasicAttack.get_status())
+        {
+            width_frame = rect.w/4;
+        } else
+        {
+            width_frame = rect.w/6;
+        }
     }
+
 }
 
 void MainObject::Clip()
@@ -67,16 +76,6 @@ void MainObject::Clip()
         frame_clip[5].y = 0;
         frame_clip[5].h = height_frame;
         frame_clip[5].w = width_frame;
-
-        /*frame_clip[6].x = 6*width_frame;
-        frame_clip[6].y = 0;
-        frame_clip[6].h = height_frame;
-        frame_clip[6].w = width_frame;
-
-        frame_clip[7].x = 7*width_frame;
-        frame_clip[7].y = 0;
-        frame_clip[7].h = height_frame;
-        frame_clip[7].w = width_frame;*/
     }
 }
 
@@ -86,15 +85,21 @@ bool MainObject::Show(SDL_Renderer* des)
     if (Store_action.left == 1 ||
         Store_action.right == 1 ||
         Store_action.up == 1 ||
-        Store_action.down == 1)
+        Store_action.down == 1 ||
+        BasicAttack.get_status())
     {
-        frame_num++;
+        frame_delay++;
+        if (frame_delay >= FRAME_DELAY)
+        {
+            frame_delay = 0;
+            frame_num++;
+        }
     }
     else{
         frame_num = 0;
     }
 
-    if (frame_num >= 6)
+    if (frame_num >= 6 || (frame_num >=4 && BasicAttack.get_status()))
     {
         frame_num = 0;
     }
@@ -109,7 +114,6 @@ bool MainObject::Show(SDL_Renderer* des)
 
 void MainObject::HandleEvent(SDL_Event event, SDL_Renderer* screen)
 {
-    Timer Cooldown_check
     if(event.type == SDL_KEYDOWN)
     {
         switch (event.key.keysym.sym)
@@ -144,10 +148,7 @@ void MainObject::HandleEvent(SDL_Event event, SDL_Renderer* screen)
             }
         case SDLK_j:
             {
-                Slash* Attack = new Slash();
-                Attack ->LoadImg(" ",screen);
-                Attack ->SetRect(this ->rect.x, this->rect.y)
-                Attack ->set_attack(true);
+                BasicAttack.set_attack(true);
             }
         }
     } else if(event.type == SDL_KEYUP)
@@ -176,7 +177,7 @@ void MainObject::HandleEvent(SDL_Event event, SDL_Renderer* screen)
             }
         case SDLK_j:
             {
-
+                BasicAttack.set_attack(false);
             }
         }
     }
@@ -186,20 +187,32 @@ void MainObject::UpdateImg(SDL_Renderer* des)
 {
     if (status_character == UP)
     {
-        LoadImg("img//player_up.png" ,des);
+        if (BasicAttack.get_status()){
+            LoadImg("img//player_slashup.png" ,des);
+        }
+        else {LoadImg("img//player_up.png" ,des);}
     }
 
     else if (status_character == LEFT)
     {
-        LoadImg("img//player_left.png" ,des);
+        if (BasicAttack.get_status()){
+            LoadImg("img//player_slashleft.png" ,des);
+        }
+        else {LoadImg("img//player_left.png" ,des);}
     }
 
     else if (status_character == RIGHT)
     {
-        LoadImg("img//player_right.png" ,des);
+        if (BasicAttack.get_status()){
+            LoadImg("img//player_slashright.png" ,des);
+        }
+        else {LoadImg("img//player_right.png" ,des);}
     }
     else {
-        LoadImg("img//player_down.png" ,des);
+        if (BasicAttack.get_status()){
+            LoadImg("img//player_slashdown.png" ,des);
+        }
+        else {LoadImg("img//player_down.png" ,des);}
     }
 }
 
@@ -238,22 +251,43 @@ void MainObject::CheckMap(Map& map_data)
     y1 = (y_pos)/TILE_SIZE;
     y2 = (y_pos + height_min - 1)/TILE_SIZE;
 
+    int val1 = map_data.tile[y1][x2];
+    int val2 = map_data.tile[y2][x2];
+    int val3 = map_data.tile[y1][x1];
+    int val4 = map_data.tile[y2][x1];
+
     if (x1 >=0 && x2 <= MAX_MAP_X && y1 >=0 && y2 <= MAX_MAP_Y)
     {
         if (x_val > 0)
         {
-            if (map_data.tile[y1][x2] != BLANK_MAP || map_data.tile[y2][x2]!=BLANK_MAP)
+            if (val1 == TREASURE || val2 == TREASURE)
             {
-                x_pos = x2*TILE_SIZE - width_frame - 1;
-                x_val=0;
+                map_data.tile[y1][x2] = BLANK_MAP;
+                map_data.tile[y2][x2] = BLANK_MAP;
+            }
+            else
+            {
+                if (val1 != BLANK_MAP || val2 !=BLANK_MAP)
+                {
+                    x_pos = x2*TILE_SIZE - width_frame - 1;
+                    x_val=0;
+                }
             }
         }
         else if (x_val < 0)
         {
-            if (map_data.tile[y1][x1] !=BLANK_MAP || map_data.tile[y2][x1]!=BLANK_MAP)
+            if (val3 == TREASURE || val4 == TREASURE)
             {
-                x_pos = (x1+1)*TILE_SIZE;
-                x_val = 0;
+                map_data.tile[y1][x1] = BLANK_MAP;
+                map_data.tile[y2][x1] = BLANK_MAP;
+            }
+            else
+            {
+                if (val3 !=BLANK_MAP || val4 !=BLANK_MAP)
+                {
+                    x_pos = (x1+1)*TILE_SIZE;
+                    x_val = 0;
+                }
             }
         }
     }
@@ -263,22 +297,44 @@ void MainObject::CheckMap(Map& map_data)
     x2 = (x_pos + width_min - 1)/TILE_SIZE;
     y1 = (y_pos + y_val)/TILE_SIZE;
     y2 = (y_pos + y_val + height_frame - 1)/TILE_SIZE;
+
+    val1 = map_data.tile[y1][x2];
+    val2 = map_data.tile[y2][x2];
+    val3 = map_data.tile[y1][x1];
+    val4 = map_data.tile[y2][x1];
+
     if (x1 >=0 && x2 <= MAX_MAP_X && y1 >=0 && y2 <= MAX_MAP_Y)
     {
         if (y_val > 0)
         {
-            if (map_data.tile[y2][x2] != BLANK_MAP || map_data.tile[y2][x1]!=BLANK_MAP)
+            if (val2 == TREASURE || val4 == TREASURE)
             {
-                y_pos = y2*TILE_SIZE - height_frame - 1;
-                y_val=0;
+                map_data.tile[y2][x2] = BLANK_MAP;
+                map_data.tile[y2][x1] = BLANK_MAP;
+            }
+            else
+            {
+                if (val2 != BLANK_MAP || val4 !=BLANK_MAP)
+                {
+                    y_pos = y2*TILE_SIZE - height_frame - 1;
+                    y_val=0;
+                }
             }
         }
         else if (y_val < 0)
         {
-            if (map_data.tile[y1][x1]!=BLANK_MAP || map_data.tile[y1][x2]!=BLANK_MAP)
+            if (val1 == TREASURE || val3 == TREASURE)
             {
-                y_pos = (y1+1)*TILE_SIZE;
-                y_val = 0;
+                map_data.tile[y1][x1] = BLANK_MAP;
+                map_data.tile[y1][x2] = BLANK_MAP;
+            }
+            else
+            {
+                if (val1 !=BLANK_MAP || val3 !=BLANK_MAP)
+                {
+                    y_pos = (y1+1)*TILE_SIZE;
+                    y_val = 0;
+                }
             }
         }
     }

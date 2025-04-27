@@ -11,6 +11,7 @@ public:
     ~Slash();
 
     void set_attack (bool check) {is_attack = check;};
+    bool get_status () {return is_attack;}
 
 private:
     bool is_attack;

@@ -7,6 +7,7 @@
 
 #define PLAYER_SPEED 6
 #define PLAYER_ATTACK 1500
+#define FRAME_DELAY 3
 
 class MainObject : public BaseObject
 {
@@ -34,8 +35,10 @@ public:
     void MapMove(Map& map_data);
     void GetValue() {std::cout << y_pos << std::endl;}
 
+    int frame_delay;
+
 private:
-    Slash Basic_attack;
+    Slash BasicAttack;
     float x_val;
     float y_val;
 
