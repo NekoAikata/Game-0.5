@@ -185,7 +185,7 @@ void MainObject::HandleEvent(SDL_Event event, SDL_Renderer* screen)
 
 void MainObject::UpdateImg(SDL_Renderer* des)
 {
-    if (status_character == UP)
+    if (Store_action.up == 1)
     {
         if (BasicAttack.get_status()){
             LoadImg("img//player_slashup.png" ,des);
@@ -193,26 +193,57 @@ void MainObject::UpdateImg(SDL_Renderer* des)
         else {LoadImg("img//player_up.png" ,des);}
     }
 
-    else if (status_character == LEFT)
+    else if (Store_action.down == 1)
     {
         if (BasicAttack.get_status()){
-            LoadImg("img//player_slashleft.png" ,des);
+            LoadImg("img//player_slashdown.png" ,des);
         }
-        else {LoadImg("img//player_left.png" ,des);}
+        else {LoadImg("img//player_down.png" ,des);}
     }
 
-    else if (status_character == RIGHT)
+    else if (Store_action.right == 1)
     {
         if (BasicAttack.get_status()){
             LoadImg("img//player_slashright.png" ,des);
         }
         else {LoadImg("img//player_right.png" ,des);}
     }
-    else {
+    else if (Store_action.left == 1){
         if (BasicAttack.get_status()){
-            LoadImg("img//player_slashdown.png" ,des);
+            LoadImg("img//player_slashleft.png" ,des);
         }
-        else {LoadImg("img//player_down.png" ,des);}
+        else {LoadImg("img//player_left.png" ,des);}
+    } else
+    {
+        if (status_character == UP)
+        {
+            if (BasicAttack.get_status()){
+                LoadImg("img//player_slashup.png" ,des);
+            }
+            else {LoadImg("img//player_up.png" ,des);}
+        }
+
+        else if (status_character == LEFT)
+        {
+            if (BasicAttack.get_status()){
+                LoadImg("img//player_slashleft.png" ,des);
+            }
+            else {LoadImg("img//player_left.png" ,des);}
+        }
+
+        else if (status_character == RIGHT)
+        {
+            if (BasicAttack.get_status()){
+                LoadImg("img//player_slashright.png" ,des);
+            }
+            else {LoadImg("img//player_right.png" ,des);}
+        }
+        else {
+            if (BasicAttack.get_status()){
+                LoadImg("img//player_slashdown.png" ,des);
+            }
+            else {LoadImg("img//player_down.png" ,des);}
+        }
     }
 }
 

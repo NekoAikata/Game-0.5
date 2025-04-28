@@ -3,23 +3,24 @@
 	<iostream>
 	<SDL.h>
 
-1745729178 source:c:\users\admin\documents\code test\game 0.5\main.cpp
-	<iostream>
+1745847882 source:c:\users\admin\documents\code test\game 0.5\main.cpp
 	"Game_Stat.h"
 	"BObject.h"
 	"Map.h"
 	"Main_o.h"
 	"Timer.h"
+	"ThreatObject.h"
 
 1742109564 c:\users\admin\documents\code test\game 0.5\game.h
 	<SDL.h>
 	<SDL_image.h>
 
-1745764172 c:\users\admin\documents\code test\game 0.5\game_stat.h
+1745846678 c:\users\admin\documents\code test\game 0.5\game_stat.h
 	<SDL.h>
 	<SDL_image.h>
 	<string>
 	<iostream>
+	<vector>
 
 1743407938 c:\users\admin\documents\code test\game 0.5\bobject.h
 	"Game_Stat.h"
@@ -73,12 +74,12 @@
 	"Game_Stat.h"
 	"Slash.h"
 
-1745731545 c:\users\admin\documents\code test\game 0.5\main_o.h
+1745847815 c:\users\admin\documents\code test\game 0.5\main_o.h
 	"BObject.h"
 	"Game_Stat.h"
 	"Slash.h"
 
-1745764431 source:c:\users\admin\documents\code test\game 0.5\main_o.cpp
+1745845012 source:c:\users\admin\documents\code test\game 0.5\main_o.cpp
 	"Main_o.h"
 	"Timer.h"
 
@@ -112,4 +113,11 @@
 
 1745331089 source:c:\users\admin\documents\code test\game 0.5\slash.cpp
 	"Slash.h"
+
+1745847882 source:c:\users\admin\documents\code test\game 0.5\threatobject.cpp
+	"ThreatObject.h"
+
+1745848272 c:\users\admin\documents\code test\game 0.5\threatobject.h
+	"BObject.h"
+	"Game_Stat.h"
 

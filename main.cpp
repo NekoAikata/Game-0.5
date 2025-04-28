@@ -1,9 +1,9 @@
-#include <iostream>
 #include "Game_Stat.h"
 #include "BObject.h"
 #include "Map.h"
 #include "Main_o.h"
 #include "Timer.h"
+#include "ThreatObject.h"
 
 BaseObject background;
 
@@ -53,6 +53,28 @@ void close()
     SDL_Quit();
 }
 
+std::vector<ThreatObject*> MakeThreatList ()
+{
+    std::vector<ThreatObject*> list_threats;
+
+    ThreatObject* threats = new ThreatObject[20];
+
+    for (int i =0; i < 20;i++)
+    {
+        ThreatObject* p_threat = (threats + i);
+        if (p_threat != NULL)
+        {
+            p_threat->LoadImg("img//threat_slime.png",renderer);
+            p_threat->Clip();
+            p_threat->SetXpos(128);
+            p_threat->SetYpos(700+i*1200);
+
+            list_threats.push_back(p_threat);
+        }
+    }
+    return list_threats;
+}
+
 int main(int argc, char* argv[])
 {
     Timer game_timer;
@@ -68,6 +90,8 @@ int main(int argc, char* argv[])
     MainObject Player1;
     Player1.LoadImg("img//player_down.png", renderer);
     Player1.Clip();
+
+    std::vector <ThreatObject*> list_threats = MakeThreatList();
 
     bool quitG = false;
     while (!quitG)
@@ -90,10 +114,20 @@ int main(int argc, char* argv[])
         Player1.SetMapXY(map_data.start_x, map_data.start_y);
         Player1.DoPlayer(map_data);
         Player1.Show(renderer);
-        Player1.GetValue();
 
         Game_map.SetMap(map_data);
         Game_map.DrawMap(renderer);
+
+        for (int i = 0;i < list_threats.size(); i++)
+        {
+            ThreatObject* threat_object = list_threats[i];
+            if (threat_object != NULL)
+            {
+                threat_object->SetMapXY(map_data.start_x, map_data.start_y);
+                threat_object->DoThreat(map_data);
+                threat_object->Show(renderer);
+            }
+        }
 
         SDL_RenderPresent(renderer);
         int real_timer = game_timer.get_tick();

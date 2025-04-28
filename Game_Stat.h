@@ -5,6 +5,7 @@
 #include <SDL_image.h>
 #include <string>
 #include <iostream>
+#include <vector>
 
 static SDL_Window* window = NULL;
 static SDL_Renderer* renderer = NULL;

@@ -33,7 +33,6 @@ public:
     void CheckMap(Map& map_data);
     void SetMapXY(const int x, const int y) {mapvalue_x = x; mapvalue_y = y;}
     void MapMove(Map& map_data);
-    void GetValue() {std::cout << y_pos << std::endl;}
 
     int frame_delay;
 

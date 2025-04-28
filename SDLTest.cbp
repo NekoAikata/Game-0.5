@@ -42,8 +42,8 @@
 		<Unit filename="Map.h" />
 		<Unit filename="Slash.cpp" />
 		<Unit filename="Slash.h" />
-		<Unit filename="Threat.cpp" />
-		<Unit filename="Threat.h" />
+		<Unit filename="ThreatObject.cpp" />
+		<Unit filename="ThreatObject.h" />
 		<Unit filename="Timer.cpp" />
 		<Unit filename="Timer.h" />
 		<Unit filename="main.cpp" />
