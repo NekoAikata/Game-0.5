@@ -10,7 +10,7 @@ MainObject::MainObject()
     width_frame = 0;
     height_frame = 0;
     frame_num = 0;
-    status_character = -1;
+    status_character = DOWN;
     Store_action.down = 0;
     Store_action.up = 0;
     Store_action.left = 0;
@@ -18,6 +18,7 @@ MainObject::MainObject()
     mapvalue_x = 0;
     mapvalue_y = 0;
     frame_delay = 0;
+    HP = 1000;
 }
 
 MainObject::~MainObject()
@@ -149,6 +150,7 @@ void MainObject::HandleEvent(SDL_Event event, SDL_Renderer* screen)
         case SDLK_j:
             {
                 BasicAttack.set_attack(true);
+                BasicAttack.LoadImg("img//Slash.PNG", screen);
             }
         }
     } else if(event.type == SDL_KEYUP)
@@ -180,6 +182,27 @@ void MainObject::HandleEvent(SDL_Event event, SDL_Renderer* screen)
                 BasicAttack.set_attack(false);
             }
         }
+    }
+}
+
+void MainObject::HandleSlash(SDL_Renderer* screen)
+{
+    if (frame_num == 1 && BasicAttack.get_status())
+    {
+        if (Store_action.up == 1 || status_character == UP)
+        {
+            BasicAttack.SetRect(this->rect.x, this->rect.y - 25);
+        } else if (Store_action.down == 1 || status_character == DOWN)
+        {
+            BasicAttack.SetRect(this->rect.x, this->rect.y + height_frame - 30);
+        } else if (Store_action.left == 1 || status_character == LEFT)
+        {
+            BasicAttack.SetRect(this->rect.x - 25, this->rect.y);
+        } else
+        {
+            BasicAttack.SetRect(this->rect.x + width_frame - 30, this->rect.y);
+        }
+        BasicAttack.Render(screen);
     }
 }
 
@@ -247,7 +270,7 @@ void MainObject::UpdateImg(SDL_Renderer* des)
     }
 }
 
-void MainObject::DoPlayer(Map& map_data)
+void MainObject::DoPlayer(Map& map_data, bool TCol)
 {
     x_val = 0;
     y_val = 0;
@@ -267,11 +290,11 @@ void MainObject::DoPlayer(Map& map_data)
     {
         y_val+=PLAYER_SPEED;
     }
-    CheckMap(map_data);
+    CheckMap(map_data, TCol);
     MapMove(map_data);
 }
 
-void MainObject::CheckMap(Map& map_data)
+void MainObject::CheckMap(Map& map_data, bool TCol)
 {
     int x1 = 0, x2 = 0;
     int y1 = 0, y2 = 0;
@@ -298,9 +321,9 @@ void MainObject::CheckMap(Map& map_data)
             }
             else
             {
-                if (val1 != BLANK_MAP || val2 !=BLANK_MAP)
+                if (val1 != BLANK_MAP || val2 !=BLANK_MAP || TCol)
                 {
-                    x_pos = x2*TILE_SIZE - width_frame - 1;
+                    x_pos = x2*TILE_SIZE - width_frame - 15;
                     x_val=0;
                 }
             }
@@ -369,8 +392,9 @@ void MainObject::CheckMap(Map& map_data)
             }
         }
     }
-    x_pos += x_val;
-    y_pos +=y_val;
+    x_pos+=x_val;
+    y_pos+=y_val;
+
     if (x_pos < 0)
     {
         x_pos=0;
@@ -409,4 +433,15 @@ void MainObject::MapMove(Map& map_data)
     {
         map_data.start_y = map_data.max_y - SCREEN_HEIGHT;
     }
+}
+
+SDL_Rect MainObject::GetRectP()
+{
+    SDL_Rect RETURN;
+    RETURN.x = rect.x;
+    RETURN.y = rect.y;
+    RETURN.w = width_frame;
+    RETURN.h = height_frame;
+
+    return RETURN;
 }

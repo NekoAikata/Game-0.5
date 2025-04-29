@@ -8,11 +8,6 @@
 class ThreatObject : public BaseObject
 {
     public:
-    enum Type_threat
-    {
-        STATIC = 0,
-        DYNAMIC = 1
-    };
     ThreatObject();
     ~ThreatObject();
 

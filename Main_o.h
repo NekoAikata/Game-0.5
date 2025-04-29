@@ -29,12 +29,17 @@ public:
     void UpdateImg(SDL_Renderer* screen);
     void Clip();
 
-    void DoPlayer(Map& map_data);
-    void CheckMap(Map& map_data);
+    void DoPlayer(Map& map_data, bool TCol);
+    void CheckMap(Map& map_data, bool TCol);
     void SetMapXY(const int x, const int y) {mapvalue_x = x; mapvalue_y = y;}
     void MapMove(Map& map_data);
 
+    void HandleSlash (SDL_Renderer* screen);
+    Slash* GetSlash () {return &BasicAttack;}
+    SDL_Rect GetRectP();
     int frame_delay;
+
+    int HP;
 
 private:
     Slash BasicAttack;

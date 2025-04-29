@@ -65,9 +65,9 @@ std::vector<ThreatObject*> MakeThreatList ()
         {
             p_threat->LoadImg("img//threat_slime.png",renderer);
             p_threat->Clip();
-            p_threat->SetType(ThreatObject::DYNAMIC);
+            p_threat->SetType(1);
             p_threat->SetXpos(128*3);
-            p_threat->SetYpos(700+i*1200);
+            p_threat->SetYpos(640*i);
             p_threat->SetBorderX(128*2,128*4);
             p_threat->SetInputL(1);
             list_threats.push_back(p_threat);
@@ -83,8 +83,10 @@ std::vector<ThreatObject*> MakeThreatList ()
         {
             p_threat->LoadImg("img//threat_slime.png",renderer);
             p_threat->Clip();
-            p_threat->SetXpos(128);
-            p_threat->SetYpos(700+i*1200);
+            p_threat->SetXpos(128*3);
+            p_threat->SetInputL(0);
+            p_threat->SetType(0);
+            p_threat->SetYpos(640*i+256);
 
             list_threats.push_back(p_threat);
         }
@@ -128,12 +130,8 @@ int main(int argc, char* argv[])
         background.Render(renderer, NULL);
         Map map_data = Game_map.GetMap();
 
+        Player1.HandleSlash(renderer);
         Player1.SetMapXY(map_data.start_x, map_data.start_y);
-        Player1.DoPlayer(map_data);
-        Player1.Show(renderer);
-
-        Game_map.SetMap(map_data);
-        Game_map.DrawMap(renderer);
 
         for (int i = 0;i < list_threats.size(); i++)
         {
@@ -146,6 +144,45 @@ int main(int argc, char* argv[])
                 threat_object->Show(renderer);
             }
         }
+        bool checkTCol = false;
+        for (int i=0; i < list_threats.size(); ++i)
+        {
+            ThreatObject* threat_check = list_threats[i];
+            if (threat_check != NULL)
+            {
+                SDL_Rect TRect;
+                    TRect.x = threat_check->GetRect().x;
+                    TRect.y = threat_check->GetRect().y;
+                    TRect.w = threat_check->GetWidthFrame();
+                    TRect.h = threat_check->GetHeightFrame();
+
+                Slash* SCheck = Player1.GetSlash();
+                if (SCheck != NULL)
+                {
+                    SDL_Rect SRect = SCheck->GetRect();
+                    bool check = Common_Func::CheckCollision(TRect, SRect);
+
+                    if(check)
+                    {
+                        list_threats[i]->Free();
+                        list_threats.erase(list_threats.begin() + i);
+                    }
+                }
+                if (&Player1 != NULL)
+                {
+                    SDL_Rect PRect = Player1.GetRectP();
+                    if (Common_Func::CheckCollision(PRect, TRect))
+                    {
+                        checkTCol = true;
+                    }
+                }
+            }
+        }
+        std::cout << Player1.HP << std::endl;
+        Player1.DoPlayer(map_data,checkTCol);
+        Player1.Show(renderer);
+        Game_map.SetMap(map_data);
+        Game_map.DrawMap(renderer);
 
         SDL_RenderPresent(renderer);
         int real_timer = game_timer.get_tick();

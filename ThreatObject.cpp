@@ -13,10 +13,11 @@ ThreatObject::ThreatObject()
     mapvalue_x;
     mapvalue_y;
 
-    type = STATIC;
+    type = 0;
     animation_left = 0;
     animation_right = 0;
     Input_type.left = 0;
+    Input_type.right = 0;
 }
 
 ThreatObject::~ThreatObject ()
@@ -128,35 +129,19 @@ void ThreatObject::CheckMap (Map& map_data)
     {
         if (x_val > 0)
         {
-            if (val1 == TREASURE || val2 == TREASURE)
-            {
-                map_data.tile[y1][x2] = BLANK_MAP;
-                map_data.tile[y2][x2] = BLANK_MAP;
-            }
-            else
-            {
                 if (val1 != BLANK_MAP || val2 !=BLANK_MAP)
                 {
                     x_pos = x2*TILE_SIZE - width_frame - 1;
                     x_val=0;
                 }
-            }
         }
         else if (x_val < 0)
         {
-            if (val3 == TREASURE || val4 == TREASURE)
-            {
-                map_data.tile[y1][x1] = BLANK_MAP;
-                map_data.tile[y2][x1] = BLANK_MAP;
-            }
-            else
-            {
                 if (val3 !=BLANK_MAP || val4 !=BLANK_MAP)
                 {
                     x_pos = (x1+1)*TILE_SIZE;
                     x_val = 0;
                 }
-            }
         }
     }
     //Check chieu doc
@@ -175,35 +160,19 @@ void ThreatObject::CheckMap (Map& map_data)
     {
         if (y_val > 0)
         {
-            if (val2 == TREASURE || val4 == TREASURE)
-            {
-                map_data.tile[y2][x2] = BLANK_MAP;
-                map_data.tile[y2][x1] = BLANK_MAP;
-            }
-            else
-            {
                 if (val2 != BLANK_MAP || val4 !=BLANK_MAP)
                 {
                     y_pos = y2*TILE_SIZE - height_frame - 1;
                     y_val=0;
                 }
-            }
         }
         else if (y_val < 0)
         {
-            if (val1 == TREASURE || val3 == TREASURE)
-            {
-                map_data.tile[y1][x1] = BLANK_MAP;
-                map_data.tile[y1][x2] = BLANK_MAP;
-            }
-            else
-            {
                 if (val1 !=BLANK_MAP || val3 !=BLANK_MAP)
                 {
                     y_pos = (y1+1)*TILE_SIZE;
                     y_val = 0;
                 }
-            }
         }
     }
     x_pos += x_val;
@@ -228,7 +197,7 @@ void ThreatObject::CheckMap (Map& map_data)
 
 void ThreatObject::Move (SDL_Renderer* screen)
 {
-    if (type = DYNAMIC)
+    if (type == 1)
     {
         if (x_pos > animation_right)
         {
@@ -241,5 +210,8 @@ void ThreatObject::Move (SDL_Renderer* screen)
             Input_type.left = 0;
             LoadImg ("img//threat_slime.png", screen);
         }
+    } else if (type == 0)
+    {
+        ;
     }
 }
