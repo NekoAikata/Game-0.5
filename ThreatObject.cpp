@@ -10,9 +10,13 @@ ThreatObject::ThreatObject()
     width_frame = 0;
     height_frame = 0;
     frame_num = 0;
-    status_threat = 0;
     mapvalue_x;
     mapvalue_y;
+
+    type = STATIC;
+    animation_left = 0;
+    animation_right = 0;
+    Input_type.left = 0;
 }
 
 ThreatObject::~ThreatObject ()
@@ -81,6 +85,14 @@ void ThreatObject::DoThreat (Map& map_data)
     {
         x_val = 0;
         y_val = 0;
+
+        if (Input_type.left == 1)
+        {
+            x_val-=THREAT_SPEED;
+        } else if (Input_type.right == 1)
+        {
+            x_val+=THREAT_SPEED;
+        }
         CheckMap (map_data);
     }
     else if (revive_time > 0)
@@ -211,5 +223,23 @@ void ThreatObject::CheckMap (Map& map_data)
     else if (y_pos + height_frame > map_data.max_y)
     {
         y_pos = map_data.max_y - height_frame - 1;
+    }
+}
+
+void ThreatObject::Move (SDL_Renderer* screen)
+{
+    if (type = DYNAMIC)
+    {
+        if (x_pos > animation_right)
+        {
+            Input_type.left = 1;
+            Input_type.right = 0;
+            LoadImg("img//threat_slime.png", screen);
+        } else if (x_pos < animation_left)
+        {
+            Input_type.right = 1;
+            Input_type.left = 0;
+            LoadImg ("img//threat_slime.png", screen);
+        }
     }
 }

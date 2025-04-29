@@ -4,14 +4,14 @@
 #include "BObject.h"
 #include "Game_Stat.h"
 
-
+#define THREAT_SPEED 4
 class ThreatObject : public BaseObject
 {
     public:
     enum Type_threat
     {
-        STATIC = 0;
-        DYNAMIC = 1;
+        STATIC = 0,
+        DYNAMIC = 1
     };
     ThreatObject();
     ~ThreatObject();
@@ -34,8 +34,9 @@ class ThreatObject : public BaseObject
     void SetMapXY(const int x, const int y) {mapvalue_x = x; mapvalue_y = y;}
 
     void SetType (const int& Type) {type = Type;}
-    void SetBorder (const int& aBord, const int& bBord) {animation_left = aBord; animation_right = bBord;}
+    void SetBorderX (const int& aBord, const int& bBord) {animation_left = aBord; animation_right = bBord;}
     void SetInputL (const int& IpLeft) {Input_type.left = IpLeft;}
+    void Move (SDL_Renderer* screen);
 private:
 
     int revive_time;
@@ -51,7 +52,6 @@ private:
 
     SDL_Rect frame_clip[6];
     int frame_num;
-    int status_threat;
 
     int mapvalue_x;
     int mapvalue_y;

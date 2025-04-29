@@ -28,6 +28,11 @@ const int RENDER_DRAW_COLOR = 0xff;
 #define BLANK_MAP 0
 #define TREASURE 4
 
+namespace Common_Func
+{
+    bool CheckCollision(const SDL_Rect& object1, const SDL_Rect& object2);
+}
+
 struct Map
 {
     int start_x;

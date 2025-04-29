@@ -57,6 +57,23 @@ std::vector<ThreatObject*> MakeThreatList ()
 {
     std::vector<ThreatObject*> list_threats;
 
+    ThreatObject* dynamic_threat = new ThreatObject[20];
+    for (int i = 0;i<20;i++)
+    {
+        ThreatObject* p_threat = (dynamic_threat + i);
+        if (p_threat != NULL)
+        {
+            p_threat->LoadImg("img//threat_slime.png",renderer);
+            p_threat->Clip();
+            p_threat->SetType(ThreatObject::DYNAMIC);
+            p_threat->SetXpos(128*3);
+            p_threat->SetYpos(700+i*1200);
+            p_threat->SetBorderX(128*2,128*4);
+            p_threat->SetInputL(1);
+            list_threats.push_back(p_threat);
+        }
+    }
+
     ThreatObject* threats = new ThreatObject[20];
 
     for (int i =0; i < 20;i++)
@@ -124,6 +141,7 @@ int main(int argc, char* argv[])
             if (threat_object != NULL)
             {
                 threat_object->SetMapXY(map_data.start_x, map_data.start_y);
+                threat_object->Move(renderer);
                 threat_object->DoThreat(map_data);
                 threat_object->Show(renderer);
             }
