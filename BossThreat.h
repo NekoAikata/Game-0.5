@@ -1,15 +1,14 @@
-#ifndef T_OBJECT
-#define T_OBJECT
+#ifndef BOSS_THREAT
+#define BOSS_THREAT
 
 #include "BObject.h"
 #include "Game_Stat.h"
 
-#define THREAT_SPEED 4
-class ThreatObject : public BaseObject
+class BossThreat : public BaseObject
 {
 public:
-    ThreatObject();
-    ~ThreatObject();
+    BossThreat();
+    ~BossThreat();
 
     bool LoadImg(std::string path, SDL_Renderer* screen);
     void Show(SDL_Renderer* des);
@@ -17,15 +16,10 @@ public:
     int GetWidthFrame () {return width_frame;}
     int GetHeightFrame () {return height_frame;}
 
-    void SetXvalue (const float& a) {x_val = a;}
-    void SetYvalue (const float& b) {y_val = b;}
-    void SetRevTime (const int& x) {revive_time = x;}
     void SetXpos (const float& a) {x_pos = a;}
     void SetYpos (const float& b) {y_pos = b;}
-    void SetXYposRes () {x_pos__respawn = x_pos; y_pos_respawn=y_pos;}
     float GetXpos () {return x_pos;}
     float GetYpos () {return y_pos;}
-    int GetRevTime () {return revive_time;}
 
     void DoThreat(Map& map_data);
     void CheckMap(Map& map_data);
@@ -37,16 +31,12 @@ public:
     void Move (SDL_Renderer* screen);
 private:
 
-    int revive_time;
 
     float x_val;
     float y_val;
 
     float x_pos;
     float y_pos;
-
-    float x_pos__respawn;
-    float y_pos_respawn;
 
     int width_frame;
     int height_frame;
@@ -63,4 +53,4 @@ private:
     Input_action Input_type;
 };
 
-#endif // T_OBJECT
+#endif // BOSS_THREAT

@@ -7,25 +7,14 @@ void GameMap::LoadMap (char* name)
         return;
     }
 
-    game_map.max_x = 0;
-    game_map.max_y = 0;
+    game_map.max_x = 12;
+    game_map.max_y = 399;
     for (int i = 0; i < MAX_MAP_Y; i++)
     {
         for (int j = 0; j< MAX_MAP_X; j++)
         {
             InputFile >> game_map.tile[i][j];
             int val = game_map.tile[i][j];
-            if (val > 0)
-            {
-                if (i > game_map.max_y)
-                {
-                    game_map.max_y = i;
-                }
-                if (j > game_map.max_x)
-                {
-                    game_map.max_x = j;
-                }
-            }
         }
     }
 

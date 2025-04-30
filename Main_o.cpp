@@ -6,7 +6,7 @@ MainObject::MainObject()
     x_val = 0;
     y_val = 0;
     x_pos = 6*TILE_SIZE;
-    y_pos = TILE_SIZE;
+    y_pos = 398*TILE_SIZE;
     width_frame = 0;
     height_frame = 0;
     frame_num = 0;
@@ -203,6 +203,7 @@ void MainObject::HandleSlash(SDL_Renderer* screen)
             BasicAttack.SetRect(this->rect.x + width_frame - 30, this->rect.y);
         }
         BasicAttack.Render(screen);
+        BasicAttack.Free();
     }
 }
 
@@ -270,7 +271,7 @@ void MainObject::UpdateImg(SDL_Renderer* des)
     }
 }
 
-void MainObject::DoPlayer(Map& map_data, bool TCol)
+void MainObject::DoPlayer(Map& map_data)
 {
     x_val = 0;
     y_val = 0;
@@ -290,11 +291,11 @@ void MainObject::DoPlayer(Map& map_data, bool TCol)
     {
         y_val+=PLAYER_SPEED;
     }
-    CheckMap(map_data, TCol);
+    CheckMap(map_data);
     MapMove(map_data);
 }
 
-void MainObject::CheckMap(Map& map_data, bool TCol)
+void MainObject::CheckMap(Map& map_data)
 {
     int x1 = 0, x2 = 0;
     int y1 = 0, y2 = 0;
@@ -321,9 +322,9 @@ void MainObject::CheckMap(Map& map_data, bool TCol)
             }
             else
             {
-                if (val1 != BLANK_MAP || val2 !=BLANK_MAP || TCol)
+                if (val1 != BLANK_MAP || val2 !=BLANK_MAP)
                 {
-                    x_pos = x2*TILE_SIZE - width_frame - 15;
+                    x_pos = x2*TILE_SIZE - width_frame - 1;
                     x_val=0;
                 }
             }
@@ -444,4 +445,15 @@ SDL_Rect MainObject::GetRectP()
     RETURN.h = height_frame;
 
     return RETURN;
+}
+
+void MainObject::ShowHP(TTF_Font* font, SDL_Renderer* screen)
+{
+    Text_object HPStat;
+    std::string HPText = "HP: ";
+    std::string HP_num = std::to_string(HP);
+    HPText += HP_num;
+    HPStat.SetText(HPText);
+    HPStat.LoadFromRenderText(font, screen);
+    HPStat.RenderText(screen, SCREEN_WIDTH-128, 64);
 }

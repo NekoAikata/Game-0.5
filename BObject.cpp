@@ -29,7 +29,14 @@ bool BaseObject::LoadImg(std::string path, SDL_Renderer* screen)
             rect.w = load_surface->w;
             rect.h = load_surface->h;
         }
+        else
+        {
+            std::cerr << "SDL_CreateTextureFromSurface Error: " << SDL_GetError() << std::endl;
+        }
         SDL_FreeSurface(load_surface);
+    } else
+    {
+        std::cerr << "IMG_Load Error: " << IMG_GetError() << std::endl;
     }
     texture = new_texture;
     return texture!=NULL;

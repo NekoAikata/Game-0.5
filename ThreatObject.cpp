@@ -12,6 +12,8 @@ ThreatObject::ThreatObject()
     frame_num = 0;
     mapvalue_x;
     mapvalue_y;
+    x_pos__respawn = 0;
+    y_pos_respawn = 0;
 
     type = 0;
     animation_left = 0;
@@ -103,8 +105,8 @@ void ThreatObject::DoThreat (Map& map_data)
         {
             x_val = 0;
             y_val = 0;
-            x_pos = 0;
-            y_pos = 0;
+            x_pos = x_pos__respawn;
+            y_pos = y_pos_respawn;
         }
     }
 }

@@ -4,6 +4,7 @@
 #include "BObject.h"
 #include "Game_Stat.h"
 #include "Slash.h"
+#include "Text.h"
 
 #define PLAYER_SPEED 6
 #define PLAYER_ATTACK 1500
@@ -29,8 +30,8 @@ public:
     void UpdateImg(SDL_Renderer* screen);
     void Clip();
 
-    void DoPlayer(Map& map_data, bool TCol);
-    void CheckMap(Map& map_data, bool TCol);
+    void DoPlayer(Map& map_data);
+    void CheckMap(Map& map_data);
     void SetMapXY(const int x, const int y) {mapvalue_x = x; mapvalue_y = y;}
     void MapMove(Map& map_data);
 
@@ -39,6 +40,7 @@ public:
     SDL_Rect GetRectP();
     int frame_delay;
 
+    void ShowHP(TTF_Font* font, SDL_Renderer* screen);
     int HP;
 
 private:

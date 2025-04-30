@@ -34,6 +34,8 @@
 		</Compiler>
 		<Unit filename="BObject.cpp" />
 		<Unit filename="BObject.h" />
+		<Unit filename="BossThreat.cpp" />
+		<Unit filename="BossThreat.h" />
 		<Unit filename="Game_Stat.cpp" />
 		<Unit filename="Game_Stat.h" />
 		<Unit filename="Main_o.cpp" />
@@ -42,6 +44,8 @@
 		<Unit filename="Map.h" />
 		<Unit filename="Slash.cpp" />
 		<Unit filename="Slash.h" />
+		<Unit filename="Text.cpp" />
+		<Unit filename="Text.h" />
 		<Unit filename="ThreatObject.cpp" />
 		<Unit filename="ThreatObject.h" />
 		<Unit filename="Timer.cpp" />
