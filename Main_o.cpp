@@ -19,6 +19,7 @@ MainObject::MainObject()
     mapvalue_y = 0;
     frame_delay = 0;
     HP = 1000;
+    have_sword = false;
 }
 
 MainObject::~MainObject()
@@ -153,7 +154,9 @@ void MainObject::HandleEvent(SDL_Event event, SDL_Renderer* screen)
             }
         case SDLK_j:
             {
-                BasicAttack.set_attack(true);
+                if (have_sword){
+                    BasicAttack.set_attack(true);
+                }
             }
         }
     } else if(event.type == SDL_KEYUP)
@@ -320,13 +323,19 @@ void MainObject::CheckMap(Map& map_data)
         {
             if (val1 == TREASURE || val2 == TREASURE)
             {
-                map_data.tile[y1][x2] = BLANK_MAP;
-                map_data.tile[y2][x2] = BLANK_MAP;
+                map_data.tile[y1][x2] = FLOOR;
+                map_data.tile[y2][x2] = FLOOR;
+                have_sword = true;
+            } else if (val1 == KEY || val2 == KEY)
+            {
+                map_data.tile[y1][x2] = FLOOR;
+                map_data.tile[y2][x2] = FLOOR;
+                map_data.tile[389][6] = 6;
             }
             else
             {
-                if ((val1 !=BLANK_MAP && val1 != FLOOR) ||
-                    (val2 !=BLANK_MAP && val2 != FLOOR))
+                if ((val1 !=BLANK_MAP && val1 != FLOOR && val1 !=DOOR_OPEN) ||
+                    (val2 !=BLANK_MAP && val2 != FLOOR && val2 !=DOOR_OPEN))
                 {
                     x_pos = x2*TILE_SIZE - width_frame + 5;
                     x_val=0;
@@ -337,13 +346,19 @@ void MainObject::CheckMap(Map& map_data)
         {
             if (val3 == TREASURE || val4 == TREASURE)
             {
-                map_data.tile[y1][x1] = BLANK_MAP;
-                map_data.tile[y2][x1] = BLANK_MAP;
+                map_data.tile[y1][x1] = FLOOR;
+                map_data.tile[y2][x1] = FLOOR;
+                have_sword = true;
+            } else if (val3 == KEY || val4 == KEY)
+            {
+                map_data.tile[y1][x1] = FLOOR;
+                map_data.tile[y2][x1] = FLOOR;
+                map_data.tile[389][6] = 6;
             }
             else
             {
-                if ((val3 !=BLANK_MAP && val3 != FLOOR) ||
-                    (val4 !=BLANK_MAP && val4 != FLOOR))
+                if ((val3 !=BLANK_MAP && val3 != FLOOR && val3 !=DOOR_OPEN) ||
+                    (val4 !=BLANK_MAP && val4 != FLOOR && val4 !=DOOR_OPEN))
                 {
                     x_pos = x1*TILE_SIZE+30;
                     x_val = 0;
@@ -369,13 +384,19 @@ void MainObject::CheckMap(Map& map_data)
         {
             if (val2 == TREASURE || val4 == TREASURE)
             {
-                map_data.tile[y2][x2] = BLANK_MAP;
-                map_data.tile[y2][x1] = BLANK_MAP;
+                map_data.tile[y2][x2] = FLOOR;
+                map_data.tile[y2][x1] = FLOOR;
+                have_sword = true;
+            } else if (val2 == KEY || val4 == KEY)
+            {
+                map_data.tile[y2][x2] = FLOOR;
+                map_data.tile[y2][x1] = FLOOR;
+                map_data.tile[389][6] = 6;
             }
             else
             {
-                if ((val2 != BLANK_MAP && val2 !=FLOOR) ||
-                    (val4 != BLANK_MAP && val4 !=FLOOR))
+                if ((val2 != BLANK_MAP && val2 !=FLOOR && val2 !=DOOR_OPEN) ||
+                    (val4 != BLANK_MAP && val4 !=FLOOR && val4 !=DOOR_OPEN))
                 {
                     y_pos = y2*TILE_SIZE - height_frame + 5;
                     y_val=0;
@@ -386,13 +407,20 @@ void MainObject::CheckMap(Map& map_data)
         {
             if (val1 == TREASURE || val3 == TREASURE)
             {
-                map_data.tile[y1][x1] = BLANK_MAP;
-                map_data.tile[y1][x2] = BLANK_MAP;
+                map_data.tile[y1][x1] = FLOOR;
+                map_data.tile[y1][x2] = FLOOR;
+                have_sword = true;
+            }
+            else if (val1 ==  KEY|| val3 == KEY)
+            {
+                map_data.tile[y1][x1] = FLOOR;
+                map_data.tile[y1][x2] = FLOOR;
+                map_data.tile[389][6] = 6;
             }
             else
             {
-                if ((val1 !=BLANK_MAP && val1 !=FLOOR) ||
-                    (val3 !=BLANK_MAP && val3 !=FLOOR))
+                if ((val1 !=BLANK_MAP && val1 !=FLOOR && val1 !=DOOR_OPEN) ||
+                    (val3 !=BLANK_MAP && val3 !=FLOOR && val3 !=DOOR_OPEN))
                 {
                     y_pos = y2*TILE_SIZE - 30;
                     y_val = 0;

@@ -35,6 +35,8 @@ const int RENDER_DRAW_COLOR = 0;
 
 #define BLANK_MAP 0
 #define FLOOR 1
+#define DOOR_OPEN 6
+#define KEY 8
 #define TREASURE 4
 
 namespace Common_Func

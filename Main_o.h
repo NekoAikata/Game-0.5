@@ -41,10 +41,12 @@ public:
     SDL_Rect GetRectP();
     int frame_delay;
 
-    void GetYPos() {std::cout << y_pos/TILE_SIZE << std::endl;}
+    float GetYPos() {return y_pos;}
 
     void ShowHP(TTF_Font* font, SDL_Renderer* screen);
     int HP;
+
+    bool have_sword;
 
 private:
     Slash BasicAttack;

@@ -48,7 +48,7 @@
 	"Game_Stat.h"
 	<string>
 
-1746110673 d:\quoc anh\game-0.5\game_stat.h
+1746123971 d:\quoc anh\game-0.5\game_stat.h
 	<SDL.h>
 	<SDL_image.h>
 	<SDL_ttf.h>
@@ -61,7 +61,7 @@
 	"Game_Stat.h"
 	<iostream>
 
-1746092015 source:d:\quoc anh\game-0.5\map.cpp
+1746118993 source:d:\quoc anh\game-0.5\map.cpp
 	"Map.h"
 
 1743464914 d:\quoc anh\game-0.5\map.h
@@ -69,11 +69,11 @@
 	"BObject.h"
 	<fstream>
 
-1746112600 source:d:\quoc anh\game-0.5\main_o.cpp
+1746124048 source:d:\quoc anh\game-0.5\main_o.cpp
 	"Main_o.h"
 	"Timer.h"
 
-1746112769 d:\quoc anh\game-0.5\main_o.h
+1746121099 d:\quoc anh\game-0.5\main_o.h
 	"BObject.h"
 	"Game_Stat.h"
 	"Slash.h"
@@ -94,7 +94,7 @@
 
 1743409958 c:\users\admin\documents\code test\game 0.5\timer.h
 
-1746113484 source:d:\quoc anh\game-0.5\main.cpp
+1746122793 source:d:\quoc anh\game-0.5\main.cpp
 	"Game_Stat.h"
 	"BObject.h"
 	"Map.h"
@@ -144,7 +144,7 @@
 1746084233 d:\quoc anh\game-0.5\text.h
 	"Game_Stat.h"
 
-1746091327 source:d:\quoc anh\game-0.5\bossthreat.cpp
+1746116459 source:d:\quoc anh\game-0.5\bossthreat.cpp
 	"BossThreat.h"
 
 1746091046 d:\quoc anh\game-0.5\bossthreat.h

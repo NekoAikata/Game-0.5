@@ -119,5 +119,7 @@ void BossThreat::Show(SDL_Renderer* des)
     SDL_RenderCopy(des, texture, current_clip, &renderQuad);
 }
 
+bool BossThreat::BossCombat (MainObject Player)
+{
 
-
+}

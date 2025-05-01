@@ -11,6 +11,7 @@ BaseObject background;
 TTF_Font* font_time;
 TTF_Font* font_menu;
 TTF_Font* font_slash;
+TTF_Font* font_noti;
 
 bool InitDataSuccess()
 {
@@ -48,6 +49,7 @@ bool InitDataSuccess()
     font_time = TTF_OpenFont("font//PixelPurl.ttf", 20);
     font_menu = TTF_OpenFont("font//PixelPurl.ttf", 80);
     font_slash = TTF_OpenFont("font//PixelPurl.ttf",25);
+    font_noti = TTF_OpenFont("font//PixelPurl.ttf",35);
     if (font_time == NULL || font_menu == NULL || font_slash == NULL)
     {
         return false;
@@ -55,9 +57,23 @@ bool InitDataSuccess()
     return true;
 }
 
-bool LoadBG()
+bool LoadBG(const int& level, SDL_Renderer* screen)
 {
-    bool ret = background.LoadImg("img//grass.png", renderer);
+    std::string path; bool ret;
+    if (level == 1 || level == 3 || level == 5)
+    {
+        path = "img//grass.png";
+    } else if (level == 2)
+    {
+        path = "";
+    } else if (level == 4)
+    {
+        path = "";
+    }
+    ret = background.LoadImg(path, renderer);
+    background.SetRect(0,0);
+    background.SetRectWH(SCREEN_WIDTH,SCREEN_HEIGHT);
+    background.Render(screen);
     return ret;
 }
 
@@ -119,17 +135,25 @@ std::vector<ThreatObject*> MakeThreatList ()
     return list_threats;
 }
 
+void SetLevelAndBG(const float& y_pos, int& level);
 int Menu(SDL_Renderer* screen, TTF_Font* font_time, bool Start);
 
 int main(int argc, char* argv[])
 {
+    int level = 1;
     Timer fps_timer, Threatt_timer, Slash_cooldown;
 
+    Text_object Noti;
     Text_object PMinus, PHeal, Dmg;
     PMinus.SetColor(255,0,0);
     PHeal.SetColor(0,0,255);
 
-    if (!InitDataSuccess() || !LoadBG())
+
+    if (!InitDataSuccess())
+    {
+        return -1;
+    }
+    if (!LoadBG(level, renderer))
     {
         return -1;
     }
@@ -151,6 +175,10 @@ int main(int argc, char* argv[])
     std::vector <ThreatObject*> list_threats = MakeThreatList();
 
     bool quitG = false;
+
+    bool intro = true;
+    bool MOVE=true; bool attack=true;
+
     Threatt_timer.start();
     Slash_cooldown.start();
 
@@ -178,6 +206,18 @@ int main(int argc, char* argv[])
                     {
                         quitG = true;
                     }
+                }
+                if ((event.key.keysym.sym == SDLK_w ||
+                    event.key.keysym.sym == SDLK_a ||
+                    event.key.keysym.sym == SDLK_s ||
+                    event.key.keysym.sym == SDLK_d) &&
+                    MOVE)
+                {
+                    MOVE = false;
+                }
+                if (event.key.keysym.sym == SDLK_j && attack && Player1.have_sword)
+                {
+                    attack = false;
                 }
             }
             Player1.HandleEvent(event, renderer);
@@ -294,6 +334,28 @@ int main(int argc, char* argv[])
         SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 128);
         SDL_RenderFillRect(renderer, &fill_rect);
+        if (intro){
+            if(MOVE){
+                Noti.SetText("Use W,A,S,D to move");
+                Noti.LoadFromRenderText(font_noti,renderer);
+                Noti.RenderText(renderer,3*TILE_SIZE,30);
+            } else if (!Player1.have_sword)
+            {
+                Noti.SetText("Take sword in this room");
+                Noti.LoadFromRenderText(font_noti,renderer);
+                Noti.RenderText(renderer,2.5*TILE_SIZE,30);
+            } else if (attack)
+            {
+                Noti.SetText("Use J to attack with sword");
+                Noti.LoadFromRenderText(font_noti,renderer);
+                Noti.RenderText(renderer,2*TILE_SIZE,30);
+            } else if (map_data.tile[390][1] == KEY)
+            {
+                Noti.SetText("Get key and save our king!");
+                Noti.LoadFromRenderText(font_noti,renderer);
+                Noti.RenderText(renderer,2*TILE_SIZE,30);
+            } else {intro = false;}
+        }
 
         std::string str_time = "Time: ";
         Uint32 current_time = SDL_GetTicks()/1000;
@@ -422,4 +484,9 @@ int Menu(SDL_Renderer* screen, TTF_Font* font_time, bool Start)
             }
         }
     }
+}
+
+void SetLevelAndBG(float y_pos, int level)
+{
+
 }

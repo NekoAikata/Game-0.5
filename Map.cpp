@@ -41,7 +41,12 @@ void GameMap::LoadTiles (SDL_Renderer* screen)
         InputImg.close();
 
         TileMap[i].LoadImg(file_img, screen);
-        TileMap[i].SetRectWH(64,64);
+        int w_test = TileMap[i].GetRect().w;
+        int h_test = TileMap[i].GetRect().h;
+        if (w_test%64 !=0 && h_test%64 != 0)
+        {
+            TileMap[i].SetRectWH(64,64);
+        }
     }
 }
 
