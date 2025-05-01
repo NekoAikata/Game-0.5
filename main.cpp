@@ -5,9 +5,12 @@
 #include "Timer.h"
 #include "ThreatObject.h"
 #include "Text.h"
+#include "BossThreat.h"
 
 BaseObject background;
 TTF_Font* font_time;
+TTF_Font* font_menu;
+TTF_Font* font_slash;
 
 bool InitDataSuccess()
 {
@@ -35,8 +38,10 @@ bool InitDataSuccess()
     {
         return false;
     }
-    font_time = TTF_OpenFont("font//PixelPurl.ttf", 40);
-    if (font_time == NULL)
+    font_time = TTF_OpenFont("font//PixelPurl.ttf", 20);
+    font_menu = TTF_OpenFont("font//PixelPurl.ttf", 80);
+    font_slash = TTF_OpenFont("font//PixelPurl.ttf",25);
+    if (font_time == NULL || font_menu == NULL || font_slash == NULL)
     {
         return false;
     }
@@ -208,7 +213,12 @@ int Menu(SDL_Renderer* screen, TTF_Font* font_time, bool Start)
 
 int main(int argc, char* argv[])
 {
-    Timer fps_timer, Threatt_timer;
+    Timer fps_timer, Threatt_timer, Slash_cooldown;
+
+    Text_object PMinus, PHeal, Dmg;
+    PMinus.SetColor(255,0,0);
+    PHeal.SetColor(0,0,255);
+
     if (!InitDataSuccess() || !LoadBG())
     {
         return -1;
@@ -222,14 +232,21 @@ int main(int argc, char* argv[])
     Player1.LoadImg("img//player_down.png", renderer);
     Player1.Clip();
 
+    BossThreat Boss1;
+    Boss1.LoadImg("img//King_Pig.png", renderer);
+    Boss1.Clip();
+    Boss1.SetXpos(6*TILE_SIZE);
+    Boss1.SetYpos(390*TILE_SIZE);
+
     std::vector <ThreatObject*> list_threats = MakeThreatList();
 
     bool quitG = false;
     Threatt_timer.start();
+    Slash_cooldown.start();
 
     Text_object Time_game;
     Time_game.SetColor(255, 255, 255);
-    int i = Menu(renderer, font_time, 1);
+    int i = Menu(renderer, font_menu, 1);
         if (i==1)
         {
             quitG=true;
@@ -246,7 +263,7 @@ int main(int argc, char* argv[])
             if(event.type == SDL_KEYDOWN)
             {
                 if (event.key.keysym.sym == SDLK_ESCAPE){
-                    int i = Menu(renderer, font_time, 0);
+                    int i = Menu(renderer, font_menu, 0);
                     if (i==1)
                     {
                         quitG = true;
@@ -263,6 +280,8 @@ int main(int argc, char* argv[])
 
         Player1.HandleSlash(renderer);
         Player1.SetMapXY(map_data.start_x, map_data.start_y);
+        Boss1.SetMapXY(map_data.start_x, map_data.start_y);
+
 
         for (int i = 0;i < list_threats.size(); i++)
         {
@@ -279,14 +298,17 @@ int main(int argc, char* argv[])
         }
         for (int i=0; i < list_threats.size(); ++i)
         {
+            if (&Player1 != NULL)
+                {
+                    SDL_Rect PRect = Player1.GetRectP();
             ThreatObject* threat_check = list_threats[i];
             if (threat_check != NULL && threat_check->GetRevTime() == 0)
             {
                 SDL_Rect TRect;
-                    TRect.x = threat_check->GetRect().x;
-                    TRect.y = threat_check->GetRect().y;
-                    TRect.w = threat_check->GetWidthFrame();
-                    TRect.h = threat_check->GetHeightFrame();
+                    TRect.x = threat_check->GetRect().x; TRect.x +=20;
+                    TRect.y = threat_check->GetRect().y; TRect.y +=20;
+                    TRect.w = threat_check->GetWidthFrame(); TRect.w -=20;
+                    TRect.h = threat_check->GetHeightFrame(); TRect.h -=20;
 
                 Slash* SCheck = Player1.GetSlash();
                 if (SCheck != NULL)
@@ -296,18 +318,51 @@ int main(int argc, char* argv[])
 
                     if(check)
                     {
-                        list_threats[i]->SetRevTime(100);
+                        if (Slash_cooldown.get_tick() >= 750)
+                        {
+                            (list_threats[i]->HP)-=25;
+                            Dmg.SetText("-25");
+                            Dmg.LoadFromRenderText(font_slash, renderer);
+                            Dmg.RenderText(renderer, TRect.x -40, TRect.y -40);
+                            if ((list_threats[i]->HP) == 0)
+                            {
+                                Player1.HP +=20;
+                                PHeal.SetText("+20");
+                                PHeal.LoadFromRenderText(font_slash,renderer);
+                                PHeal.RenderText(renderer,PRect.x + PRect.w -10,PRect.y);
+                                list_threats[i]->SetRevTime(200);
+                            }
+                            Slash_cooldown.start();
+                        }
+                        if (Slash_cooldown.get_tick() <= 250)
+                        {
+                            Dmg.SetText("-25");
+                            Dmg.LoadFromRenderText(font_slash, renderer);
+                            Dmg.RenderText(renderer, TRect.x -40, TRect.y -40);
+                        }
+                        if (list_threats[i]->GetRevTime() >= 30)
+                        {
+                            PHeal.SetText("+20");
+                            PHeal.LoadFromRenderText(font_slash,renderer);
+                            PHeal.RenderText(renderer,PRect.x + PRect.w -10,PRect.y);
+                        }
                     }
                 }
-                if (&Player1 != NULL)
-                {
-                    SDL_Rect PRect = Player1.GetRectP();
                     if (Common_Func::CheckCollision(PRect, TRect))
                     {
                         if (Threatt_timer.get_tick() >= 1500)
                         {
                             Player1.HP-=50;
+                            PMinus.SetText("-50");
+                            PMinus.LoadFromRenderText(font_slash,renderer);
+                            PMinus.RenderText(renderer,PRect.x + PRect.w -10,PRect.y - 20);
                             Threatt_timer.start();
+                        }
+                        if (Threatt_timer.get_tick() <= 500)
+                        {
+                            PMinus.SetText("-50");
+                            PMinus.LoadFromRenderText(font_slash,renderer);
+                            PMinus.RenderText(renderer,PRect.x + PRect.w -10,PRect.y - 20);
                         }
                     }
                 }
@@ -315,8 +370,12 @@ int main(int argc, char* argv[])
         }
 
         Player1.DoPlayer(map_data);
+
+        Player1.FreeSlash();
         Player1.Show(renderer);
-        Player1.ShowHP(font_time, renderer);
+
+        Boss1.Show(renderer);
+
         Game_map.SetMap(map_data);
         Game_map.DrawMap(renderer);
 
@@ -329,6 +388,7 @@ int main(int argc, char* argv[])
         Time_game.LoadFromRenderText(font_time, renderer);
         Time_game.RenderText(renderer, SCREEN_WIDTH - 128, 15);
 
+        Player1.ShowHP(font_time, renderer);
 
         SDL_RenderPresent(renderer);
         int real_timer = fps_timer.get_tick();

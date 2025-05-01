@@ -35,6 +35,8 @@ public:
     void SetBorderX (const int& aBord, const int& bBord) {animation_left = aBord; animation_right = bBord;}
     void SetInputL (const int& IpLeft) {Input_type.left = IpLeft;}
     void Move (SDL_Renderer* screen);
+
+    int HP;
 private:
 
     int revive_time;

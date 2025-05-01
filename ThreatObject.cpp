@@ -2,6 +2,7 @@
 
 ThreatObject::ThreatObject()
 {
+    HP=150;
 	revive_time = 0;
     x_val = 0;
     y_val = 0;
@@ -78,7 +79,7 @@ void ThreatObject::Show(SDL_Renderer* des)
 
     SDL_Rect* current_clip = &frame_clip[frame_num];
 
-    SDL_Rect renderQuad = {rect.x, rect.y, width_frame, height_frame};
+    SDL_Rect renderQuad = {rect.x, rect.y, 64, 64};
     SDL_RenderCopy(des, texture, current_clip, &renderQuad);
 }
 
@@ -107,6 +108,7 @@ void ThreatObject::DoThreat (Map& map_data)
             y_val = 0;
             x_pos = x_pos__respawn;
             y_pos = y_pos_respawn;
+            HP=150;
         }
     }
 }

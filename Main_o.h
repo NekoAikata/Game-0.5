@@ -36,6 +36,7 @@ public:
     void MapMove(Map& map_data);
 
     void HandleSlash (SDL_Renderer* screen);
+    void FreeSlash () {BasicAttack.Free();}
     Slash* GetSlash () {return &BasicAttack;}
     SDL_Rect GetRectP();
     int frame_delay;

@@ -41,6 +41,7 @@ void GameMap::LoadTiles (SDL_Renderer* screen)
         InputImg.close();
 
         TileMap[i].LoadImg(file_img, screen);
+        TileMap[i].SetRectWH(64,64);
     }
 }
 

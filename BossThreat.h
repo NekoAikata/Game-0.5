@@ -3,6 +3,7 @@
 
 #include "BObject.h"
 #include "Game_Stat.h"
+#include "Main_o.h"
 
 class BossThreat : public BaseObject
 {
@@ -21,19 +22,21 @@ public:
     float GetXpos () {return x_pos;}
     float GetYpos () {return y_pos;}
 
-    void DoThreat(Map& map_data);
-    void CheckMap(Map& map_data);
     void SetMapXY(const int x, const int y) {mapvalue_x = x; mapvalue_y = y;}
 
     void SetType (const int& Type) {type = Type;}
-    void SetBorderX (const int& aBord, const int& bBord) {animation_left = aBord; animation_right = bBord;}
-    void SetInputL (const int& IpLeft) {Input_type.left = IpLeft;}
-    void Move (SDL_Renderer* screen);
+    void SetStatus (const bool& x) {dead = x;}
+
+    void SetATK (const int& x) {ATK=x;}
+    void SetHP (const int& x) {HP=x;}
+    void SetSPEED (const int& x) {SPEED=x;}
+
+    void MinusHP (const int& x) {HP-=x;}
+    bool BossCombat (MainObject Player);
 private:
-
-
-    float x_val;
-    float y_val;
+    int HP;
+    int ATK;
+    int SPEED;
 
     float x_pos;
     float y_pos;
@@ -41,16 +44,14 @@ private:
     int width_frame;
     int height_frame;
 
-    SDL_Rect frame_clip[6];
+    SDL_Rect frame_clip[12];
     int frame_num;
 
     int mapvalue_x;
     int mapvalue_y;
 
     int type;
-    int animation_right;
-    int animation_left;
-    Input_action Input_type;
+    bool dead;
 };
 
 #endif // BOSS_THREAT

@@ -28,6 +28,7 @@ const int RENDER_DRAW_COLOR = 0;
 #define MAX_MAP_Y 400
 
 #define BLANK_MAP 0
+#define FLOOR 1
 #define TREASURE 4
 
 namespace Common_Func

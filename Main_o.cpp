@@ -6,7 +6,7 @@ MainObject::MainObject()
     x_val = 0;
     y_val = 0;
     x_pos = 6*TILE_SIZE;
-    y_pos = 398*TILE_SIZE;
+    y_pos = 3*TILE_SIZE;
     width_frame = 0;
     height_frame = 0;
     frame_num = 0;
@@ -26,14 +26,14 @@ MainObject::~MainObject()
 
 }
 
-bool MainObject::LoadImg(std::string path, SDL_Renderer* screen)
+bool MainObject::LoadImg(std::string path, SDL_Renderer* screen )
 {
     bool ret = BaseObject::LoadImg(path, screen);
 
     if (ret)
     {
         height_frame = rect.h;
-        if (BasicAttack.get_status())
+        if (BasicAttack.get_status() )
         {
             width_frame = rect.w/4;
         } else
@@ -80,7 +80,7 @@ void MainObject::Clip()
     }
 }
 
-bool MainObject::Show(SDL_Renderer* des)
+bool MainObject::Show(SDL_Renderer* des )
 {
     UpdateImg(des);
     if (Store_action.left == 1 ||
@@ -100,7 +100,7 @@ bool MainObject::Show(SDL_Renderer* des)
         frame_num = 0;
     }
 
-    if (frame_num >= 6 || (frame_num >=4 && BasicAttack.get_status()))
+    if (frame_num >= 6 || (frame_num >=4 && BasicAttack.get_status() ))
     {
         frame_num = 0;
     }
@@ -150,7 +150,6 @@ void MainObject::HandleEvent(SDL_Event event, SDL_Renderer* screen)
         case SDLK_j:
             {
                 BasicAttack.set_attack(true);
-                BasicAttack.LoadImg("img//Slash.PNG", screen);
             }
         }
     } else if(event.type == SDL_KEYUP)
@@ -187,8 +186,9 @@ void MainObject::HandleEvent(SDL_Event event, SDL_Renderer* screen)
 
 void MainObject::HandleSlash(SDL_Renderer* screen)
 {
-    if (frame_num == 1 && BasicAttack.get_status())
+    if (( frame_num ==2) && BasicAttack.get_status())
     {
+        BasicAttack.LoadImg("img//Slash.PNG", screen);
         if (Store_action.up == 1 || status_character == UP)
         {
             BasicAttack.SetRect(this->rect.x, this->rect.y - 25);
@@ -203,7 +203,6 @@ void MainObject::HandleSlash(SDL_Renderer* screen)
             BasicAttack.SetRect(this->rect.x + width_frame - 30, this->rect.y);
         }
         BasicAttack.Render(screen);
-        BasicAttack.Free();
     }
 }
 
@@ -211,7 +210,7 @@ void MainObject::UpdateImg(SDL_Renderer* des)
 {
     if (Store_action.up == 1)
     {
-        if (BasicAttack.get_status()){
+        if (BasicAttack.get_status() ){
             LoadImg("img//player_slashup.png" ,des);
         }
         else {LoadImg("img//player_up.png" ,des);}
@@ -219,7 +218,7 @@ void MainObject::UpdateImg(SDL_Renderer* des)
 
     else if (Store_action.down == 1)
     {
-        if (BasicAttack.get_status()){
+        if (BasicAttack.get_status() ){
             LoadImg("img//player_slashdown.png" ,des);
         }
         else {LoadImg("img//player_down.png" ,des);}
@@ -227,13 +226,13 @@ void MainObject::UpdateImg(SDL_Renderer* des)
 
     else if (Store_action.right == 1)
     {
-        if (BasicAttack.get_status()){
-            LoadImg("img//player_slashright.png" ,des);
+        if (BasicAttack.get_status() ){
+            LoadImg("img//player_slashright.png" ,des );
         }
         else {LoadImg("img//player_right.png" ,des);}
     }
     else if (Store_action.left == 1){
-        if (BasicAttack.get_status()){
+        if (BasicAttack.get_status() ){
             LoadImg("img//player_slashleft.png" ,des);
         }
         else {LoadImg("img//player_left.png" ,des);}
@@ -241,15 +240,15 @@ void MainObject::UpdateImg(SDL_Renderer* des)
     {
         if (status_character == UP)
         {
-            if (BasicAttack.get_status()){
-                LoadImg("img//player_slashup.png" ,des);
+            if (BasicAttack.get_status() ){
+                LoadImg("img//player_slashup.png" ,des );
             }
             else {LoadImg("img//player_up.png" ,des);}
         }
 
         else if (status_character == LEFT)
         {
-            if (BasicAttack.get_status()){
+            if (BasicAttack.get_status() ){
                 LoadImg("img//player_slashleft.png" ,des);
             }
             else {LoadImg("img//player_left.png" ,des);}
@@ -257,13 +256,13 @@ void MainObject::UpdateImg(SDL_Renderer* des)
 
         else if (status_character == RIGHT)
         {
-            if (BasicAttack.get_status()){
+            if (BasicAttack.get_status() ){
                 LoadImg("img//player_slashright.png" ,des);
             }
             else {LoadImg("img//player_right.png" ,des);}
         }
         else {
-            if (BasicAttack.get_status()){
+            if (BasicAttack.get_status() ){
                 LoadImg("img//player_slashdown.png" ,des);
             }
             else {LoadImg("img//player_down.png" ,des);}
@@ -439,10 +438,10 @@ void MainObject::MapMove(Map& map_data)
 SDL_Rect MainObject::GetRectP()
 {
     SDL_Rect RETURN;
-    RETURN.x = rect.x;
-    RETURN.y = rect.y;
-    RETURN.w = width_frame;
-    RETURN.h = height_frame;
+    RETURN.x = rect.x + 20;
+    RETURN.y = rect.y + 20;
+    RETURN.w = width_frame - 20;
+    RETURN.h = height_frame - 20;
 
     return RETURN;
 }
@@ -455,5 +454,5 @@ void MainObject::ShowHP(TTF_Font* font, SDL_Renderer* screen)
     HPText += HP_num;
     HPStat.SetText(HPText);
     HPStat.LoadFromRenderText(font, screen);
-    HPStat.RenderText(screen, SCREEN_WIDTH-128, 64);
+    HPStat.RenderText(screen, SCREEN_WIDTH-128, 54);
 }

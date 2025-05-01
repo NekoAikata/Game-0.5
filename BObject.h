@@ -10,6 +10,7 @@ public:
     BaseObject();
     ~BaseObject();
     void SetRect(const int &x, const int &y) {rect.x = x, rect.y = y;}
+    void SetRectWH(const int &w, const int &h) {rect.w = w, rect.h = h;}
     SDL_Rect GetRect() const {return rect;}
     SDL_Texture* GetTexture() const {return texture;}
 
