@@ -14,7 +14,7 @@ TTF_Font* font_slash;
 
 bool InitDataSuccess()
 {
-    if (SDL_Init(SDL_INIT_VIDEO) < 0)
+    if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO) < 0)
     {
         return false;
     }
@@ -34,6 +34,13 @@ bool InitDataSuccess()
             SDL_SetRenderDrawColor(renderer, RENDER_DRAW_COLOR, RENDER_DRAW_COLOR, RENDER_DRAW_COLOR, RENDER_DRAW_COLOR);
             int ImgFlag = IMG_INIT_PNG;
             if (!(IMG_Init(ImgFlag) && ImgFlag)) return false;}}
+
+    if( Mix_OpenAudio( 44100, MIX_DEFAULT_FORMAT, 2, 2048 ) < 0 )
+    {
+        printf( "SDL_mixer could not initialize! SDL_mixer Error: %s\n", Mix_GetError() );
+        return false;
+    }
+
     if (TTF_Init() == -1)
     {
         return false;
@@ -64,6 +71,7 @@ void close()
     SDL_DestroyWindow(window);
     window = NULL;
 
+    Mix_Quit();
     IMG_Quit();
     SDL_Quit();
 }
@@ -111,105 +119,7 @@ std::vector<ThreatObject*> MakeThreatList ()
     return list_threats;
 }
 
-int Menu(SDL_Renderer* screen, TTF_Font* font_time, bool Start)
-{
-    int x,y;
-    const int BUT_NUM = 2;
-    const char* BUTTON[BUT_NUM] = {"Continue","Exit"};
-    if (Start)
-    {
-        BUTTON[0] = "Play";
-    }
-    bool Button_status[BUT_NUM] = {0,0};
-    SDL_Color But_color[2] = {{255,255,255},{255,0,0}};
-    Text_object Button[BUT_NUM];
-    SDL_Point pos[BUT_NUM];
-    SDL_RenderClear(screen);
-    for (int i = 0; i < BUT_NUM; i++)
-    {
-        Button[i].SetText(BUTTON[i]);
-        Button[i].SetColor(But_color[0]);
-        Button[i].LoadFromRenderText(font_time,renderer);
-        int height = (Button[i].GetHeight())/2;
-        if (i==0){
-            height = -height;
-        }
-        pos[i].x = SCREEN_WIDTH/2 - (Button[i].GetWidth())/2;
-        pos[i].y = SCREEN_HEIGHT/2 + height;
-        Button[i].RenderText(renderer,pos[i].x, pos[i].y);
-    }
-    SDL_RenderPresent(screen);
-    while (true)
-    {
-        while (SDL_PollEvent(&event))
-        {
-            switch (event.type)
-            {
-            case SDL_QUIT:
-                for (int i=0;i<BUT_NUM;i++)
-                {
-                    Button[i].Free();
-                }
-                return 1;
-            case SDL_MOUSEMOTION:
-                SDL_GetMouseState(&x, &y);
-                for (int i=0;i<BUT_NUM;++i)
-                {
-                    if (x>=pos[i].x && x<=pos[i].x + Button[i].GetWidth() &&
-                        y>=pos[i].y && y<=pos[i].y + Button[i].GetHeight())
-                    {
-                        if(!Button_status[i])
-                        {
-                            Button_status[i] = 1;
-                            Button[i].Free();
-                            Button[i].SetColor(But_color[1]);
-                            Button[i].LoadFromRenderText(font_time,screen);
-                            Button[i].RenderText(screen,pos[i].x, pos[i].y);
-                            SDL_RenderPresent(screen);
-                        }
-                    } else
-                    {
-                        if(Button_status[i])
-                        {
-                            Button_status[i] = 0;
-                            Button[i].Free();
-                            Button[i].SetColor(But_color[0]);
-                            Button[i].LoadFromRenderText(font_time,screen);
-                            Button[i].RenderText(screen,pos[i].x, pos[i].y);
-                            SDL_RenderPresent(screen);
-                        }
-                    }
-                }
-                break;
-            case SDL_MOUSEBUTTONDOWN:
-                SDL_GetMouseState(&x, &y);
-                for (int i=0;i<BUT_NUM;++i)
-                {
-                    if (x>=pos[i].x && x<=pos[i].x + Button[i].GetWidth() &&
-                        y>=pos[i].y && y<=pos[i].y + Button[i].GetHeight())
-                    {
-                        for (int j =0;j<BUT_NUM;j++)
-                        {
-                            Button[j].Free();
-                        }
-                        return i;
-                    }
-                }
-                break;
-            case SDL_KEYDOWN:
-                if (event.key.keysym.sym == SDLK_ESCAPE)
-                {
-                    for (int j =0;j<BUT_NUM;j++)
-                    {
-                            Button[j].Free();
-                    }
-                    return 0;
-                }
-                break;
-            }
-        }
-    }
-}
+int Menu(SDL_Renderer* screen, TTF_Font* font_time, bool Start);
 
 int main(int argc, char* argv[])
 {
@@ -235,8 +145,8 @@ int main(int argc, char* argv[])
     BossThreat Boss1;
     Boss1.LoadImg("img//King_Pig.png", renderer);
     Boss1.Clip();
-    Boss1.SetXpos(6*TILE_SIZE);
-    Boss1.SetYpos(390*TILE_SIZE);
+    Boss1.SetXpos(5*TILE_SIZE);
+    Boss1.SetYpos(375*TILE_SIZE);
 
     std::vector <ThreatObject*> list_threats = MakeThreatList();
 
@@ -371,13 +281,19 @@ int main(int argc, char* argv[])
 
         Player1.DoPlayer(map_data);
 
+        Game_map.SetMap(map_data);
+        Game_map.DrawMap(renderer);
+
         Player1.FreeSlash();
         Player1.Show(renderer);
 
         Boss1.Show(renderer);
 
-        Game_map.SetMap(map_data);
-        Game_map.DrawMap(renderer);
+        //Show Stat_game
+        SDL_Rect fill_rect = {SCREEN_WIDTH-160, 0, 160, 64};
+        SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
+        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 128);
+        SDL_RenderFillRect(renderer, &fill_rect);
 
         std::string str_time = "Time: ";
         Uint32 current_time = SDL_GetTicks()/1000;
@@ -389,6 +305,7 @@ int main(int argc, char* argv[])
         Time_game.RenderText(renderer, SCREEN_WIDTH - 128, 15);
 
         Player1.ShowHP(font_time, renderer);
+        Player1.GetYPos();
 
         SDL_RenderPresent(renderer);
         int real_timer = fps_timer.get_tick();
@@ -405,4 +322,104 @@ int main(int argc, char* argv[])
     }
     close();
     return 0;
+}
+
+int Menu(SDL_Renderer* screen, TTF_Font* font_time, bool Start)
+{
+    int x,y;
+    const int BUT_NUM = 2;
+    const char* BUTTON[BUT_NUM] = {"Continue","Exit"};
+    if (Start)
+    {
+        BUTTON[0] = "Play";
+        SDL_RenderClear(screen);
+    }
+    bool Button_status[BUT_NUM] = {0,0};
+    SDL_Color But_color[2] = {{255,255,255},{255,0,0}};
+    Text_object Button[BUT_NUM];
+    SDL_Point pos[BUT_NUM];
+    for (int i = 0; i < BUT_NUM; i++)
+    {
+        Button[i].SetText(BUTTON[i]);
+        Button[i].SetColor(But_color[0]);
+        Button[i].LoadFromRenderText(font_time,renderer);
+        int height = (Button[i].GetHeight())/2;
+        if (i==0){
+            height = -height;
+        }
+        pos[i].x = SCREEN_WIDTH/2 - (Button[i].GetWidth())/2;
+        pos[i].y = SCREEN_HEIGHT/2 + height;
+        Button[i].RenderText(renderer,pos[i].x, pos[i].y);
+    }
+    SDL_RenderPresent(screen);
+    while (true)
+    {
+        while (SDL_PollEvent(&event))
+        {
+            switch (event.type)
+            {
+            case SDL_QUIT:
+                for (int i=0;i<BUT_NUM;i++)
+                {
+                    Button[i].Free();
+                }
+                return 1;
+            case SDL_MOUSEMOTION:
+                SDL_GetMouseState(&x, &y);
+                for (int i=0;i<BUT_NUM;++i)
+                {
+                    if (x>=pos[i].x && x<=pos[i].x + Button[i].GetWidth() &&
+                        y>=pos[i].y && y<=pos[i].y + Button[i].GetHeight())
+                    {
+                        if(!Button_status[i])
+                        {
+                            Button_status[i] = 1;
+                            Button[i].Free();
+                            Button[i].SetColor(But_color[1]);
+                            Button[i].LoadFromRenderText(font_time,screen);
+                            Button[i].RenderText(screen,pos[i].x, pos[i].y);
+                            SDL_RenderPresent(screen);
+                        }
+                    } else
+                    {
+                        if(Button_status[i])
+                        {
+                            Button_status[i] = 0;
+                            Button[i].Free();
+                            Button[i].SetColor(But_color[0]);
+                            Button[i].LoadFromRenderText(font_time,screen);
+                            Button[i].RenderText(screen,pos[i].x, pos[i].y);
+                            SDL_RenderPresent(screen);
+                        }
+                    }
+                }
+                break;
+            case SDL_MOUSEBUTTONDOWN:
+                SDL_GetMouseState(&x, &y);
+                for (int i=0;i<BUT_NUM;++i)
+                {
+                    if (x>=pos[i].x && x<=pos[i].x + Button[i].GetWidth() &&
+                        y>=pos[i].y && y<=pos[i].y + Button[i].GetHeight())
+                    {
+                        for (int j =0;j<BUT_NUM;j++)
+                        {
+                            Button[j].Free();
+                        }
+                        return i;
+                    }
+                }
+                break;
+            case SDL_KEYDOWN:
+                if (event.key.keysym.sym == SDLK_ESCAPE)
+                {
+                    for (int j =0;j<BUT_NUM;j++)
+                    {
+                            Button[j].Free();
+                    }
+                    return 0;
+                }
+                break;
+            }
+        }
+    }
 }

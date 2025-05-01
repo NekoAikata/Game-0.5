@@ -87,3 +87,4 @@ bool Common_Func::CheckCollision(const SDL_Rect& object1, const SDL_Rect& object
 
   return false;
 }
+

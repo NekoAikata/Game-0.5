@@ -27,6 +27,12 @@ const int RENDER_DRAW_COLOR = 0;
 #define MAX_MAP_X 13
 #define MAX_MAP_Y 400
 
+#define LEVEL_1 389
+#define LEVEL_1_5 375
+#define LEVEL_2 300
+#define LEVEL_3 200
+#define LEVEL_4 100
+
 #define BLANK_MAP 0
 #define FLOOR 1
 #define TREASURE 4

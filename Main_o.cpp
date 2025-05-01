@@ -6,7 +6,7 @@ MainObject::MainObject()
     x_val = 0;
     y_val = 0;
     x_pos = 6*TILE_SIZE;
-    y_pos = 3*TILE_SIZE;
+    y_pos = 396*TILE_SIZE;
     width_frame = 0;
     height_frame = 0;
     frame_num = 0;
@@ -83,7 +83,15 @@ void MainObject::Clip()
 bool MainObject::Show(SDL_Renderer* des )
 {
     UpdateImg(des);
-    if (Store_action.left == 1 ||
+    if (((Store_action.up == 1) && (Store_action.down == 1) &&
+         (Store_action.left != 1) && (Store_action.right != 1))
+          ||
+        ((Store_action.left == 1) && (Store_action.right == 1) &&
+         (Store_action.up != 1) && (Store_action.down != 1)))
+    {
+        frame_num = 0;
+    }
+    else if (Store_action.left == 1 ||
         Store_action.right == 1 ||
         Store_action.up == 1 ||
         Store_action.down == 1 ||
@@ -109,7 +117,7 @@ bool MainObject::Show(SDL_Renderer* des )
 
     SDL_Rect* current_clip = &frame_clip[frame_num];
 
-    SDL_Rect renderQuad = {rect.x, rect.y, width_frame, height_frame};
+    SDL_Rect renderQuad = {rect.x, rect.y, 78, 78};
     SDL_RenderCopy(des, texture, current_clip, &renderQuad);
 }
 
@@ -123,28 +131,24 @@ void MainObject::HandleEvent(SDL_Event event, SDL_Renderer* screen)
             {
                 status_character = UP;
                 Store_action.up = 1;
-                Store_action.down = 0;
                 break;
             }
         case SDLK_s:
             {
                 status_character = DOWN;
                 Store_action.down = 1;
-                Store_action.up = 0;
                 break;
             }
         case SDLK_d:
             {
                 status_character = RIGHT;
                 Store_action.right = 1;
-                Store_action.left = 0;
                 break;
             }
         case SDLK_a:
             {
                 status_character = LEFT;
                 Store_action.left = 1;
-                Store_action.right = 0;
                 break;
             }
         case SDLK_j:
@@ -300,10 +304,10 @@ void MainObject::CheckMap(Map& map_data)
     int y1 = 0, y2 = 0;
     //Check chieu ngang
     int height_min = height_frame < TILE_SIZE ? height_frame : TILE_SIZE;
-    x1 = (x_pos + x_val)/TILE_SIZE;
-    x2 = (x_pos + x_val + width_frame - 1)/TILE_SIZE;
-    y1 = (y_pos)/TILE_SIZE;
-    y2 = (y_pos + height_min - 1)/TILE_SIZE;
+    x1 = (x_pos + x_val + 35)/TILE_SIZE;
+    x2 = (x_pos + x_val + width_frame - 10)/TILE_SIZE;
+    y1 = (y_pos + 30)/TILE_SIZE;
+    y2 = (y_pos + height_min - 10)/TILE_SIZE;
 
     int val1 = map_data.tile[y1][x2];
     int val2 = map_data.tile[y2][x2];
@@ -321,9 +325,10 @@ void MainObject::CheckMap(Map& map_data)
             }
             else
             {
-                if (val1 != BLANK_MAP || val2 !=BLANK_MAP)
+                if ((val1 !=BLANK_MAP && val1 != FLOOR) ||
+                    (val2 !=BLANK_MAP && val2 != FLOOR))
                 {
-                    x_pos = x2*TILE_SIZE - width_frame - 1;
+                    x_pos = x2*TILE_SIZE - width_frame + 5;
                     x_val=0;
                 }
             }
@@ -337,9 +342,10 @@ void MainObject::CheckMap(Map& map_data)
             }
             else
             {
-                if (val3 !=BLANK_MAP || val4 !=BLANK_MAP)
+                if ((val3 !=BLANK_MAP && val3 != FLOOR) ||
+                    (val4 !=BLANK_MAP && val4 != FLOOR))
                 {
-                    x_pos = (x1+1)*TILE_SIZE;
+                    x_pos = x1*TILE_SIZE+30;
                     x_val = 0;
                 }
             }
@@ -347,10 +353,10 @@ void MainObject::CheckMap(Map& map_data)
     }
     //Check chieu doc
     int width_min = width_frame < TILE_SIZE ? width_frame : TILE_SIZE;
-    x1 = (x_pos)/TILE_SIZE;
-    x2 = (x_pos + width_min - 1)/TILE_SIZE;
-    y1 = (y_pos + y_val)/TILE_SIZE;
-    y2 = (y_pos + y_val + height_frame - 1)/TILE_SIZE;
+    x1 = (x_pos + 40)/TILE_SIZE;
+    x2 = (x_pos + width_min - 30)/TILE_SIZE;
+    y1 = (y_pos + y_val + 25)/TILE_SIZE;
+    y2 = (y_pos + y_val + height_frame - 5)/TILE_SIZE;
 
     val1 = map_data.tile[y1][x2];
     val2 = map_data.tile[y2][x2];
@@ -368,9 +374,10 @@ void MainObject::CheckMap(Map& map_data)
             }
             else
             {
-                if (val2 != BLANK_MAP || val4 !=BLANK_MAP)
+                if ((val2 != BLANK_MAP && val2 !=FLOOR) ||
+                    (val4 != BLANK_MAP && val4 !=FLOOR))
                 {
-                    y_pos = y2*TILE_SIZE - height_frame - 1;
+                    y_pos = y2*TILE_SIZE - height_frame + 5;
                     y_val=0;
                 }
             }
@@ -384,9 +391,10 @@ void MainObject::CheckMap(Map& map_data)
             }
             else
             {
-                if (val1 !=BLANK_MAP || val3 !=BLANK_MAP)
+                if ((val1 !=BLANK_MAP && val1 !=FLOOR) ||
+                    (val3 !=BLANK_MAP && val3 !=FLOOR))
                 {
-                    y_pos = (y1+1)*TILE_SIZE;
+                    y_pos = y2*TILE_SIZE - 30;
                     y_val = 0;
                 }
             }
@@ -415,6 +423,7 @@ void MainObject::CheckMap(Map& map_data)
 
 void MainObject::MapMove(Map& map_data)
 {
+    //chieu x
     map_data.start_x = x_pos - (SCREEN_WIDTH/2);
     if (map_data.start_x < 0)
     {
@@ -424,14 +433,62 @@ void MainObject::MapMove(Map& map_data)
     {
         map_data.start_x = map_data.max_x - SCREEN_WIDTH;
     }
+    //Chieu y
     map_data.start_y = y_pos - (SCREEN_HEIGHT/2);
+
     if (map_data.start_y < 0)
     {
         map_data.start_y = 0;
     }
-    else if (map_data.start_y + SCREEN_HEIGHT >= map_data.max_y)
+    else if (y_pos >= LEVEL_1*TILE_SIZE)
     {
         map_data.start_y = map_data.max_y - SCREEN_HEIGHT;
+    }
+    else if (y_pos >= LEVEL_1_5*TILE_SIZE)
+    {
+        if (map_data.start_y + SCREEN_HEIGHT > LEVEL_1*TILE_SIZE + TILE_SIZE)
+        {
+            map_data.start_y = LEVEL_1*TILE_SIZE - SCREEN_HEIGHT + TILE_SIZE;
+        } else if (map_data.start_y <= LEVEL_1_5*TILE_SIZE)
+        {
+            map_data.start_y = LEVEL_1_5*TILE_SIZE;
+        }
+    }
+    else if (y_pos >= LEVEL_2*TILE_SIZE)
+    {
+        if (map_data.start_y + SCREEN_HEIGHT > LEVEL_1_5*TILE_SIZE + TILE_SIZE)
+        {
+            map_data.start_y = LEVEL_1_5*TILE_SIZE - SCREEN_HEIGHT + TILE_SIZE;
+        } else if (map_data.start_y <= LEVEL_2*TILE_SIZE)
+        {
+            map_data.start_y = LEVEL_2*TILE_SIZE;
+        }
+    }
+    else if (y_pos >= LEVEL_3*TILE_SIZE)
+    {
+        if (map_data.start_y + SCREEN_HEIGHT > LEVEL_2*TILE_SIZE + TILE_SIZE)
+        {
+            map_data.start_y = LEVEL_2*TILE_SIZE - SCREEN_HEIGHT + TILE_SIZE;
+        } else if (map_data.start_y <= LEVEL_3*TILE_SIZE)
+        {
+            map_data.start_y = LEVEL_3*TILE_SIZE;
+        }
+    }
+    else if (y_pos >= LEVEL_4*TILE_SIZE)
+    {
+        if (map_data.start_y + SCREEN_HEIGHT > LEVEL_3*TILE_SIZE + TILE_SIZE)
+        {
+            map_data.start_y = LEVEL_3*TILE_SIZE - SCREEN_HEIGHT + TILE_SIZE;
+        } else if (map_data.start_y <= LEVEL_4*TILE_SIZE - TILE_SIZE)
+        {
+            map_data.start_y = LEVEL_4*TILE_SIZE - TILE_SIZE;
+        }
+    } else
+    {
+        if (map_data.start_y + SCREEN_HEIGHT > LEVEL_4*TILE_SIZE)
+        {
+            map_data.start_y = LEVEL_4*TILE_SIZE - SCREEN_HEIGHT;
+        }
     }
 }
 
@@ -454,5 +511,5 @@ void MainObject::ShowHP(TTF_Font* font, SDL_Renderer* screen)
     HPText += HP_num;
     HPStat.SetText(HPText);
     HPStat.LoadFromRenderText(font, screen);
-    HPStat.RenderText(screen, SCREEN_WIDTH-128, 54);
+    HPStat.RenderText(screen, SCREEN_WIDTH-128, 40);
 }
