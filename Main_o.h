@@ -30,6 +30,8 @@ public:
     void UpdateImg(SDL_Renderer* screen);
     void Clip();
 
+    void UpdateBattleStatus (const bool& x);
+
     void DoPlayer(Map& map_data);
     void CheckMap(Map& map_data);
     void SetMapXY(const int x, const int y) {mapvalue_x = x; mapvalue_y = y;}
@@ -45,16 +47,24 @@ public:
     void SetYPos(const float& x) {y_pos = x;}
     float GetYPos() {return y_pos;}
 
-    void ShowHP(TTF_Font* font, SDL_Renderer* screen);
+    void ShowStat(TTF_Font* font, SDL_Renderer* screen);
+    void ShowBattleStat (TTF_Font* font, SDL_Renderer* screen);
+    void HandleXP ();
     int HP;
     int maxHP;
+
+    int ATK;
+    int SPEED;
 
     bool have_sword;
 
     int xp;
+    int xp_cap;
     int level;
 
 private:
+    bool battle;
+
     Slash BasicAttack;
     float x_val;
     float y_val;
@@ -72,7 +82,6 @@ private:
 
     int mapvalue_x;
     int mapvalue_y;
-
 
 };
 

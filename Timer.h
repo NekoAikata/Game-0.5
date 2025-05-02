@@ -17,6 +17,8 @@ public:
     bool const start_check() {return is_started;};
     bool const pause_check() {return is_paused;};
 
+    int Store_pause;
+
 private:
     int start_tick;
     int paused_tick;

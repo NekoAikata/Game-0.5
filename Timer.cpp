@@ -8,6 +8,8 @@ Timer::Timer()
 
     is_paused = false;
     is_started = false;
+
+    Store_pause = 0;
 }
 
 Timer::~Timer()
@@ -43,6 +45,7 @@ void Timer::unpaused()
     {
         is_paused = false;
         start_tick = SDL_GetTicks();
+        Store_pause+=paused_tick;
         paused_tick = 0;
     }
 }

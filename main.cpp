@@ -71,7 +71,7 @@ bool LoadBG(const int& level, SDL_Renderer* screen)
     std::string path; bool ret;
     if (level == 1 || level == 3 || level == 5)
     {
-        path = "img//grass.png";
+        path = "img//grass1.png";
     } else if (level == 2)
     {
         path = "";
@@ -122,97 +122,9 @@ void close1()
     IMG_Quit();
 }
 
-std::vector<ThreatObject*> MakeThreatList ()
-{
-    std::vector<ThreatObject*> list_threats;
-    std::ifstream OpenFile;
-    OpenFile.open("map//threat.txt");
-    ThreatObject* test_threat = new ThreatObject;
-        test_threat->LoadImg("img//threat_slime.png",renderer);
-        test_threat->Clip();
-        int a,b;
-        int type, HP, ATK, HP_drop, XP_drop;
-        float x;
-        OpenFile >> type;
-        test_threat->SetType(type);
-        test_threat->SetInputL(type);
-        OpenFile >> x;
-        test_threat->SetXpos(x*TILE_SIZE);
-        OpenFile >> x;
-        test_threat->SetYpos(x*TILE_SIZE);
-        test_threat->SetXYposRes();
-        OpenFile >> a;
-        test_threat->HP = a;
-        OpenFile >> a;
-        test_threat->ATK = a;
-        OpenFile >> a;
-        test_threat->HP_drop = a;
-        OpenFile >> a;
-        test_threat->XP_drop = a;
-        list_threats.push_back(test_threat);
+std::vector<ThreatObject*> MakeThreatList ();
 
-    ThreatObject* dynamic_threat = new ThreatObject[20];
-    OpenFile >> type;
-    OpenFile >> HP;
-    OpenFile >> ATK;
-    OpenFile >> HP_drop;
-    OpenFile >> XP_drop;
-
-    for (int i = 0;i<20;i++)
-    {
-        ThreatObject* p_threat = (dynamic_threat + i);
-        if (p_threat != NULL)
-        {
-            p_threat->LoadImg("img//threat_slime.png",renderer);
-            p_threat->Clip();
-            p_threat->SetType(type);
-            p_threat->SetInputL(type);
-            p_threat->HP = HP;
-            p_threat->ATK = ATK;
-            p_threat->XP_drop = XP_drop;
-            p_threat->HP_drop = HP_drop;
-            OpenFile >> x;
-            p_threat->SetXpos(x*TILE_SIZE);
-            OpenFile >> x;
-            p_threat->SetYpos(x*TILE_SIZE);
-            OpenFile >> a;
-            OpenFile >> b;
-            p_threat->SetBorderX(a*TILE_SIZE,b*TILE_SIZE);
-            p_threat->SetXYposRes();
-            list_threats.push_back(p_threat);
-        }
-    }
-
-    ThreatObject* threats = new ThreatObject[20];
-    OpenFile >> type;
-    OpenFile >> HP;
-    OpenFile >> ATK;
-    OpenFile >> HP_drop;
-    OpenFile >> XP_drop;
-
-    for (int i =0; i < 20;i++)
-    {
-        ThreatObject* p_threat = (threats + i);
-        if (p_threat != NULL)
-        {
-            p_threat->LoadImg("img//threat_slime.png",renderer);
-            p_threat->Clip();
-            p_threat->SetType(type);
-            p_threat->SetInputL(type);
-            p_threat->HP = HP;
-            p_threat->ATK = ATK;
-            p_threat->XP_drop = XP_drop;
-            p_threat->HP_drop = HP_drop;
-            OpenFile >> x;
-            p_threat->SetXpos(x*TILE_SIZE);
-            OpenFile >> x;
-            p_threat->SetYpos(x*TILE_SIZE);
-            list_threats.push_back(p_threat);
-        }
-    }
-    return list_threats;
-}
-
+std::vector<BossThreat*> MakeBossThreatList ();
 void SetLevelAndBG(const float& y_pos, int& level);
 int Menu(SDL_Renderer* screen, TTF_Font* font_time, bool Start, TTF_Font* font_title);
 
@@ -221,7 +133,7 @@ int main(int argc, char* argv[])
     bool running = true;
     while (running){
         int level = 1;
-        Timer fps_timer, Threatt_timer, Slash_cooldown;
+        Timer fps_timer, Threatt_timer, Slash_cooldown, Run_time;
 
         Text_object Noti;
         Text_object PMinus, PHeal, Dmg;
@@ -243,7 +155,7 @@ int main(int argc, char* argv[])
         }
 
         GameMap Game_map;
-        Game_map.LoadMap("map/map.dat");
+        Game_map.LoadMap("map/map1.dat");
         Game_map.LoadTiles(renderer);
 
         MainObject Player1;
@@ -282,8 +194,13 @@ int main(int argc, char* argv[])
         {
             Mix_PlayMusic(BGM, -1);
         }
+        Run_time.start();
         while (!quitG)
         {
+            if (Mix_PausedMusic () == 1)
+            {
+                Mix_ResumeMusic();
+            }
             fps_timer.start();
             while(SDL_PollEvent(&event) != 0)
             {
@@ -296,13 +213,17 @@ int main(int argc, char* argv[])
                 {
                     if (event.key.keysym.sym == SDLK_ESCAPE){
 
-                        SDL_Rect fill_rect = {SCREEN_WIDTH/2 - 128,5*TILE_SIZE, 256, 128};
+                        Run_time.paused();
+                        SDL_Rect fill_rect = {SCREEN_WIDTH/2 - 128,10*TILE_SIZE/2, 256, 128};
                         SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
                         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 128);
                         SDL_RenderFillRect(renderer, &fill_rect);
+                        Mix_PauseMusic();
+
                         int i = Menu(renderer, font_menu, 0, font_title);
                         if (i==1)
                         {
+                            Mix_HaltMusic();
                             quitG = true;
                         }
                         if (i==2)
@@ -310,6 +231,7 @@ int main(int argc, char* argv[])
                             quitG = true;
                             running = false;
                         }
+                        Run_time.unpaused();
                     }
                     if ((event.key.keysym.sym == SDLK_w ||
                         event.key.keysym.sym == SDLK_a ||
@@ -335,7 +257,7 @@ int main(int argc, char* argv[])
             Player1.HandleSlash(renderer);
             Player1.SetMapXY(map_data.start_x, map_data.start_y);
             Boss1.SetMapXY(map_data.start_x, map_data.start_y);
-
+            Boss1.Show(renderer);
 
             for (int i = 0;i < list_threats.size(); i++)
             {
@@ -350,12 +272,43 @@ int main(int argc, char* argv[])
                     }
                 }
             }
-            for (int i=0; i < list_threats.size(); ++i)
-            {
-                if (&Player1 != NULL)
+            if (&Player1 != NULL)
                     {
                         SDL_Rect PRect = Player1.GetRectP();
+                        if (Boss1.GetTexture() != NULL){
+                            SDL_Rect BRect;
+                                BRect.x = Boss1.GetRect().x;
+                                BRect.y = Boss1.GetRect().y;
+                                BRect.w = 128;
+                                BRect.h = 128;
+                            if (Common_Func::CheckCollision(PRect,BRect))
+                            {
+                                SDL_RenderClear(renderer);
+
+                                if (Mix_PlayingMusic() == 1)
+                                {
+                                    Mix_PauseMusic();
+                                }
+                                Boss1.battle = true;
+                                int result = Boss1.BossCombat(Player1,font_combat,renderer,font_menu);
+                                if (result == 0){
+                                    Player1.UpdateBattleStatus(false);
+                                    Boss1.Free();
+                                    continue;
+                                }
+                            }
+                        }
+            for (int i=0; i < list_threats.size(); ++i)
+            {
                 ThreatObject* threat_check = list_threats[i];
+                if (list_threats[i]->GetRevTime() >= 975)
+                            {
+                                std::string y = std::to_string(list_threats[i]->HP_drop);
+                                y = "+" + y;
+                                PHeal.SetText(y);
+                                PHeal.LoadFromRenderText(font_slash,renderer);
+                                PHeal.RenderText(renderer,PRect.x + PRect.w -10,PRect.y);
+                            }
                 if (threat_check != NULL && threat_check->GetRevTime() == 0)
                 {
                     SDL_Rect TRect;
@@ -365,6 +318,9 @@ int main(int argc, char* argv[])
                         TRect.h = threat_check->GetHeightFrame(); TRect.h -=20;
 
                     Slash* SCheck = Player1.GetSlash();
+
+
+
                     if (SCheck != NULL)
                     {
                         SDL_Rect SRect = SCheck->GetRect();
@@ -372,14 +328,16 @@ int main(int argc, char* argv[])
 
                         if(check)
                         {
+                            std::string x = std::to_string(Player1.ATK);
+                            x = "-" + x;
+                            Dmg.SetText(x);
                             if (Slash_cooldown.get_tick() >= 750)
                             {
                                 if (!hit_threat)
                                 {
                                     hit_threat = true;
                                 }
-                                (list_threats[i]->HP)-=25;
-                                Dmg.SetText("-25");
+                                (list_threats[i]->HP)-=Player1.ATK;
                                 Dmg.LoadFromRenderText(font_slash, renderer);
                                 Dmg.RenderText(renderer, TRect.x -40, TRect.y -40);
                                 if ((list_threats[i]->HP) == 0)
@@ -388,45 +346,44 @@ int main(int argc, char* argv[])
                                     {
                                         killed_threat = true;
                                     }
-                                    Player1.HP +=20;
-                                    PHeal.SetText("+20");
+                                    Player1.xp+=list_threats[i]->XP_drop;
+                                    if (Player1.HP + (list_threats[i]->HP_drop) > Player1.maxHP) Player1.HP = Player1.maxHP;
+                                    else Player1.HP +=list_threats[i]->HP_drop;
+                                    std::string y = std::to_string(list_threats[i]->HP_drop);
+                                    y = "+" + y;
+                                    PHeal.SetText(y);
                                     PHeal.LoadFromRenderText(font_slash,renderer);
                                     PHeal.RenderText(renderer,PRect.x + PRect.w -10,PRect.y);
-                                    list_threats[i]->SetRevTime(200);
+                                    list_threats[i]->SetRevTime(1000);
                                 }
                                 Slash_cooldown.start();
                             }
-                            if (Slash_cooldown.get_tick() <= 250)
+                            if (Slash_cooldown.get_tick() <= 550)
                             {
-                                Dmg.SetText("-25");
                                 Dmg.LoadFromRenderText(font_slash, renderer);
                                 Dmg.RenderText(renderer, TRect.x -40, TRect.y -40);
-                            }
-                            if (list_threats[i]->GetRevTime() >= 30)
-                            {
-                                PHeal.SetText("+20");
-                                PHeal.LoadFromRenderText(font_slash,renderer);
-                                PHeal.RenderText(renderer,PRect.x + PRect.w -10,PRect.y);
                             }
                         }
                     }
                         if (Common_Func::CheckCollision(PRect, TRect))
                         {
+                            std::string w = std::to_string(list_threats[i]->ATK);
+                            w = "-" + w;
                             if (Threatt_timer.get_tick() >= 1500)
                             {
                                 if (!threat_hit)
                                 {
                                     threat_hit = true;
                                 }
-                                Player1.HP-=50;
-                                PMinus.SetText("-50");
+                                Player1.HP-=list_threats[i]->ATK;
+                                PMinus.SetText(w);
                                 PMinus.LoadFromRenderText(font_slash,renderer);
                                 PMinus.RenderText(renderer,PRect.x + PRect.w -10,PRect.y - 20);
                                 Threatt_timer.start();
                             }
-                            if (Threatt_timer.get_tick() <= 500)
+                            if (Threatt_timer.get_tick() <= 850)
                             {
-                                PMinus.SetText("-50");
+                                PMinus.SetText(w);
                                 PMinus.LoadFromRenderText(font_slash,renderer);
                                 PMinus.RenderText(renderer,PRect.x + PRect.w -10,PRect.y - 20);
                             }
@@ -443,58 +400,16 @@ int main(int argc, char* argv[])
             Player1.FreeSlash();
             Player1.Show(renderer);
 
-            Boss1.Show(renderer);
+            Player1.HandleXP();
 
             //Show Stat_game
-            SDL_Rect fill_rect = {SCREEN_WIDTH-160, 0, 160, 64};
+            SDL_Rect fill_rect = {SCREEN_WIDTH-160, 0, 160, 120};
             SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
             SDL_SetRenderDrawColor(renderer, 0, 0, 0, 128);
             SDL_RenderFillRect(renderer, &fill_rect);
-            float Player_y = Player1.GetYPos();
-            if (intro){
-                if(MOVE){
-                    Noti.SetText("Use W,A,S,D to move");
-                    Noti.LoadFromRenderText(font_noti,renderer);
-                    Noti.RenderText(renderer,3*TILE_SIZE,30);
-                } else if (!Player1.have_sword)
-                {
-                    Noti.SetText("Take sword in this room");
-                    Noti.LoadFromRenderText(font_noti,renderer);
-                    Noti.RenderText(renderer,2.5*TILE_SIZE,30);
-                } else if (attack)
-                {
-                    Noti.SetText("Use J to attack with sword");
-                    Noti.LoadFromRenderText(font_noti,renderer);
-                    Noti.RenderText(renderer,2*TILE_SIZE,30);
-                } else if (map_data.tile[390][1] == KEY)
-                {
-                    Noti.SetText("Get key and try small threats!");
-                    Noti.LoadFromRenderText(font_noti,renderer);
-                    Noti.RenderText(renderer,2*TILE_SIZE,30);
-                } else if (!killed_threat){
-                    if(Player_y <= 389*TILE_SIZE &&
-                        Player_y >= 377*TILE_SIZE)
-                        if (!threat_hit && !hit_threat)
-                        {
-                            Noti.SetText("You got hit when threat come close!");
-                            Noti.LoadFromRenderText(font_noti,renderer);
-                            Noti.RenderText(renderer,1*TILE_SIZE,30);
-                        } else if (threat_hit && !hit_threat)
-                        {
-                            Noti.SetText("Use sword to hit them!");
-                            Noti.LoadFromRenderText(font_noti,renderer);
-                            Noti.RenderText(renderer,2.5*TILE_SIZE,30);
-                        } else
-                        {
-                            Noti.SetText("After kill them, you gain XP and HP");
-                            Noti.LoadFromRenderText(font_noti,renderer);
-                            Noti.RenderText(renderer,1*TILE_SIZE,30);
-                        }
-                } else {intro = false;}
-            }
 
             std::string str_time = "Time: ";
-            Uint32 current_time = SDL_GetTicks()/1000;
+            int current_time = (Run_time.get_tick() + Run_time.Store_pause)/1000;
             std::string str_val = std::to_string(current_time);
             str_time += str_val;
 
@@ -502,8 +417,51 @@ int main(int argc, char* argv[])
             Time_game.LoadFromRenderText(font_time, renderer);
             Time_game.RenderText(renderer, SCREEN_WIDTH - 128, 15);
 
-            Player1.ShowHP(font_time, renderer);
-            Player1.GetYPos();
+            Player1.ShowStat(font_time, renderer);
+
+            float Player_y = Player1.GetYPos();
+            if (intro){
+                if(MOVE){
+                    Noti.SetText("Use W,A,S,D to move");
+                    Noti.LoadFromRenderText(font_noti,renderer);
+                    Noti.RenderText(renderer,4*TILE_SIZE,30);
+                } else if (!Player1.have_sword)
+                {
+                    Noti.SetText("Take sword in this room");
+                    Noti.LoadFromRenderText(font_noti,renderer);
+                    Noti.RenderText(renderer,3.5*TILE_SIZE,30);
+                } else if (attack)
+                {
+                    Noti.SetText("Use J to attack with sword");
+                    Noti.LoadFromRenderText(font_noti,renderer);
+                    Noti.RenderText(renderer,3*TILE_SIZE,30);
+                } else if (map_data.tile[390][1] == KEY)
+                {
+                    Noti.SetText("Get key and try small threats!");
+                    Noti.LoadFromRenderText(font_noti,renderer);
+                    Noti.RenderText(renderer,3*TILE_SIZE,30);
+                } else if (!killed_threat){
+                    if(Player_y <= 389*TILE_SIZE &&
+                        Player_y >= 377*TILE_SIZE)
+                        if (!threat_hit && !hit_threat)
+                        {
+                            Noti.SetText("You got hit when threat come close!");
+                            Noti.LoadFromRenderText(font_noti,renderer);
+                            Noti.RenderText(renderer,2*TILE_SIZE,30);
+                        } else if (threat_hit && !hit_threat)
+                        {
+                            Noti.SetText("Use sword to hit them!");
+                            Noti.LoadFromRenderText(font_noti,renderer);
+                            Noti.RenderText(renderer,3.5*TILE_SIZE,30);
+                        } else
+                        {
+                            Noti.SetText("After kill them, you gain XP and HP");
+                            Noti.LoadFromRenderText(font_noti,renderer);
+                            Noti.RenderText(renderer,2*TILE_SIZE,30);
+                        }
+                } else {intro = false;}
+            }
+
 
             SDL_RenderPresent(renderer);
             int real_timer = fps_timer.get_tick();
@@ -646,4 +604,95 @@ int Menu(SDL_Renderer* screen, TTF_Font* font_time, bool Start, TTF_Font* font_t
 void SetLevelAndBG(float y_pos, int level)
 {
 
+}
+
+std::vector<ThreatObject*> MakeThreatList ()
+{
+    std::vector<ThreatObject*> list_threats;
+    std::ifstream OpenFile;
+    OpenFile.open("map//threat.txt");
+    ThreatObject* test_threat = new ThreatObject;
+        test_threat->LoadImg("img//threat_slime.png",renderer);
+        test_threat->Clip();
+        int a,b;
+        int type, HP, ATK, HP_drop, XP_drop;
+        float x;
+        OpenFile >> type;
+        test_threat->SetType(type);
+        test_threat->SetInputL(type);
+        OpenFile >> x;
+        test_threat->SetXpos(x*TILE_SIZE);
+        OpenFile >> x;
+        test_threat->SetYpos(x*TILE_SIZE);
+        test_threat->SetXYposRes();
+        OpenFile >> a;
+        test_threat->HP = a;
+        OpenFile >> a;
+        test_threat->ATK = a;
+        OpenFile >> a;
+        test_threat->HP_drop = a;
+        OpenFile >> a;
+        test_threat->XP_drop = a;
+        list_threats.push_back(test_threat);
+
+    ThreatObject* dynamic_threat = new ThreatObject[20];
+    OpenFile >> type;
+    OpenFile >> HP;
+    OpenFile >> ATK;
+    OpenFile >> HP_drop;
+    OpenFile >> XP_drop;
+
+    for (int i = 0;i<20;i++)
+    {
+        ThreatObject* p_threat = (dynamic_threat + i);
+        if (p_threat != NULL)
+        {
+            p_threat->LoadImg("img//threat_slime.png",renderer);
+            p_threat->Clip();
+            p_threat->SetType(type);
+            p_threat->SetInputL(type);
+            p_threat->HP = HP;
+            p_threat->ATK = ATK;
+            p_threat->XP_drop = XP_drop;
+            p_threat->HP_drop = HP_drop;
+            OpenFile >> x;
+            p_threat->SetXpos(x*TILE_SIZE);
+            OpenFile >> x;
+            p_threat->SetYpos(x*TILE_SIZE);
+            OpenFile >> a;
+            OpenFile >> b;
+            p_threat->SetBorderX(a*TILE_SIZE,b*TILE_SIZE);
+            p_threat->SetXYposRes();
+            list_threats.push_back(p_threat);
+        }
+    }
+
+    ThreatObject* threats = new ThreatObject[20];
+    OpenFile >> type;
+    OpenFile >> HP;
+    OpenFile >> ATK;
+    OpenFile >> HP_drop;
+    OpenFile >> XP_drop;
+
+    for (int i =0; i < 20;i++)
+    {
+        ThreatObject* p_threat = (threats + i);
+        if (p_threat != NULL)
+        {
+            p_threat->LoadImg("img//threat_slime.png",renderer);
+            p_threat->Clip();
+            p_threat->SetType(type);
+            p_threat->SetInputL(type);
+            p_threat->HP = HP;
+            p_threat->ATK = ATK;
+            p_threat->XP_drop = XP_drop;
+            p_threat->HP_drop = HP_drop;
+            OpenFile >> x;
+            p_threat->SetXpos(x*TILE_SIZE);
+            OpenFile >> x;
+            p_threat->SetYpos(x*TILE_SIZE);
+            list_threats.push_back(p_threat);
+        }
+    }
+    return list_threats;
 }

@@ -7,7 +7,7 @@ void GameMap::LoadMap (char* name)
         return;
     }
 
-    game_map.max_x = 12;
+    game_map.max_x = 13;
     game_map.max_y = 399;
     for (int i = 0; i < MAX_MAP_Y; i++)
     {

@@ -2,9 +2,9 @@
 
 BossThreat::BossThreat()
 {
-    HP=1500;
-    ATK=0;
-    SPEED=0;
+    HP=500;
+    ATK=20;
+    SPEED=200;
 
     x_pos = 0;
     y_pos = 0;
@@ -16,7 +16,7 @@ BossThreat::BossThreat()
     mapvalue_y;
 
     type = 0;
-    dead = false;
+    battle = false;
 }
 
 BossThreat::~BossThreat ()
@@ -110,19 +110,36 @@ void BossThreat::Show(SDL_Renderer* des)
     {
         frame_num = 0;
     }
-    rect.x = x_pos - mapvalue_x;
-    rect.y = y_pos - mapvalue_y;
+    SDL_Rect renderQuad;
+    if (!battle){
+        rect.x = x_pos - mapvalue_x;
+        rect.y = y_pos - mapvalue_y;
+        renderQuad = {rect.x, rect.y, 128, 128};
+    } else {renderQuad = {rect.x, rect.y, 224, 224};}
 
     SDL_Rect* current_clip = &frame_clip[frame_num];
 
-    SDL_Rect renderQuad = {rect.x, rect.y, 128, 128};
     SDL_RenderCopy(des, texture, current_clip, &renderQuad);
 }
 
-bool BossThreat::BossCombat (MainObject Player, TTF_Font* font_combat, SDL_Renderer* screen)
+int BossThreat::BossCombat (MainObject Player, TTF_Font* font_combat, SDL_Renderer* screen, TTF_Font* font_noti)
 {
-    Player.SetXPos(x_pos + TILE_SIZE);
-    Player.SetYPos(y_pos + 4*TILE_SIZE);
+    int PCD = Player.SPEED;
+    int BCD = SPEED;
+    int defense = 0;
+    int result = 0;
+    SDL_RenderClear(screen);
+    BaseObject background;
+
+    Player.UpdateBattleStatus(true);
+    Player.LoadImg("img//player_battle.png",screen);
+    Player.Clip();
+    Player.SetXPos(x_pos + TILE_SIZE/2);
+    Player.SetYPos(y_pos + 2.5*TILE_SIZE);
+    Player.SetRect(128,SCREEN_HEIGHT/2 - TILE_SIZE);
+
+    SetRect(SCREEN_WIDTH-320,SCREEN_HEIGHT/2 - 2*TILE_SIZE);
+
     int x,y;
     const int BUT_NUM = 4;
     const char* BUTTON[BUT_NUM] = {"Attack","Defend","Heal","Back To Map"};
@@ -130,12 +147,20 @@ bool BossThreat::BossCombat (MainObject Player, TTF_Font* font_combat, SDL_Rende
     SDL_Color But_color[2] = {{255,255,255},{0,0,0}};
     Text_object Button[BUT_NUM];
     SDL_Point pos[BUT_NUM];
+
+    Text_object Notifi;
+    Text_object PMinus, PHeal, Dmg;
+    Notifi.SetColor(But_color[0]);
+    PMinus.SetColor(255,0,0);
+    PHeal.SetColor(0,0,255);
+
+    Timer threat_delay;
+
     for (int i = 0; i < BUT_NUM; i++)
     {
         Button[i].SetText(BUTTON[i]);
         Button[i].SetColor(But_color[0]);
-        Button[i].LoadFromRenderText(font_combat,renderer);
-        int height = (Button[i].GetHeight())/2;
+        Button[i].LoadFromRenderText(font_noti,renderer);
         if (i==0){
             pos[i].x = 0;
             pos[i].y = SCREEN_HEIGHT - 5*Button[i].GetHeight()/2;
@@ -152,81 +177,155 @@ bool BossThreat::BossCombat (MainObject Player, TTF_Font* font_combat, SDL_Rende
             pos[i].x = SCREEN_WIDTH/2;
             pos[i].y = SCREEN_HEIGHT - Button[i].GetHeight();
         }
-        Button[i].RenderText(renderer,pos[i].x, pos[i].y);
+        Button[i].RenderText(screen,pos[i].x, pos[i].y);
     }
     SDL_RenderPresent(screen);
-    while (true)
+    Timer fps_timer;
+    bool running = true;
+    while (running)
     {
-        while (SDL_PollEvent(&event))
+        if (PCD > 0 && BCD > 0) {PCD--; BCD--;}
+
+        background.LoadImg("img//grass.png", screen);
+        background.SetRect(0,0);
+        background.SetRectWH(SCREEN_WIDTH, SCREEN_HEIGHT);
+        background.Render(screen);
+
+        for (int i=0; i< BUT_NUM;++i)
         {
-            switch (event.type)
+            Button[i].LoadFromRenderText(font_combat,screen);
+            Button[i].RenderText(screen,pos[i].x,pos[i].y);
+        }
+
+        Player.ShowBattleStat(font_combat,screen);
+
+        fps_timer.start();
+        Player.Show(screen);
+
+        Show(screen);
+        SDL_RenderPresent(screen);
+        if (PCD == 0){
+            while (SDL_PollEvent(&event))
             {
-            case SDL_QUIT:
-                for (int i=0;i<BUT_NUM;i++)
-                {
-                    Button[i].Free();
+                if (event.type == SDL_QUIT){
+                    for (int i=0;i<BUT_NUM;i++)
+                    {
+                        Button[i].Free();
+                    }
+                    running = false;
+                    break;
                 }
-                return false;
-                break;
-            case SDL_MOUSEMOTION:
-                SDL_GetMouseState(&x, &y);
-                for (int i=0;i<BUT_NUM;++i)
-                {
-                    if (x>=pos[i].x && x<=pos[i].x + Button[i].GetWidth() &&
-                        y>=pos[i].y && y<=pos[i].y + Button[i].GetHeight())
+                else if (event.type == SDL_MOUSEBUTTONDOWN){
+                    SDL_GetMouseState(&x, &y);
+                    for (int i=0;i<BUT_NUM;++i)
                     {
-                        if(!Button_status[i])
+                        if (x>=pos[i].x && x<=pos[i].x + Button[i].GetWidth() &&
+                            y>=pos[i].y && y<=pos[i].y + Button[i].GetHeight())
                         {
-                            Button_status[i] = 1;
-                            Button[i].Free();
-                            Button[i].SetColor(But_color[1]);
-                            Button[i].LoadFromRenderText(font_combat,screen);
-                            Button[i].RenderText(screen,pos[i].x, pos[i].y);
-                            SDL_RenderPresent(screen);
-                        }
-                    } else
-                    {
-                        if(Button_status[i])
-                        {
-                            Button_status[i] = 0;
-                            Button[i].Free();
-                            Button[i].SetColor(But_color[0]);
-                            Button[i].LoadFromRenderText(font_combat,screen);
-                            Button[i].RenderText(screen,pos[i].x, pos[i].y);
-                            SDL_RenderPresent(screen);
+                            for (int j =0;j<BUT_NUM;j++)
+                            {
+                                Button[j].Free();
+                            }
+                            PCD = Player.SPEED;
+                            defense--;
+                            if (i==0)
+                            {
+                                HP-=Player.ATK;
+                                std::string x = "-" + std::to_string(Player.ATK);
+                                Dmg.SetText(x);
+                                Dmg.LoadFromRenderText(font_noti,screen);
+                                Dmg.RenderText(screen, GetRect().x + 180, GetRect().y);
+                                SDL_RenderPresent(screen);
+                                SDL_Delay(500);
+                            }
+                            else if (i==1)
+                            {
+                                defense = 2;
+                            }
+                            else if (i==2)
+                            {
+                                Player.HP += Player.maxHP/10;
+                                std::string x = "+" + std::to_string(Player.maxHP/10);
+                                PHeal.SetText(x);
+                                PHeal.LoadFromRenderText(font_noti,screen);
+                                PHeal.RenderText(screen,Player.GetRect().x, Player.GetRect().y);
+                                if (Player.HP > Player.maxHP)
+                                {
+                                    Player.HP = Player.maxHP;
+                                }
+                                SDL_RenderPresent(screen);
+                                SDL_Delay(500);
+                            }
+                            if (i==3)
+                            {
+                                running = false;
+                                break;
+                            }
                         }
                     }
                 }
-                break;
-            case SDL_MOUSEBUTTONDOWN:
-                SDL_GetMouseState(&x, &y);
-                for (int i=0;i<BUT_NUM;++i)
-                {
-                    if (x>=pos[i].x && x<=pos[i].x + Button[i].GetWidth() &&
-                        y>=pos[i].y && y<=pos[i].y + Button[i].GetHeight())
+                if (event.type == SDL_MOUSEMOTION){
+                    SDL_GetMouseState(&x, &y);
+                    for (int i=0;i<BUT_NUM;++i)
                     {
-                        for (int j =0;j<BUT_NUM;j++)
+                        if (x>=pos[i].x && x<=pos[i].x + Button[i].GetWidth() &&
+                            y>=pos[i].y && y<=pos[i].y + Button[i].GetHeight())
                         {
-                            Button[j].Free();
-                        }
-                        if (i==3)
+                            if(!Button_status[i])
+                            {
+                                Button_status[i] = 1;
+                                Button[i].Free();
+                                Button[i].SetColor(But_color[1]);
+                                Button[i].LoadFromRenderText(font_combat,screen);
+                                Button[i].RenderText(screen,pos[i].x, pos[i].y);
+                                SDL_RenderPresent(screen);
+                            }
+                        } else
                         {
-                            return false;
+                            if(Button_status[i])
+                            {
+                                Button_status[i] = 0;
+                                Button[i].Free();
+                                Button[i].SetColor(But_color[0]);
+                                Button[i].LoadFromRenderText(font_combat,screen);
+                                Button[i].RenderText(screen,pos[i].x, pos[i].y);
+                                SDL_RenderPresent(screen);
+                            }
                         }
                     }
                 }
-                break;
-            case SDL_KEYDOWN:
-                if (event.key.keysym.sym == SDLK_ESCAPE)
-                {
-                    for (int j =0;j<BUT_NUM;j++)
-                    {
-                            Button[j].Free();
-                    }
-                    return 0;
-                }
-                break;
             }
         }
+        else if (BCD == 0)
+        {
+            Notifi.SetText("Opponent is thinking");
+            Notifi.LoadFromRenderText(font_noti, screen);
+            Notifi.RenderText(screen, 2*TILE_SIZE, 50);
+            if(!threat_delay.start_check()) threat_delay.start();
+            if (threat_delay.get_tick()>2000)
+            {
+                Player.HP-=ATK;
+                std::string x = "-" + std::to_string(ATK);
+                PMinus.SetText(x);
+                PMinus.LoadFromRenderText(font_noti,screen);
+                PMinus.RenderText(screen, Player.GetRect().x, Player.GetRect().y);
+                SDL_RenderPresent(screen);
+                SDL_Delay(500);
+                BCD = SPEED;
+            }
+        }
+        SDL_RenderPresent(screen);
+        int real_timer = fps_timer.get_tick();
+            int time_per_frame = 1000/50;
+
+            if (real_timer < time_per_frame)
+            {
+                int delay_time = time_per_frame - real_timer;
+                if (delay_time >= 0)
+                {
+                    SDL_Delay(delay_time);
+                }
+            }
     }
+    return result;
 }

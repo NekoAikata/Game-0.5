@@ -5,6 +5,8 @@
 #include "Game_Stat.h"
 #include "Main_o.h"
 #include "Text.h"
+#include "Map.h"
+#include "Timer.h"
 
 class BossThreat : public BaseObject
 {
@@ -26,14 +28,15 @@ public:
     void SetMapXY(const int x, const int y) {mapvalue_x = x; mapvalue_y = y;}
 
     void SetType (const int& Type) {type = Type;}
-    void SetStatus (const bool& x) {dead = x;}
 
     int HP;
     int ATK;
     int SPEED;
 
+    bool battle;
+
     void MinusHP (const int& x) {HP-=x;}
-    bool BossCombat (MainObject Player, TTF_Font* font_combat, SDL_Renderer* screen);
+    int BossCombat (MainObject Player, TTF_Font* font_combat, SDL_Renderer* screen, TTF_Font* font_noti);
 private:
 
     float x_pos;
@@ -49,7 +52,6 @@ private:
     int mapvalue_y;
 
     int type;
-    bool dead;
 };
 
 #endif // BOSS_THREAT

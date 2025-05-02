@@ -14,7 +14,7 @@ static SDL_Renderer* renderer = NULL;
 static SDL_Event event;
 
 const int FRAME_PER_SECOND = 24;
-const int SCREEN_WIDTH = 640;
+const int SCREEN_WIDTH = 896;
 const int SCREEN_HEIGHT = 704;
 const int BPP = 32;
 
@@ -24,7 +24,7 @@ const int COLOR_KEY_B = 180;
 const int RENDER_DRAW_COLOR = 0;
 
 #define TILE_SIZE 64
-#define MAX_MAP_X 13
+#define MAX_MAP_X 14
 #define MAX_MAP_Y 400
 
 #define LEVEL_1 389
@@ -35,9 +35,10 @@ const int RENDER_DRAW_COLOR = 0;
 
 #define BLANK_MAP 0
 #define FLOOR 1
-#define DOOR_OPEN 6
-#define KEY 8
-#define TREASURE 4
+#define DOOR 15
+#define DOOR_OPEN 16
+#define KEY 17
+#define TREASURE 18
 
 namespace Common_Func
 {

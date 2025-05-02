@@ -6,7 +6,7 @@ MainObject::MainObject()
     x_val = 0;
     y_val = 0;
     x_pos = 6*TILE_SIZE;
-    y_pos = 396*TILE_SIZE;
+    y_pos = 378*TILE_SIZE;
 
     width_frame = 0;
     height_frame = 0;
@@ -23,11 +23,15 @@ MainObject::MainObject()
     frame_delay = 0;
 
     xp = 0;
+    xp_cap = 100;
     level = 1;
 
     maxHP = 1000;
+    ATK = 25;
+    SPEED = 50;
     HP=maxHP;
     have_sword = false;
+    battle = false;
 }
 
 MainObject::~MainObject()
@@ -104,7 +108,8 @@ bool MainObject::Show(SDL_Renderer* des )
         Store_action.right == 1 ||
         Store_action.up == 1 ||
         Store_action.down == 1 ||
-        BasicAttack.get_status())
+        BasicAttack.get_status() ||
+             battle)
     {
         frame_delay++;
         if (frame_delay >= FRAME_DELAY)
@@ -121,12 +126,14 @@ bool MainObject::Show(SDL_Renderer* des )
     {
         frame_num = 0;
     }
-    rect.x = x_pos - mapvalue_x;
-    rect.y = y_pos - mapvalue_y;
+    SDL_Rect renderQuad;
+    if (!battle){
+        rect.x = x_pos - mapvalue_x;
+        rect.y = y_pos - mapvalue_y;
+        renderQuad = {rect.x, rect.y, 78, 78};
+    } else {renderQuad = {rect.x, rect.y, 192, 192};}
 
     SDL_Rect* current_clip = &frame_clip[frame_num];
-
-    SDL_Rect renderQuad = {rect.x, rect.y, 78, 78};
     SDL_RenderCopy(des, texture, current_clip, &renderQuad);
 }
 
@@ -283,6 +290,13 @@ void MainObject::UpdateImg(SDL_Renderer* des)
             else {LoadImg("img//player_down.png" ,des);}
         }
     }
+    if (battle)
+    {
+        if (BasicAttack.get_status())
+        {
+            LoadImg("img//player_slashright.png",des);
+        }else {LoadImg("img//player_battle.png", des);}
+    }
 }
 
 void MainObject::DoPlayer(Map& map_data)
@@ -343,7 +357,7 @@ void MainObject::CheckMap(Map& map_data)
             {
                 map_data.tile[y1][x2] = FLOOR;
                 map_data.tile[y2][x2] = FLOOR;
-                map_data.tile[389][6] = 6;
+                map_data.tile[389][6] = DOOR_OPEN;
             }
             else
             {
@@ -367,7 +381,7 @@ void MainObject::CheckMap(Map& map_data)
             {
                 map_data.tile[y1][x1] = FLOOR;
                 map_data.tile[y2][x1] = FLOOR;
-                map_data.tile[389][6] = 6;
+                map_data.tile[389][6] = DOOR_OPEN;
             }
             else
             {
@@ -406,7 +420,7 @@ void MainObject::CheckMap(Map& map_data)
             {
                 map_data.tile[y2][x2] = FLOOR;
                 map_data.tile[y2][x1] = FLOOR;
-                map_data.tile[389][6] = 6;
+                map_data.tile[389][6] = DOOR_OPEN;
             }
             else
             {
@@ -431,7 +445,7 @@ void MainObject::CheckMap(Map& map_data)
             {
                 map_data.tile[y1][x1] = FLOOR;
                 map_data.tile[y1][x2] = FLOOR;
-                map_data.tile[389][6] = 6;
+                map_data.tile[389][6] = DOOR_OPEN;
             }
             else
             {
@@ -547,13 +561,71 @@ SDL_Rect MainObject::GetRectP()
     return RETURN;
 }
 
-void MainObject::ShowHP(TTF_Font* font, SDL_Renderer* screen)
+void MainObject::ShowStat(TTF_Font* font, SDL_Renderer* screen)
 {
-    Text_object HPStat;
-    std::string HPText = "HP: ";
+    Text_object HPStat, XP, Level, HPNew;
+    std::string HPText = "HP: "; std::string XPText = "XP: "; std::string LEVEL = "Level: ";
     std::string HP_num = std::to_string(HP);
-    HPText += HP_num;
-    HPStat.SetText(HPText);
-    HPStat.LoadFromRenderText(font, screen);
-    HPStat.RenderText(screen, SCREEN_WIDTH-128, 40);
+    std::string XP_num = std::to_string(xp);
+    std::string LEVEL_num = std::to_string(level);
+    HPText += HP_num; XPText += XP_num; LEVEL += LEVEL_num;
+    HP_num = std::to_string(maxHP); XP_num = std::to_string(xp_cap);
+    HPText += "/"; XPText += "/";
+    HPText += HP_num; XPText += XP_num;
+    XP.SetText(XPText); Level.SetText(LEVEL);
+    HPNew.SetText(HPText);
+    HPNew.LoadFromRenderText(font,screen);
+    XP.LoadFromRenderText(font, screen);
+    Level.LoadFromRenderText(font,screen);
+    HPNew.RenderText(screen,SCREEN_WIDTH-128, 40);
+    XP.RenderText(screen, SCREEN_WIDTH-128, 65);
+    Level.RenderText(screen,SCREEN_WIDTH-128, 90);
+}
+
+void MainObject::UpdateBattleStatus (const bool& x)
+{
+    battle = x;
+        Store_action.up = 0;
+        Store_action.left = 0;
+        Store_action.right = 0;
+        Store_action.down = 0;
+    if (battle)
+    {
+        status_character = RIGHT;
+    }
+}
+
+void MainObject::HandleXP()
+{
+    if (xp >= xp_cap)
+    {
+        level++;
+        xp=xp - xp_cap;
+        xp_cap += level*10;
+        maxHP += level*5;
+        ATK += level*2/5;
+    }
+}
+
+void MainObject::ShowBattleStat(TTF_Font* font, SDL_Renderer* screen)
+{
+    Text_object Speed, Atk, Level, HPNew;
+    std::string HPText = "HP: " + std::to_string(HP);
+    std::string XPText = "Speed: " + std::to_string(SPEED);
+    std::string LEVEL = "Player (Level " + std::to_string(level) + ")";
+    std::string ATKText ="ATK: " + std::to_string(ATK);
+    HPText += "/" + std::to_string(maxHP);
+
+    Speed.SetText(XPText); Level.SetText(LEVEL);
+    HPNew.SetText(HPText); Atk.SetText(ATKText);
+
+    HPNew.LoadFromRenderText(font,screen);
+    Speed.LoadFromRenderText(font, screen);
+    Level.LoadFromRenderText(font,screen);
+    Atk.LoadFromRenderText(font, screen);
+
+    Level.RenderText(screen, 30, 40);
+    HPNew.RenderText(screen, 30, 70);
+    Atk.RenderText(screen, 30, 100);
+    Speed.RenderText(screen, 30, 130);
 }
