@@ -2,7 +2,11 @@
 
 ThreatObject::ThreatObject()
 {
-    HP=150;
+    HP = 0;
+    ATK = 0;
+    HP_drop = 0;
+    XP_drop = 0;
+
 	revive_time = 0;
     x_val = 0;
     y_val = 0;

@@ -119,7 +119,114 @@ void BossThreat::Show(SDL_Renderer* des)
     SDL_RenderCopy(des, texture, current_clip, &renderQuad);
 }
 
-bool BossThreat::BossCombat (MainObject Player)
+bool BossThreat::BossCombat (MainObject Player, TTF_Font* font_combat, SDL_Renderer* screen)
 {
-
+    Player.SetXPos(x_pos + TILE_SIZE);
+    Player.SetYPos(y_pos + 4*TILE_SIZE);
+    int x,y;
+    const int BUT_NUM = 4;
+    const char* BUTTON[BUT_NUM] = {"Attack","Defend","Heal","Back To Map"};
+    bool Button_status[BUT_NUM] = {0,0,0,0};
+    SDL_Color But_color[2] = {{255,255,255},{0,0,0}};
+    Text_object Button[BUT_NUM];
+    SDL_Point pos[BUT_NUM];
+    for (int i = 0; i < BUT_NUM; i++)
+    {
+        Button[i].SetText(BUTTON[i]);
+        Button[i].SetColor(But_color[0]);
+        Button[i].LoadFromRenderText(font_combat,renderer);
+        int height = (Button[i].GetHeight())/2;
+        if (i==0){
+            pos[i].x = 0;
+            pos[i].y = SCREEN_HEIGHT - 5*Button[i].GetHeight()/2;
+        } else if (i==1)
+        {
+            pos[i].x = SCREEN_WIDTH/2;
+            pos[i].y = SCREEN_HEIGHT - 5*Button[i].GetHeight()/2;
+        } else if (i==2)
+        {
+            pos[i].x = 0;
+            pos[i].y = SCREEN_HEIGHT - Button[i].GetHeight();
+        } else
+        {
+            pos[i].x = SCREEN_WIDTH/2;
+            pos[i].y = SCREEN_HEIGHT - Button[i].GetHeight();
+        }
+        Button[i].RenderText(renderer,pos[i].x, pos[i].y);
+    }
+    SDL_RenderPresent(screen);
+    while (true)
+    {
+        while (SDL_PollEvent(&event))
+        {
+            switch (event.type)
+            {
+            case SDL_QUIT:
+                for (int i=0;i<BUT_NUM;i++)
+                {
+                    Button[i].Free();
+                }
+                return false;
+                break;
+            case SDL_MOUSEMOTION:
+                SDL_GetMouseState(&x, &y);
+                for (int i=0;i<BUT_NUM;++i)
+                {
+                    if (x>=pos[i].x && x<=pos[i].x + Button[i].GetWidth() &&
+                        y>=pos[i].y && y<=pos[i].y + Button[i].GetHeight())
+                    {
+                        if(!Button_status[i])
+                        {
+                            Button_status[i] = 1;
+                            Button[i].Free();
+                            Button[i].SetColor(But_color[1]);
+                            Button[i].LoadFromRenderText(font_combat,screen);
+                            Button[i].RenderText(screen,pos[i].x, pos[i].y);
+                            SDL_RenderPresent(screen);
+                        }
+                    } else
+                    {
+                        if(Button_status[i])
+                        {
+                            Button_status[i] = 0;
+                            Button[i].Free();
+                            Button[i].SetColor(But_color[0]);
+                            Button[i].LoadFromRenderText(font_combat,screen);
+                            Button[i].RenderText(screen,pos[i].x, pos[i].y);
+                            SDL_RenderPresent(screen);
+                        }
+                    }
+                }
+                break;
+            case SDL_MOUSEBUTTONDOWN:
+                SDL_GetMouseState(&x, &y);
+                for (int i=0;i<BUT_NUM;++i)
+                {
+                    if (x>=pos[i].x && x<=pos[i].x + Button[i].GetWidth() &&
+                        y>=pos[i].y && y<=pos[i].y + Button[i].GetHeight())
+                    {
+                        for (int j =0;j<BUT_NUM;j++)
+                        {
+                            Button[j].Free();
+                        }
+                        if (i==3)
+                        {
+                            return false;
+                        }
+                    }
+                }
+                break;
+            case SDL_KEYDOWN:
+                if (event.key.keysym.sym == SDLK_ESCAPE)
+                {
+                    for (int j =0;j<BUT_NUM;j++)
+                    {
+                            Button[j].Free();
+                    }
+                    return 0;
+                }
+                break;
+            }
+        }
+    }
 }

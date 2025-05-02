@@ -94,7 +94,7 @@
 
 1743409958 c:\users\admin\documents\code test\game 0.5\timer.h
 
-1746122793 source:d:\quoc anh\game-0.5\main.cpp
+1746158855 source:d:\quoc anh\game-0.5\main.cpp
 	"Game_Stat.h"
 	"BObject.h"
 	"Map.h"
@@ -153,4 +153,169 @@
 	"Main_o.h"
 
 1746105960 source:d:\quoc anh\game-0.5\notifi.cpp
+
+1746084233 source:d:\quoc anh\game_0.5\bobject.cpp
+	"BObject.h"
+
+1746092015 d:\quoc anh\game_0.5\bobject.h
+	"Game_Stat.h"
+	<string>
+
+1746123971 d:\quoc anh\game_0.5\game_stat.h
+	<SDL.h>
+	<SDL_image.h>
+	<SDL_ttf.h>
+	<SDL_mixer.h>
+	<string>
+	<iostream>
+	<vector>
+
+1746116459 source:d:\quoc anh\game_0.5\bossthreat.cpp
+	"BossThreat.h"
+
+1746091046 d:\quoc anh\game_0.5\bossthreat.h
+	"BObject.h"
+	"Game_Stat.h"
+	"Main_o.h"
+
+1746121099 d:\quoc anh\game_0.5\main_o.h
+	"BObject.h"
+	"Game_Stat.h"
+	"Slash.h"
+	"Text.h"
+
+1745908233 d:\quoc anh\game_0.5\slash.h
+	"Game_Stat.h"
+	"BObject.h"
+
+1746084233 d:\quoc anh\game_0.5\text.h
+	"Game_Stat.h"
+
+1746106350 source:d:\quoc anh\game_0.5\game_stat.cpp
+	"Game_Stat.h"
+	<iostream>
+
+1746158855 source:d:\quoc anh\game_0.5\main.cpp
+	"Game_Stat.h"
+	"BObject.h"
+	"Map.h"
+	"Main_o.h"
+	"Timer.h"
+	"ThreatObject.h"
+	"Text.h"
+	"BossThreat.h"
+
+1743464914 d:\quoc anh\game_0.5\map.h
+	"Game_Stat.h"
+	"BObject.h"
+	<fstream>
+
+1746025951 d:\quoc anh\game_0.5\timer.h
+
+1746087361 d:\quoc anh\game_0.5\threatobject.h
+	"BObject.h"
+	"Game_Stat.h"
+
+1746124048 source:d:\quoc anh\game_0.5\main_o.cpp
+	"Main_o.h"
+	"Timer.h"
+
+1746118993 source:d:\quoc anh\game_0.5\map.cpp
+	"Map.h"
+
+1743483369 source:d:\quoc anh\game_0.5\slash.cpp
+	"Slash.h"
+
+1746084233 source:d:\quoc anh\game_0.5\text.cpp
+	"Text.h"
+
+1746087361 source:d:\quoc anh\game_0.5\threatobject.cpp
+	"ThreatObject.h"
+
+1743464953 source:d:\quoc anh\game_0.5\timer.cpp
+	"Timer.h"
+	"Game_Stat.h"
+
+1746084233 source:d:\quoc_anh\game_0.5\bobject.cpp
+	"BObject.h"
+
+1746092015 d:\quoc_anh\game_0.5\bobject.h
+	"Game_Stat.h"
+	<string>
+
+1746171702 d:\quoc_anh\game_0.5\game_stat.h
+	<SDL.h>
+	<SDL_image.h>
+	<SDL_ttf.h>
+	<SDL_mixer.h>
+	<string>
+	<iostream>
+	<vector>
+
+1746116459 source:d:\quoc_anh\game_0.5\bossthreat.cpp
+	"BossThreat.h"
+
+1746171701 d:\quoc_anh\game_0.5\bossthreat.h
+	"BObject.h"
+	"Game_Stat.h"
+	"Main_o.h"
+	"Text.h"
+
+1746171702 d:\quoc_anh\game_0.5\main_o.h
+	"BObject.h"
+	"Game_Stat.h"
+	"Slash.h"
+	"Text.h"
+
+1745908233 d:\quoc_anh\game_0.5\slash.h
+	"Game_Stat.h"
+	"BObject.h"
+
+1746171701 d:\quoc_anh\game_0.5\text.h
+	"Game_Stat.h"
+
+1746106350 source:d:\quoc_anh\game_0.5\game_stat.cpp
+	"Game_Stat.h"
+	<iostream>
+
+1746171701 source:d:\quoc_anh\game_0.5\main.cpp
+	"Game_Stat.h"
+	"BObject.h"
+	"Map.h"
+	"Main_o.h"
+	"Timer.h"
+	"ThreatObject.h"
+	"Text.h"
+	"BossThreat.h"
+
+1743464914 d:\quoc_anh\game_0.5\map.h
+	"Game_Stat.h"
+	"BObject.h"
+	<fstream>
+
+1746025951 d:\quoc_anh\game_0.5\timer.h
+
+1746166432 d:\quoc_anh\game_0.5\threatobject.h
+	"BObject.h"
+	"Game_Stat.h"
+
+1746165232 source:d:\quoc_anh\game_0.5\main_o.cpp
+	"Main_o.h"
+	"Timer.h"
+
+1746118993 source:d:\quoc_anh\game_0.5\map.cpp
+	"Map.h"
+
+1743483369 source:d:\quoc_anh\game_0.5\slash.cpp
+	"Slash.h"
+
+1746084233 source:d:\quoc_anh\game_0.5\text.cpp
+	"Text.h"
+
+1746166074 source:d:\quoc_anh\game_0.5\threatobject.cpp
+	"ThreatObject.h"
+
+1743464953 source:d:\quoc_anh\game_0.5\timer.cpp
+	"Timer.h"
+	"Game_Stat.h"
 

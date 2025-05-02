@@ -4,6 +4,7 @@
 #include "BObject.h"
 #include "Game_Stat.h"
 #include "Main_o.h"
+#include "Text.h"
 
 class BossThreat : public BaseObject
 {
@@ -27,16 +28,13 @@ public:
     void SetType (const int& Type) {type = Type;}
     void SetStatus (const bool& x) {dead = x;}
 
-    void SetATK (const int& x) {ATK=x;}
-    void SetHP (const int& x) {HP=x;}
-    void SetSPEED (const int& x) {SPEED=x;}
-
-    void MinusHP (const int& x) {HP-=x;}
-    bool BossCombat (MainObject Player);
-private:
     int HP;
     int ATK;
     int SPEED;
+
+    void MinusHP (const int& x) {HP-=x;}
+    bool BossCombat (MainObject Player, TTF_Font* font_combat, SDL_Renderer* screen);
+private:
 
     float x_pos;
     float y_pos;

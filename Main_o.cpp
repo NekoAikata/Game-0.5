@@ -7,18 +7,26 @@ MainObject::MainObject()
     y_val = 0;
     x_pos = 6*TILE_SIZE;
     y_pos = 396*TILE_SIZE;
+
     width_frame = 0;
     height_frame = 0;
     frame_num = 0;
+
     status_character = DOWN;
     Store_action.down = 0;
     Store_action.up = 0;
     Store_action.left = 0;
     Store_action.right = 0;
+
     mapvalue_x = 0;
     mapvalue_y = 0;
     frame_delay = 0;
-    HP = 1000;
+
+    xp = 0;
+    level = 1;
+
+    maxHP = 1000;
+    HP=maxHP;
     have_sword = false;
 }
 
@@ -297,6 +305,10 @@ void MainObject::DoPlayer(Map& map_data)
     {
         y_val+=PLAYER_SPEED;
     }
+    if (xp > 300)
+    {
+        level++;
+    }
     CheckMap(map_data);
     MapMove(map_data);
 }
@@ -325,6 +337,7 @@ void MainObject::CheckMap(Map& map_data)
             {
                 map_data.tile[y1][x2] = FLOOR;
                 map_data.tile[y2][x2] = FLOOR;
+                map_data.tile[390][1] = KEY;
                 have_sword = true;
             } else if (val1 == KEY || val2 == KEY)
             {
@@ -348,6 +361,7 @@ void MainObject::CheckMap(Map& map_data)
             {
                 map_data.tile[y1][x1] = FLOOR;
                 map_data.tile[y2][x1] = FLOOR;
+                map_data.tile[390][1] = KEY;
                 have_sword = true;
             } else if (val3 == KEY || val4 == KEY)
             {
@@ -386,6 +400,7 @@ void MainObject::CheckMap(Map& map_data)
             {
                 map_data.tile[y2][x2] = FLOOR;
                 map_data.tile[y2][x1] = FLOOR;
+                map_data.tile[390][1] = KEY;
                 have_sword = true;
             } else if (val2 == KEY || val4 == KEY)
             {
@@ -409,6 +424,7 @@ void MainObject::CheckMap(Map& map_data)
             {
                 map_data.tile[y1][x1] = FLOOR;
                 map_data.tile[y1][x2] = FLOOR;
+                map_data.tile[390][1] = KEY;
                 have_sword = true;
             }
             else if (val1 ==  KEY|| val3 == KEY)

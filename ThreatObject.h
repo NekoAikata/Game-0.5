@@ -37,8 +37,12 @@ public:
     void Move (SDL_Renderer* screen);
 
     int HP;
-private:
+    int ATK;
 
+    int XP_drop;
+    int HP_drop;
+
+private:
     int revive_time;
 
     float x_val;

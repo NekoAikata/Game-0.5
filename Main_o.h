@@ -41,12 +41,18 @@ public:
     SDL_Rect GetRectP();
     int frame_delay;
 
+    void SetXPos(const float& x) {x_pos = x;}
+    void SetYPos(const float& x) {y_pos = x;}
     float GetYPos() {return y_pos;}
 
     void ShowHP(TTF_Font* font, SDL_Renderer* screen);
     int HP;
+    int maxHP;
 
     bool have_sword;
+
+    int xp;
+    int level;
 
 private:
     Slash BasicAttack;
