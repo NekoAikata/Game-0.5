@@ -50,6 +50,9 @@ public:
     void ShowStat(TTF_Font* font, SDL_Renderer* screen);
     void ShowBattleStat (TTF_Font* font, SDL_Renderer* screen);
     void HandleXP ();
+    void SetAttack (const bool& x) {BasicAttack.set_attack(x);}
+    void ResetFrameNum () {frame_num = 0;}
+
     int HP;
     int maxHP;
 
@@ -62,6 +65,7 @@ public:
     int xp_cap;
     int level;
 
+    int HP_potion;
 private:
     bool battle;
 

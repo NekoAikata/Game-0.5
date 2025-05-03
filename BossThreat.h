@@ -20,6 +20,10 @@ public:
     int GetWidthFrame () {return width_frame;}
     int GetHeightFrame () {return height_frame;}
 
+    int Skill_1 ();
+    int Skill_2 ();
+    int Skill_3 ();
+
     void SetXpos (const float& a) {x_pos = a;}
     void SetYpos (const float& b) {y_pos = b;}
     float GetXpos () {return x_pos;}
@@ -28,15 +32,24 @@ public:
     void SetMapXY(const int x, const int y) {mapvalue_x = x; mapvalue_y = y;}
 
     void SetType (const int& Type) {type = Type;}
+    int GetType () {return type;}
 
     int HP;
+    int maxHP;
     int ATK;
     int SPEED;
+    double EF_RES;
 
     bool battle;
+    int XP_drop;
+    int count_turn;
 
+    bool attack;
+    bool dead;
+
+    void ShowHP(TTF_Font* font, SDL_Renderer* screen);
     void MinusHP (const int& x) {HP-=x;}
-    int BossCombat (MainObject Player, TTF_Font* font_combat, SDL_Renderer* screen, TTF_Font* font_noti);
+    int BossCombat (MainObject& Player, TTF_Font* font_combat, SDL_Renderer* screen, TTF_Font* font_noti, TTF_Font* font_title);
 private:
 
     float x_pos;

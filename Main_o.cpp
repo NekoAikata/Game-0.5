@@ -26,9 +26,11 @@ MainObject::MainObject()
     xp_cap = 100;
     level = 1;
 
-    maxHP = 1000;
-    ATK = 25;
-    SPEED = 50;
+    HP_potion=0;
+
+    maxHP = 1;
+    ATK = 200;
+    SPEED = 25;
     HP=maxHP;
     have_sword = false;
     battle = false;
@@ -585,14 +587,10 @@ void MainObject::ShowStat(TTF_Font* font, SDL_Renderer* screen)
 void MainObject::UpdateBattleStatus (const bool& x)
 {
     battle = x;
-        Store_action.up = 0;
-        Store_action.left = 0;
-        Store_action.right = 0;
-        Store_action.down = 0;
-    if (battle)
-    {
-        status_character = RIGHT;
-    }
+    Store_action.up = 0;
+    Store_action.left = 0;
+    Store_action.right = 0;
+    Store_action.down = 0;
 }
 
 void MainObject::HandleXP()
@@ -611,21 +609,28 @@ void MainObject::ShowBattleStat(TTF_Font* font, SDL_Renderer* screen)
 {
     Text_object Speed, Atk, Level, HPNew;
     std::string HPText = "HP: " + std::to_string(HP);
-    std::string XPText = "Speed: " + std::to_string(SPEED);
-    std::string LEVEL = "Player (Level " + std::to_string(level) + ")";
-    std::string ATKText ="ATK: " + std::to_string(ATK);
-    HPText += "/" + std::to_string(maxHP);
+    std::string XPText = "Speed: " ;
+    std::string LEVEL = "Player (Level ";
+    std::string ATKText ="ATK: " ;
+    std::string x = std::to_string(maxHP);
+    HPText += "/" + x;
+    x=std::to_string(level) + ")";
+    LEVEL += x;
+    x = std::to_string(SPEED);
+    XPText += x;
+    x = std::to_string(ATK);
+    ATKText += x;
 
     Speed.SetText(XPText); Level.SetText(LEVEL);
     HPNew.SetText(HPText); Atk.SetText(ATKText);
 
-    HPNew.LoadFromRenderText(font,screen);
-    Speed.LoadFromRenderText(font, screen);
     Level.LoadFromRenderText(font,screen);
+    HPNew.LoadFromRenderText(font,screen);
     Atk.LoadFromRenderText(font, screen);
+    Speed.LoadFromRenderText(font, screen);
 
-    Level.RenderText(screen, 30, 40);
-    HPNew.RenderText(screen, 30, 70);
-    Atk.RenderText(screen, 30, 100);
-    Speed.RenderText(screen, 30, 130);
+    Level.RenderText(screen, 30, 45);
+    HPNew.RenderText(screen, 30, 75);
+    Atk.RenderText(screen, 30, 105);
+    Speed.RenderText(screen, 30, 135);
 }

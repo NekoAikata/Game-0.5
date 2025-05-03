@@ -12,7 +12,7 @@ public:
     bool LoadFromRenderText (TTF_Font* font, SDL_Renderer* screen);
     void Free();
 
-    void SetColor(Uint8 red, Uint8 blue, Uint8 green);
+    void SetColor(Uint8 red, Uint8 blue, Uint8 green, Uint8 alpha = 255);
     void SetColor(SDL_Color sample);
 
     void RenderText(SDL_Renderer* screen,

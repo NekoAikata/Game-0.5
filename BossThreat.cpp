@@ -2,9 +2,15 @@
 
 BossThreat::BossThreat()
 {
-    HP=500;
-    ATK=20;
-    SPEED=200;
+    HP=0;
+    ATK=0;
+    SPEED=0;
+    EF_RES=0;
+
+    maxHP=0;
+    count_turn=0;
+
+    attack=false;
 
     x_pos = 0;
     y_pos = 0;
@@ -17,6 +23,7 @@ BossThreat::BossThreat()
 
     type = 0;
     battle = false;
+    dead = false;
 }
 
 BossThreat::~BossThreat ()
@@ -122,14 +129,55 @@ void BossThreat::Show(SDL_Renderer* des)
     SDL_RenderCopy(des, texture, current_clip, &renderQuad);
 }
 
-int BossThreat::BossCombat (MainObject Player, TTF_Font* font_combat, SDL_Renderer* screen, TTF_Font* font_noti)
+int BossThreat::Skill_1 ()
 {
+    return ATK;
+}
+
+int BossThreat::Skill_2 ()
+{
+    return ATK*1.5;
+}
+
+int BossThreat::Skill_3 ()
+{
+    return ATK*2;
+};
+
+void BossThreat::ShowHP(TTF_Font* font, SDL_Renderer* screen)
+{
+    Text_object HPNew;
+    std::string HPText = "HP: " + std::to_string(HP);
+    std::string x = std::to_string(maxHP);
+    HPText += "/" + x;
+    HPNew.SetText(HPText);
+    HPNew.LoadFromRenderText(font,screen);
+    HPNew.RenderText(screen, SCREEN_WIDTH-HPNew.GetWidth(), 70);
+}
+
+int BossThreat::BossCombat (MainObject& Player, TTF_Font* font_combat, SDL_Renderer* screen, TTF_Font* font_noti, TTF_Font* font_title)
+{
+    std::random_device rd;
+    std::mt19937 gen(std::time(0) ^ reinterpret_cast<uintptr_t>(&gen));
+
+    std::uniform_int_distribution<int> dist_rngdmg(1,15);
+    std::bernoulli_distribution EF(EF_RES);
+
     int PCD = Player.SPEED;
     int BCD = SPEED;
     int defense = 0;
+
+    int effect = 0;
+
     int result = 0;
     SDL_RenderClear(screen);
     BaseObject background;
+
+    BaseObject IconPlayer;
+    BaseObject IconBoss;
+
+    IconPlayer.LoadImg("img//PIcon.png", screen);
+    IconBoss.LoadImg("img//King_Pig_Icon.png", screen);
 
     Player.UpdateBattleStatus(true);
     Player.LoadImg("img//player_battle.png",screen);
@@ -148,11 +196,16 @@ int BossThreat::BossCombat (MainObject Player, TTF_Font* font_combat, SDL_Render
     Text_object Button[BUT_NUM];
     SDL_Point pos[BUT_NUM];
 
+    SDL_Color StatColor[2] = {{255,0,0},{0,0,255}};
+
     Text_object Notifi;
     Text_object PMinus, PHeal, Dmg;
+    Dmg.SetColor(But_color[0]);
     Notifi.SetColor(But_color[0]);
-    PMinus.SetColor(255,0,0);
-    PHeal.SetColor(0,0,255);
+    PMinus.SetColor(StatColor[0]);
+    PHeal.SetColor(StatColor[1]);
+
+    int maxSpeed = Player.SPEED > SPEED ? Player.SPEED : SPEED ;
 
     Timer threat_delay;
 
@@ -163,11 +216,11 @@ int BossThreat::BossCombat (MainObject Player, TTF_Font* font_combat, SDL_Render
         Button[i].LoadFromRenderText(font_noti,renderer);
         if (i==0){
             pos[i].x = 0;
-            pos[i].y = SCREEN_HEIGHT - 5*Button[i].GetHeight()/2;
+            pos[i].y = SCREEN_HEIGHT - 4*Button[i].GetHeight()/2;
         } else if (i==1)
         {
             pos[i].x = SCREEN_WIDTH/2;
-            pos[i].y = SCREEN_HEIGHT - 5*Button[i].GetHeight()/2;
+            pos[i].y = SCREEN_HEIGHT - 4*Button[i].GetHeight()/2;
         } else if (i==2)
         {
             pos[i].x = 0;
@@ -184,27 +237,136 @@ int BossThreat::BossCombat (MainObject Player, TTF_Font* font_combat, SDL_Render
     bool running = true;
     while (running)
     {
-        if (PCD > 0 && BCD > 0) {PCD--; BCD--;}
+        if (PCD > 0 && BCD > 0 && HP > 0 && Player.HP > 0) {PCD--; BCD--;}
 
         background.LoadImg("img//grass.png", screen);
         background.SetRect(0,0);
         background.SetRectWH(SCREEN_WIDTH, SCREEN_HEIGHT);
         background.Render(screen);
 
-        for (int i=0; i< BUT_NUM;++i)
+        if (HP > 0 && Player.HP > 0)
         {
-            Button[i].LoadFromRenderText(font_combat,screen);
-            Button[i].RenderText(screen,pos[i].x,pos[i].y);
+            for (int i=0; i< BUT_NUM;++i)
+            {
+                Button[i].LoadFromRenderText(font_combat,screen);
+                Button[i].RenderText(screen,pos[i].x,pos[i].y);
+            }
+            SDL_Rect fillRect = {32, 16, SCREEN_WIDTH-TILE_SIZE, 14};
+            SDL_SetRenderDrawColor(screen, 196, 196, 196, 255);
+            SDL_RenderFillRect(screen, &fillRect );
+
+            SDL_Rect outlineRect = {32, 16, SCREEN_WIDTH-TILE_SIZE, 14};
+            SDL_SetRenderDrawColor(screen, 255, 255, 255, 255);
+            SDL_RenderDrawRect(screen, &outlineRect);
+
+            IconPlayer.SetRect(32 + 800*PCD/maxSpeed, 4);
+            IconPlayer.SetRectWH(32, 32);
+            IconPlayer.Render(screen);
+
+            IconBoss.SetRect(32 + 800*BCD/maxSpeed, 7);
+            IconBoss.Render(screen);
         }
 
-        Player.ShowBattleStat(font_combat,screen);
-
         fps_timer.start();
-        Player.Show(screen);
 
+        Player.Show(screen);
         Show(screen);
+
+        ShowHP(font_combat,screen);
         SDL_RenderPresent(screen);
-        if (PCD == 0){
+        if (PCD > 0 && HP > 0 && Player.HP > 0)
+        {
+            while (SDL_PollEvent(&event))
+            {
+                if (event.type == SDL_QUIT)
+                {
+                    result = 2;
+                    running = false;
+                }
+            } if (!running) {break;}
+        }
+
+        if (HP <=0)
+        {
+            if (!threat_delay.start_check()) threat_delay.start();
+            if (threat_delay.get_tick() > 2500)
+            {
+                Dmg.SetText("Press Space_bar to continue!");
+                Dmg.LoadFromRenderText(font_combat, screen);
+                Dmg.RenderText(screen, SCREEN_WIDTH/2 - Dmg.GetWidth()/2, SCREEN_HEIGHT/2 + Notifi.GetHeight()/2 - Dmg.GetHeight()/2);
+            }
+            Player.ShowBattleStat(font_combat,screen);
+            ShowHP(font_combat,screen);
+            Notifi.Free();
+            Notifi.SetText("You won!");
+            Notifi.LoadFromRenderText(font_title, screen);
+            Notifi.RenderText(screen, SCREEN_WIDTH/2 - Notifi.GetWidth()/2, SCREEN_HEIGHT/2 - Notifi.GetHeight()/2);
+            SDL_RenderPresent(screen);
+            while (SDL_PollEvent(&event))
+            {
+                if (event.type == SDL_QUIT)
+                {
+                    result = 2;
+                    running = false;
+                    break;
+                } else if (event.type = SDL_KEYDOWN)
+                {
+                    if (event.key.keysym.sym == SDLK_SPACE)
+                    {
+                        result = 1;
+                        running = false;
+                        if(Mix_PlayingMusic() == 1)
+                        {
+                            Mix_HaltMusic();
+                        }
+                        break;
+                    }
+                }
+            } if (!running) break;
+        } else if (Player.HP <=0)
+        {
+            if (!threat_delay.start_check()) threat_delay.start();
+            if (threat_delay.get_tick() > 2500)
+            {
+                Dmg.SetText("Press Space_bar to continue!");
+                Dmg.LoadFromRenderText(font_combat, screen);
+                Dmg.RenderText(screen, SCREEN_WIDTH/2 - Dmg.GetWidth()/2, SCREEN_HEIGHT/2 + Notifi.GetHeight()/2 - Dmg.GetHeight()/2);
+            }
+            Player.ShowBattleStat(font_combat,screen);
+            ShowHP(font_combat,screen);
+            Notifi.Free();
+            Notifi.SetText("You lose!");
+            Notifi.LoadFromRenderText(font_title, screen);
+            Notifi.RenderText(screen, SCREEN_WIDTH/2 - Notifi.GetWidth()/2, SCREEN_HEIGHT/2 - Notifi.GetHeight()/2);
+            SDL_RenderPresent(screen);
+            while (SDL_PollEvent(&event))
+            {
+                if (event.type == SDL_QUIT)
+                {
+                    result = 2;
+                    running = false;
+                    break;
+                } else if (event.type = SDL_KEYDOWN)
+                {
+                    if (event.key.keysym.sym == SDLK_SPACE)
+                    {
+                        result = -1;
+                        running = false;
+                        if(Mix_PlayingMusic() == 1)
+                        {
+                            Mix_HaltMusic();
+                        }
+                        break;
+                    }
+                }
+            } if (!running) break;
+        }
+
+        if (PCD == 0 && HP > 0 && Player.HP > 0)
+        {
+            Player.ShowBattleStat(font_combat,screen);
+            Notifi.SetText("Your turn");
+            Notifi.LoadFromRenderText(font_noti,screen);
             while (SDL_PollEvent(&event))
             {
                 if (event.type == SDL_QUIT){
@@ -212,10 +374,12 @@ int BossThreat::BossCombat (MainObject Player, TTF_Font* font_combat, SDL_Render
                     {
                         Button[i].Free();
                     }
+                    result = 2;
                     running = false;
                     break;
                 }
-                else if (event.type == SDL_MOUSEBUTTONDOWN){
+                else if (event.type == SDL_MOUSEBUTTONDOWN)
+                {
                     SDL_GetMouseState(&x, &y);
                     for (int i=0;i<BUT_NUM;++i)
                     {
@@ -225,25 +389,38 @@ int BossThreat::BossCombat (MainObject Player, TTF_Font* font_combat, SDL_Render
                             for (int j =0;j<BUT_NUM;j++)
                             {
                                 Button[j].Free();
+                                Button[j].SetColor(But_color[0]);
                             }
-                            PCD = Player.SPEED;
-                            defense--;
                             if (i==0)
                             {
-                                HP-=Player.ATK;
-                                std::string x = "-" + std::to_string(Player.ATK);
+                                BaseObject SLASH;
+                                SLASH.LoadImg("img/Slash_img.png", screen);
+                                SLASH.SetRect(GetRect().x + 0.75*TILE_SIZE,GetRect().y + 1.5*TILE_SIZE);
+                                SLASH.SetRectWH(128,128);
+                                SLASH.Render(screen);
+                                Notifi.Free();
+                                Notifi.SetText("You chose Attack");
+                                Notifi.LoadFromRenderText(font_noti, screen);
+                                int HPDown = Player.ATK*(84+dist_rngdmg(gen))/100;
+                                HP-=HPDown;
+                                std::string x = "-" + std::to_string(HPDown);
                                 Dmg.SetText(x);
                                 Dmg.LoadFromRenderText(font_noti,screen);
                                 Dmg.RenderText(screen, GetRect().x + 180, GetRect().y);
-                                SDL_RenderPresent(screen);
-                                SDL_Delay(500);
+
                             }
                             else if (i==1)
                             {
+                                Notifi.Free();
+                                Notifi.SetText("You chose Defense");
+                                Notifi.LoadFromRenderText(font_noti, screen);
                                 defense = 2;
                             }
-                            else if (i==2)
+                            else if (i==2 && attack)
                             {
+                                Notifi.Free();
+                                Notifi.SetText("You chose Heal");
+                                Notifi.LoadFromRenderText(font_noti, screen);
                                 Player.HP += Player.maxHP/10;
                                 std::string x = "+" + std::to_string(Player.maxHP/10);
                                 PHeal.SetText(x);
@@ -253,18 +430,26 @@ int BossThreat::BossCombat (MainObject Player, TTF_Font* font_combat, SDL_Render
                                 {
                                     Player.HP = Player.maxHP;
                                 }
-                                SDL_RenderPresent(screen);
-                                SDL_Delay(500);
+                            } else if (i==2 && !attack)
+                            {
+                                continue;
                             }
                             if (i==3)
                             {
+                                Notifi.Free();
+                                Notifi.SetText("You chose Leave");
+                                Notifi.LoadFromRenderText(font_noti, screen);
+                                Mix_HaltMusic();
                                 running = false;
-                                break;
                             }
+                            PCD += Player.SPEED;
+                            defense--; effect--;
                         }
                     }
                 }
-                if (event.type == SDL_MOUSEMOTION){
+
+                if (event.type == SDL_MOUSEMOTION)
+                {
                     SDL_GetMouseState(&x, &y);
                     for (int i=0;i<BUT_NUM;++i)
                     {
@@ -273,9 +458,11 @@ int BossThreat::BossCombat (MainObject Player, TTF_Font* font_combat, SDL_Render
                         {
                             if(!Button_status[i])
                             {
-                                Button_status[i] = 1;
-                                Button[i].Free();
-                                Button[i].SetColor(But_color[1]);
+                                if (!(i==2 && !attack)){
+                                    Button_status[i] = 1;
+                                    Button[i].Free();
+                                    Button[i].SetColor(But_color[1]);
+                                }
                                 Button[i].LoadFromRenderText(font_combat,screen);
                                 Button[i].RenderText(screen,pos[i].x, pos[i].y);
                                 SDL_RenderPresent(screen);
@@ -295,37 +482,81 @@ int BossThreat::BossCombat (MainObject Player, TTF_Font* font_combat, SDL_Render
                     }
                 }
             }
+            if (PCD != 0)
+            {
+                Notifi.RenderText(screen, 5.5*TILE_SIZE, 50);
+                SDL_RenderPresent(screen);
+                SDL_Delay(500);
+            }
+            else
+            {
+                SDL_GetMouseState(&x,&y);
+                if (x>=pos[2].x && x<=pos[2].x + Button[2].GetWidth() &&
+                    y>=pos[2].y && y<=pos[2].y + Button[2].GetHeight() && !attack)
+                {
+                    Notifi.Free();
+                    Notifi.SetText("Enemy not attacked!");
+                    Notifi.LoadFromRenderText(font_noti, screen);
+                    Notifi.RenderText(screen, 4.5*TILE_SIZE, 50);
+                }else Notifi.RenderText(screen, 7*TILE_SIZE, 50);
+
+                SDL_RenderPresent(screen);
+            }
+            if (!running) break;
         }
-        else if (BCD == 0)
+        else if (BCD == 0 && HP>0 && Player.HP > 0)
         {
-            Notifi.SetText("Opponent is thinking");
-            Notifi.LoadFromRenderText(font_noti, screen);
-            Notifi.RenderText(screen, 2*TILE_SIZE, 50);
             if(!threat_delay.start_check()) threat_delay.start();
             if (threat_delay.get_tick()>2000)
             {
-                Player.HP-=ATK;
-                std::string x = "-" + std::to_string(ATK);
+                attack=true;
+                std::uniform_int_distribution<int> dist_crit(1,50);
+                std::uniform_int_distribution<int> dist_skill(1,15);
+
+                count_turn++;
+                int damgage; int skill = dist_skill(gen);
+                if ((skill ==1 || skill == 18 || skill == 3) && count_turn > 2)
+                {
+                    damgage = Skill_3();
+                    count_turn=0;
+                }
+                else if (skill%2 == 1) damgage=Skill_2();
+                else damgage = Skill_1();
+                damgage = damgage*(84+dist_rngdmg(gen))/100;
+
+                if(dist_crit(gen) == 1) damgage*=2;
+                if (defense > 0) damgage/=2;
+
+                Player.HP-=damgage;
+                std::string dam = std::to_string(damgage);
+                std::string x = "-" + dam;
                 PMinus.SetText(x);
                 PMinus.LoadFromRenderText(font_noti,screen);
                 PMinus.RenderText(screen, Player.GetRect().x, Player.GetRect().y);
                 SDL_RenderPresent(screen);
                 SDL_Delay(500);
+                threat_delay.stop();
                 BCD = SPEED;
+            } else
+            {
+                Notifi.SetText("Opponent is thinking");
+                Notifi.LoadFromRenderText(font_noti, screen);
+                Notifi.RenderText(screen, 3*TILE_SIZE, 50);
             }
         }
         SDL_RenderPresent(screen);
+        SDL_RenderClear(screen);
         int real_timer = fps_timer.get_tick();
-            int time_per_frame = 1000/50;
+        int time_per_frame = 1000/60;
 
-            if (real_timer < time_per_frame)
+        if (real_timer < time_per_frame)
+        {
+            int delay_time = time_per_frame - real_timer;
+            if (delay_time >= 0)
             {
-                int delay_time = time_per_frame - real_timer;
-                if (delay_time >= 0)
-                {
-                    SDL_Delay(delay_time);
-                }
+                SDL_Delay(delay_time);
             }
+        }
     }
     return result;
 }

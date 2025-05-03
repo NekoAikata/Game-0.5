@@ -8,6 +8,10 @@
 #include <string>
 #include <iostream>
 #include <vector>
+#include <random>
+#include <ctime>
+
+#include "Text.h"
 
 static SDL_Window* window = NULL;
 static SDL_Renderer* renderer = NULL;

@@ -15,6 +15,10 @@ TTF_Font* font_noti = nullptr;
 TTF_Font* font_title = nullptr;
 TTF_Font* font_combat = nullptr;
 Mix_Music* BGM = nullptr;
+Mix_Music* FirstBattleBGM = nullptr;
+Mix_Music* CaveBattleBGM = nullptr;
+Mix_Music* FinalBattleBMG = nullptr;
+TTF_Font* Font_noti_2 = nullptr;
 
 bool InitDataSuccess()
 {
@@ -58,6 +62,7 @@ bool InitDataSuccess()
     font_noti = TTF_OpenFont("font//PixelPurl.ttf",35);
     font_title = TTF_OpenFont("font//PixelPurl.ttf",100);
     font_combat = TTF_OpenFont("font//PixelPurl.ttf",40);
+    Font_noti_2 = TTF_OpenFont("font//PixelPurl.ttf",80);
 
     if (font_time == NULL || font_menu == NULL || font_slash == NULL)
     {
@@ -71,7 +76,7 @@ bool LoadBG(const int& level, SDL_Renderer* screen)
     std::string path; bool ret;
     if (level == 1 || level == 3 || level == 5)
     {
-        path = "img//grass1.png";
+        path = "img//grass2.png";
     } else if (level == 2)
     {
         path = "";
@@ -89,6 +94,9 @@ bool LoadBG(const int& level, SDL_Renderer* screen)
 bool LoadBGM()
 {
     BGM = Mix_LoadMUS("Music_Sound//Music.mp3");
+    FirstBattleBGM = Mix_LoadMUS("Music_Sound//Music_1.mp3");
+    //CaveBattleBGM = Mix_LoadMUS("Music_Sound//Music_2.mp3")
+    //FinalBattleBMG = Mix_LoadMUS("Music_Sound//Music_3.mp3")
     return BGM != NULL;
 }
 
@@ -125,11 +133,22 @@ void close1()
 std::vector<ThreatObject*> MakeThreatList ();
 
 std::vector<BossThreat*> MakeBossThreatList ();
+
 void SetLevelAndBG(const float& y_pos, int& level);
+
 int Menu(SDL_Renderer* screen, TTF_Font* font_time, bool Start, TTF_Font* font_title);
 
 int main(int argc, char* argv[])
 {
+    std::random_device rd;
+    std::mt19937 gen(std::time(0) ^ reinterpret_cast<uintptr_t>(&gen));
+
+    std::bernoulli_distribution TDL1(0.01);
+    std::bernoulli_distribution TDL2(0.05);
+    std::bernoulli_distribution TDL3(0.08);
+    std::bernoulli_distribution TDL4(0.11);
+    std::bernoulli_distribution TDL5(0.15);
+
     bool running = true;
     while (running){
         int level = 1;
@@ -162,13 +181,8 @@ int main(int argc, char* argv[])
         Player1.LoadImg("img//player_down.png", renderer);
         Player1.Clip();
 
-        BossThreat Boss1;
-        Boss1.LoadImg("img//King_Pig.png", renderer);
-        Boss1.Clip();
-        Boss1.SetXpos(5*TILE_SIZE);
-        Boss1.SetYpos(375*TILE_SIZE);
-
         std::vector <ThreatObject*> list_threats = MakeThreatList();
+        std::vector <BossThreat*> list_boss = MakeBossThreatList();
 
         bool quitG = false;
 
@@ -256,8 +270,16 @@ int main(int argc, char* argv[])
 
             Player1.HandleSlash(renderer);
             Player1.SetMapXY(map_data.start_x, map_data.start_y);
-            Boss1.SetMapXY(map_data.start_x, map_data.start_y);
-            Boss1.Show(renderer);
+
+            for (int i = 0;i < list_boss.size(); i++)
+            {
+                BossThreat* boss_object = list_boss[i];
+                if(boss_object != NULL)
+                {
+                    boss_object->SetMapXY(map_data.start_x, map_data.start_y);
+                    boss_object->Show(renderer);
+                }
+            }
 
             for (int i = 0;i < list_threats.size(); i++)
             {
@@ -273,98 +295,140 @@ int main(int argc, char* argv[])
                 }
             }
             if (&Player1 != NULL)
-                    {
-                        SDL_Rect PRect = Player1.GetRectP();
-                        if (Boss1.GetTexture() != NULL){
-                            SDL_Rect BRect;
-                                BRect.x = Boss1.GetRect().x;
-                                BRect.y = Boss1.GetRect().y;
-                                BRect.w = 128;
-                                BRect.h = 128;
-                            if (Common_Func::CheckCollision(PRect,BRect))
-                            {
-                                SDL_RenderClear(renderer);
-
-                                if (Mix_PlayingMusic() == 1)
-                                {
-                                    Mix_PauseMusic();
-                                }
-                                Boss1.battle = true;
-                                int result = Boss1.BossCombat(Player1,font_combat,renderer,font_menu);
-                                if (result == 0){
-                                    Player1.UpdateBattleStatus(false);
-                                    Boss1.Free();
-                                    continue;
-                                }
-                            }
-                        }
-            for (int i=0; i < list_threats.size(); ++i)
             {
-                ThreatObject* threat_check = list_threats[i];
-                if (list_threats[i]->GetRevTime() >= 975)
-                            {
-                                std::string y = std::to_string(list_threats[i]->HP_drop);
-                                y = "+" + y;
-                                PHeal.SetText(y);
-                                PHeal.LoadFromRenderText(font_slash,renderer);
-                                PHeal.RenderText(renderer,PRect.x + PRect.w -10,PRect.y);
-                            }
-                if (threat_check != NULL && threat_check->GetRevTime() == 0)
+                SDL_Rect PRect = Player1.GetRectP();
+                for (int i = 0;i<list_boss.size();++i)
                 {
-                    SDL_Rect TRect;
-                        TRect.x = threat_check->GetRect().x; TRect.x +=20;
-                        TRect.y = threat_check->GetRect().y; TRect.y +=20;
-                        TRect.w = threat_check->GetWidthFrame(); TRect.w -=20;
-                        TRect.h = threat_check->GetHeightFrame(); TRect.h -=20;
-
-                    Slash* SCheck = Player1.GetSlash();
-
-
-
-                    if (SCheck != NULL)
+                    BossThreat* Boss_check = list_boss[i];
+                    if (Boss_check != NULL)
                     {
-                        SDL_Rect SRect = SCheck->GetRect();
-                        bool check = Common_Func::CheckCollision(TRect, SRect);
-
-                        if(check)
+                        SDL_Rect BRect;
+                            BRect.x = Boss_check->GetRect().x;
+                            BRect.y = Boss_check->GetRect().y;
+                            BRect.w = 128;
+                            BRect.h = 128;
+                        if (Common_Func::CheckCollision(PRect,BRect))
                         {
-                            std::string x = std::to_string(Player1.ATK);
-                            x = "-" + x;
-                            Dmg.SetText(x);
-                            if (Slash_cooldown.get_tick() >= 750)
+                            SDL_RenderClear(renderer);
+
+                            if (Mix_PlayingMusic() == 1)
                             {
-                                if (!hit_threat)
-                                {
-                                    hit_threat = true;
-                                }
-                                (list_threats[i]->HP)-=Player1.ATK;
-                                Dmg.LoadFromRenderText(font_slash, renderer);
-                                Dmg.RenderText(renderer, TRect.x -40, TRect.y -40);
-                                if ((list_threats[i]->HP) == 0)
-                                {
-                                    if (!killed_threat)
-                                    {
-                                        killed_threat = true;
-                                    }
-                                    Player1.xp+=list_threats[i]->XP_drop;
-                                    if (Player1.HP + (list_threats[i]->HP_drop) > Player1.maxHP) Player1.HP = Player1.maxHP;
-                                    else Player1.HP +=list_threats[i]->HP_drop;
-                                    std::string y = std::to_string(list_threats[i]->HP_drop);
-                                    y = "+" + y;
-                                    PHeal.SetText(y);
-                                    PHeal.LoadFromRenderText(font_slash,renderer);
-                                    PHeal.RenderText(renderer,PRect.x + PRect.w -10,PRect.y);
-                                    list_threats[i]->SetRevTime(1000);
-                                }
-                                Slash_cooldown.start();
+                                Mix_HaltMusic();
                             }
-                            if (Slash_cooldown.get_tick() <= 550)
+                            if (list_boss[i]->GetType() <=1)
                             {
-                                Dmg.LoadFromRenderText(font_slash, renderer);
-                                Dmg.RenderText(renderer, TRect.x -40, TRect.y -40);
+                                Mix_PlayMusic(FirstBattleBGM, -1);
+                            }
+                            list_boss[i]->battle = true;
+                            int result = list_boss[i]->BossCombat(Player1,font_noti,renderer,font_menu, Font_noti_2);
+                            if (result == 1){
+                                Player1.UpdateBattleStatus(false);
+                                Player1.xp += list_boss[i]->XP_drop;
+                                list_boss[i]->Free();
+                                list_boss.erase (list_boss.begin() + i);
+                                Player1.UpdateImg(renderer);
+                                Player1.Clip();
+                                if(Mix_PlayingMusic() == 0)
+                                {
+                                    Mix_PlayMusic(BGM, -1);
+                                }
+                                continue;
+                            } else if (result == 0)
+                            {
+                                Player1.UpdateBattleStatus(false);
+                                Player1.UpdateImg(renderer);
+                                Player1.Clip();
+                                list_boss[i]->battle = false;
+                                list_boss[i]->HP = list_boss[i]->maxHP;
+                                list_boss[i]->attack = false;
+                                list_boss[i]->count_turn = 0;
+                                if(Mix_PlayingMusic() == 0)
+                                {
+                                    Mix_PlayMusic(BGM, -1);
+                                }
+                                continue;
+                            } else if (result == 2)
+                            {
+                                quitG = true;
+                                running = false;
+                            } else if (result == -1)
+                            {
+                                quitG = true;
                             }
                         }
                     }
+                }
+                for (int i=0; i < list_threats.size(); ++i)
+                {
+                    ThreatObject* threat_check = list_threats[i];
+                    if (list_threats[i]->GetRevTime() >= 975)
+                    {
+                        std::string y = std::to_string(list_threats[i]->HP_drop);
+                        y = "+" + y;
+                        PHeal.SetText(y);
+                        PHeal.LoadFromRenderText(font_slash,renderer);
+                        PHeal.RenderText(renderer,PRect.x + PRect.w -10,PRect.y);
+                    }
+                    if (threat_check != NULL && threat_check->GetRevTime() == 0)
+                    {
+                        SDL_Rect TRect;
+                            TRect.x = threat_check->GetRect().x; TRect.x +=20;
+                            TRect.y = threat_check->GetRect().y; TRect.y +=20;
+                            TRect.w = threat_check->GetWidthFrame(); TRect.w -=20;
+                            TRect.h = threat_check->GetHeightFrame(); TRect.h -=20;
+
+                        Slash* SCheck = Player1.GetSlash();
+                        if (SCheck != NULL)
+                        {
+                            SDL_Rect SRect = SCheck->GetRect();
+                            bool check = Common_Func::CheckCollision(TRect, SRect);
+
+                            if(check)
+                            {
+                                std::string x = std::to_string(Player1.ATK);
+                                x = "-" + x;
+                                Dmg.SetText(x);
+                                if (Slash_cooldown.get_tick() >= 750)
+                                {
+                                    if (!hit_threat)
+                                    {
+                                        hit_threat = true;
+                                    }
+                                    (list_threats[i]->HP)-=Player1.ATK;
+                                    Dmg.LoadFromRenderText(font_slash, renderer);
+                                    Dmg.RenderText(renderer, TRect.x -40, TRect.y -40);
+                                    if ((list_threats[i]->HP) == 0)
+                                    {
+                                        if (!killed_threat)
+                                        {
+                                            killed_threat = true;
+                                            Player1.HP_potion++;
+                                        }
+                                        int x = list_threats[i]->GetType();
+                                        if (x==0){if (TDL1(gen)) Player1.HP_potion++;}
+                                        if (x==1){if (TDL2(gen)) Player1.HP_potion++;}
+                                        if (x==2){if (TDL3(gen)) Player1.HP_potion++;}
+                                        if (x==3){if (TDL4(gen)) Player1.HP_potion++;}
+                                        if (x==4){if (TDL5(gen)) Player1.HP_potion++;}
+                                        Player1.xp+=list_threats[i]->XP_drop;
+                                        if (Player1.HP + (list_threats[i]->HP_drop) > Player1.maxHP) Player1.HP = Player1.maxHP;
+                                        else Player1.HP +=list_threats[i]->HP_drop;
+                                        std::string y = std::to_string(list_threats[i]->HP_drop);
+                                        y = "+" + y;
+                                        PHeal.SetText(y);
+                                        PHeal.LoadFromRenderText(font_slash,renderer);
+                                        PHeal.RenderText(renderer,PRect.x + PRect.w -10,PRect.y);
+                                        list_threats[i]->SetRevTime(1000);
+                                    }
+                                    Slash_cooldown.start();
+                                }
+                                if (Slash_cooldown.get_tick() <= 550)
+                                {
+                                    Dmg.LoadFromRenderText(font_slash, renderer);
+                                    Dmg.RenderText(renderer, TRect.x -40, TRect.y -40);
+                                }
+                            }
+                        }
                         if (Common_Func::CheckCollision(PRect, TRect))
                         {
                             std::string w = std::to_string(list_threats[i]->ATK);
@@ -614,25 +678,18 @@ std::vector<ThreatObject*> MakeThreatList ()
     ThreatObject* test_threat = new ThreatObject;
         test_threat->LoadImg("img//threat_slime.png",renderer);
         test_threat->Clip();
-        int a,b;
+        int a,b; float x;
         int type, HP, ATK, HP_drop, XP_drop;
-        float x;
         OpenFile >> type;
         test_threat->SetType(type);
         test_threat->SetInputL(type);
-        OpenFile >> x;
-        test_threat->SetXpos(x*TILE_SIZE);
-        OpenFile >> x;
-        test_threat->SetYpos(x*TILE_SIZE);
+        OpenFile >> x; test_threat->SetXpos(x*TILE_SIZE);
+        OpenFile >> x; test_threat->SetYpos(x*TILE_SIZE);
+        OpenFile >> a; test_threat->HP = a;
+        OpenFile >> a; test_threat->ATK = a;
+        OpenFile >> a; test_threat->HP_drop = a;
+        OpenFile >> a; test_threat->XP_drop = a;
         test_threat->SetXYposRes();
-        OpenFile >> a;
-        test_threat->HP = a;
-        OpenFile >> a;
-        test_threat->ATK = a;
-        OpenFile >> a;
-        test_threat->HP_drop = a;
-        OpenFile >> a;
-        test_threat->XP_drop = a;
         list_threats.push_back(test_threat);
 
     ThreatObject* dynamic_threat = new ThreatObject[20];
@@ -655,12 +712,9 @@ std::vector<ThreatObject*> MakeThreatList ()
             p_threat->ATK = ATK;
             p_threat->XP_drop = XP_drop;
             p_threat->HP_drop = HP_drop;
-            OpenFile >> x;
-            p_threat->SetXpos(x*TILE_SIZE);
-            OpenFile >> x;
-            p_threat->SetYpos(x*TILE_SIZE);
-            OpenFile >> a;
-            OpenFile >> b;
+            OpenFile >> x; p_threat->SetXpos(x*TILE_SIZE);
+            OpenFile >> x; p_threat->SetYpos(x*TILE_SIZE);
+            OpenFile >> a >> b;
             p_threat->SetBorderX(a*TILE_SIZE,b*TILE_SIZE);
             p_threat->SetXYposRes();
             list_threats.push_back(p_threat);
@@ -687,12 +741,36 @@ std::vector<ThreatObject*> MakeThreatList ()
             p_threat->ATK = ATK;
             p_threat->XP_drop = XP_drop;
             p_threat->HP_drop = HP_drop;
-            OpenFile >> x;
-            p_threat->SetXpos(x*TILE_SIZE);
-            OpenFile >> x;
-            p_threat->SetYpos(x*TILE_SIZE);
+            OpenFile >> x; p_threat->SetXpos(x*TILE_SIZE);
+            OpenFile >> x; p_threat->SetYpos(x*TILE_SIZE);
             list_threats.push_back(p_threat);
         }
     }
+    OpenFile.close();
     return list_threats;
+}
+
+std::vector <BossThreat*> MakeBossThreatList ()
+{
+    std::vector <BossThreat*> BossList;
+    std::ifstream OpenFile;
+    OpenFile.open("map//BossThreat.txt");
+    float a; int b; double x;
+    for (int i = 0;i<5;++i)
+    {
+        BossThreat* p_boss = new BossThreat;
+        p_boss->LoadImg("img//King_Pig.png", renderer);
+        p_boss->Clip();
+        OpenFile >> b; p_boss->SetType(b);
+        OpenFile >> a; p_boss->SetXpos(a*TILE_SIZE);
+        OpenFile >> a; p_boss->SetYpos(a*TILE_SIZE);
+        OpenFile >> b; p_boss->HP = b; p_boss->maxHP = b;
+        OpenFile >> b; p_boss->ATK = b;
+        OpenFile >> b; p_boss->SPEED = b;
+        OpenFile >> b; p_boss->XP_drop = b;
+        OpenFile >> x; p_boss->EF_RES = x;
+        BossList.push_back(p_boss);
+    }
+    OpenFile.close();
+    return BossList;
 }

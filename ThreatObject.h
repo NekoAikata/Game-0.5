@@ -32,6 +32,7 @@ public:
     void SetMapXY(const int x, const int y) {mapvalue_x = x; mapvalue_y = y;}
 
     void SetType (const int& Type) {type = Type;}
+    int GetType () {return type;}
     void SetBorderX (const int& aBord, const int& bBord) {animation_left = aBord; animation_right = bBord;}
     void SetInputL (const int& IpLeft) {Input_type.left = IpLeft;}
     void Move (SDL_Renderer* screen);

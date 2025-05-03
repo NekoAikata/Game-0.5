@@ -5,6 +5,7 @@ Text_object::Text_object()
     text_color.r = 255;
     text_color.b = 255;
     text_color.g = 255;
+    text_color.a = 255;
     width = 0; height = 0;
     texture = NULL;
 }
@@ -37,11 +38,12 @@ void Text_object::Free()
     }
 }
 
-void Text_object::SetColor(Uint8 red, Uint8 blue, Uint8 green)
+void Text_object::SetColor(Uint8 red, Uint8 blue, Uint8 green, Uint8 alpha)
 {
     text_color.r = red;
     text_color.b = blue;
     text_color.g = green;
+    text_color.a = alpha;
 }
 
 void Text_object::SetColor(SDL_Color sample)
