@@ -6,8 +6,7 @@
 #include "Slash.h"
 #include "Text.h"
 
-#define PLAYER_SPEED 6
-#define PLAYER_ATTACK 1500
+#define PLAYER_SPEED 8
 #define FRAME_DELAY 3
 
 class MainObject : public BaseObject

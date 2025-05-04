@@ -21,6 +21,9 @@ ThreatObject::ThreatObject()
     y_pos_respawn = 0;
 
     type = 0;
+
+    animation_up = 0;
+    animation_down = 0;
     animation_left = 0;
     animation_right = 0;
     Input_type.left = 0;
@@ -100,6 +103,12 @@ void ThreatObject::DoThreat (Map& map_data)
         } else if (Input_type.right == 1)
         {
             x_val+=THREAT_SPEED;
+        } else if (Input_type.up == 1)
+        {
+            y_val-=THREAT_SPEED;
+        } else if  (Input_type.down == 1)
+        {
+            y_val+=THREAT_SPEED;
         }
         CheckMap (map_data);
     }
@@ -218,8 +227,46 @@ void ThreatObject::Move (SDL_Renderer* screen)
             Input_type.left = 0;
             LoadImg ("img//threat_slime.png", screen);
         }
-    } else if (type == 0)
+    }
+    else if (type == 2)
+    {
+
+    }
+    else if (type == 0)
     {
         ;
+    }
+}
+
+void ThreatObject::InitBullet (BulletObject* p_bullet, SDL_Renderer*screen)
+{
+    if (p_bullet != NULL)
+    {
+        bool ret = p_bullet->LoadImgBullet(screen);
+        p_bullet->set_is_move(true);
+        p_bullet->set_bullet_dir(BulletObject::DIR_LEFT);
+        p_bullet->SetRect(x_pos, y_pos);
+        p_bullet->set_x_val(15);
+        bullet_list.push_back(p_bullet);
+    }
+}
+
+void ThreatObject::MakeBullet(SDL_Renderer* screen, const int& x_limit, const int& y_limit)
+{
+    for (int i = 0; i < bullet_list.size(); ++i)
+    {
+        BulletObject* p_bullet = bullet_list[i];
+        if(p_bullet != NULL)
+        {
+            if (p_bullet->get_is_move())
+            {
+                p_bullet->HandleMove(x_limit, y_limit);
+                p_bullet->Render(screen);
+            } else
+            {
+                p_bullet->set_is_move(true);
+                p_bullet->SetRect(x_pos, y_pos);
+            }
+        }
     }
 }

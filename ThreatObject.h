@@ -3,6 +3,7 @@
 
 #include "BObject.h"
 #include "Game_Stat.h"
+#include "BulletObject.h"
 
 #define THREAT_SPEED 4
 class ThreatObject : public BaseObject
@@ -34,6 +35,7 @@ public:
     void SetType (const int& Type) {type = Type;}
     int GetType () {return type;}
     void SetBorderX (const int& aBord, const int& bBord) {animation_left = aBord; animation_right = bBord;}
+    void SetBorderY (const int& aBord, const int& bBord) {animation_up = aBord; animation_down = bBord;}
     void SetInputL (const int& IpLeft) {Input_type.left = IpLeft;}
     void Move (SDL_Renderer* screen);
 
@@ -43,7 +45,13 @@ public:
     int XP_drop;
     int HP_drop;
 
+    std::vector<BulletObject*> get_bullet_list () const {return bullet_list;}
+    void set_bullet_list(const std::vector<BulletObject*>& bl_list) {bullet_list = bl_list;}
+    void InitBullet (BulletObject* p_bullet, SDL_Renderer*screen);
+    void MakeBullet (SDL_Renderer* screen, const int& x_limit, const int& y_limit);
+
 private:
+    std::vector<BulletObject*> bullet_list;
     int revive_time;
 
     float x_val;
@@ -65,6 +73,9 @@ private:
     int mapvalue_y;
 
     int type;
+    int animation_up;
+    int animation_down;
+
     int animation_right;
     int animation_left;
     Input_action Input_type;

@@ -35,12 +35,22 @@ bool BossThreat::LoadImg (std::string path, SDL_Renderer* screen)
 {
 	bool ret = BaseObject::LoadImg(path, screen);
 
-    if (ret)
-    {
-        height_frame = rect.h;
-        width_frame = rect.w/12;
-    }
+	height_frame = rect.h;
 
+    if (ret && type == 5)
+    {
+        width_frame = rect.w/12;
+    } else if (ret && (type == 0 || type == 2))
+    {
+        width_frame = rect.w/4;
+    }
+    else if (ret && type == 1)
+    {
+        width_frame = rect.w/7;
+    } else if (ret && (type == 2 || type == 3 || type == 4))
+    {
+        width_frame = rect.w/6;
+    }
     return ret;
 }
 
@@ -112,47 +122,65 @@ void BossThreat::Clip()
 
 void BossThreat::Show(SDL_Renderer* des)
 {
-	frame_num++;
-    if (frame_num >= 12)
+	frame_delay++;
+    if (frame_delay >= FRAME_DELAY)
     {
-        frame_num = 0;
+        frame_delay = 0;
+        frame_num++;
+    }
+    if (type == 5)
+    {
+        frame_num = frame_num >= 12 ? 0 : frame_num;
+    } else if (type ==  0 || type == 2)
+    {
+       frame_num = frame_num >= 4 ? 0 : frame_num;
+    }
+    else if (type ==  1)
+    {
+       frame_num = frame_num >= 7 ? 0 : frame_num;
+    } else
+    {
+        frame_num = frame_num >= 6 ? 0 : frame_num;
     }
     SDL_Rect renderQuad;
     if (!battle){
         rect.x = x_pos - mapvalue_x;
         rect.y = y_pos - mapvalue_y;
-        renderQuad = {rect.x, rect.y, 128, 128};
-    } else {renderQuad = {rect.x, rect.y, 224, 224};}
+        if (type == 0) renderQuad = {rect.x, rect.y, 128, 96};
+        else if (type == 1) renderQuad = {rect.x - 64, rect.y, 256, 128};
+        else if (type == 2) renderQuad = {rect.x - 32, rect.y - 16, 192, 128};
+        else if (type == 3) renderQuad = {rect.x, rect.y - 64, 128, 192};
+        else renderQuad = {rect.x - 64, rect.y - 64, 256, 256};
+    } else
+    {
+        if (type == 5) renderQuad = {rect.x, rect.y, 224, 224};
+        else if (type == 0) renderQuad = {rect.x, rect.y + 64, 256, 160};
+        else if (type == 1) renderQuad = {rect.x -64, rect.y+32, 288, 160};
+        else if (type == 2) renderQuad = {rect.x , rect.y, 224, 224};
+        else if (type == 3) renderQuad = {rect.x - 32 , rect.y, 224, 224};
+        else if (type == 4) renderQuad = {rect.x  , rect.y, 224, 224};
+    }
 
     SDL_Rect* current_clip = &frame_clip[frame_num];
 
     SDL_RenderCopy(des, texture, current_clip, &renderQuad);
 }
 
-int BossThreat::Skill_1 ()
-{
-    return ATK;
-}
-
-int BossThreat::Skill_2 ()
-{
-    return ATK*1.5;
-}
-
-int BossThreat::Skill_3 ()
-{
-    return ATK*2;
-};
-
 void BossThreat::ShowHP(TTF_Font* font, SDL_Renderer* screen)
 {
     Text_object HPNew;
-    std::string HPText = "HP: " + std::to_string(HP);
+    std::string HPText;
+    if (type == 0) HPText = "LumberJack HP: " + std::to_string(HP);
+    else if (type == 1) HPText = "MushMonster HP: " + std::to_string(HP);
+    else if (type == 2) HPText = "Golem HP: " + std::to_string(HP);
+    else if (type == 3) HPText = "Spider HP: " + std::to_string(HP);
+    else if (type == 4) HPText = "Skeleton HP: " + std::to_string(HP);
+    else if (type == 5) HPText = "King Pig HP: " + std::to_string(HP);
     std::string x = std::to_string(maxHP);
     HPText += "/" + x;
     HPNew.SetText(HPText);
     HPNew.LoadFromRenderText(font,screen);
-    HPNew.RenderText(screen, SCREEN_WIDTH-HPNew.GetWidth(), 70);
+    HPNew.RenderText(screen, SCREEN_WIDTH-HPNew.GetWidth(), 100);
 }
 
 int BossThreat::BossCombat (MainObject& Player, TTF_Font* font_combat, SDL_Renderer* screen, TTF_Font* font_noti, TTF_Font* font_title)
@@ -162,12 +190,13 @@ int BossThreat::BossCombat (MainObject& Player, TTF_Font* font_combat, SDL_Rende
 
     std::uniform_int_distribution<int> dist_rngdmg(1,15);
     std::bernoulli_distribution EF(EF_RES);
+    std::bernoulli_distribution EF2(EF_RES*1.5);
 
     int PCD = Player.SPEED;
     int BCD = SPEED;
     int defense = 0;
 
-    int effect = 0;
+    int poison = 0; int para = 0;
 
     int result = 0;
     SDL_RenderClear(screen);
@@ -176,8 +205,19 @@ int BossThreat::BossCombat (MainObject& Player, TTF_Font* font_combat, SDL_Rende
     BaseObject IconPlayer;
     BaseObject IconBoss;
 
+    BaseObject Para; BaseObject Poison;
+    Para.LoadImg("img/para.png", screen);
+    Para.SetRect(30, 165); Para.SetRectWH(64, 16);
+    Poison.LoadImg("img/poison.png", screen);
+    Poison.SetRect(94, 165); Poison.SetRectWH(64, 16);
+
     IconPlayer.LoadImg("img//PIcon.png", screen);
-    IconBoss.LoadImg("img//King_Pig_Icon.png", screen);
+    if (type==5) IconBoss.LoadImg("img//King_Pig_Icon.png", screen);
+    if (type==0) IconBoss.LoadImg("img//MLJ_Icon.png", screen);
+    if (type==1) IconBoss.LoadImg("img//Mushroom_Icon.png", screen);
+    if (type==2) IconBoss.LoadImg("img//rat_Icon.png", screen);
+    if (type==3) IconBoss.LoadImg("img//spider_Icon.png", screen);
+    if (type==4) IconBoss.LoadImg("img//skeleton_Icon.png", screen);
 
     Player.UpdateBattleStatus(true);
     Player.LoadImg("img//player_battle.png",screen);
@@ -199,11 +239,13 @@ int BossThreat::BossCombat (MainObject& Player, TTF_Font* font_combat, SDL_Rende
     SDL_Color StatColor[2] = {{255,0,0},{0,0,255}};
 
     Text_object Notifi;
-    Text_object PMinus, PHeal, Dmg;
+    Text_object PMinus, PHeal, Dmg, PoisonDmg;
     Dmg.SetColor(But_color[0]);
     Notifi.SetColor(But_color[0]);
     PMinus.SetColor(StatColor[0]);
     PHeal.SetColor(StatColor[1]);
+    PoisonDmg.SetColor(87, 87, 0);
+    PoisonDmg.SetText("-" + std::to_string (Player.maxHP*3/100));
 
     int maxSpeed = Player.SPEED > SPEED ? Player.SPEED : SPEED ;
 
@@ -239,10 +281,30 @@ int BossThreat::BossCombat (MainObject& Player, TTF_Font* font_combat, SDL_Rende
     {
         if (PCD > 0 && BCD > 0 && HP > 0 && Player.HP > 0) {PCD--; BCD--;}
 
-        background.LoadImg("img//Battle_1.png", screen);
-        background.SetRect(0,0);
-        background.SetRectWH(SCREEN_WIDTH, SCREEN_HEIGHT);
-        background.Render(screen);
+        if (type == 0 || type == 1){
+            background.LoadImg("img//Battle_1.png", screen);
+            background.SetRect(0,0);
+            background.SetRectWH(SCREEN_WIDTH, SCREEN_HEIGHT);
+            background.Render(screen);
+        } else if (type == 2 || type == 3)
+        {
+            background.LoadImg("img//Battle_2.png", screen);
+            background.SetRect(0,0);
+            background.SetRectWH(SCREEN_WIDTH, SCREEN_HEIGHT);
+            background.Render(screen);
+        } else if (type == 4)
+        {
+            background.LoadImg("img//Battle_3.png", screen);
+            background.SetRect(0,0);
+            background.SetRectWH(SCREEN_WIDTH, SCREEN_HEIGHT);
+            background.Render(screen);
+        } else
+        {
+            background.LoadImg("img//Battle_4.png", screen);
+            background.SetRect(0,0);
+            background.SetRectWH(SCREEN_WIDTH, SCREEN_HEIGHT);
+            background.Render(screen);
+        }
 
         if (HP > 0 && Player.HP > 0)
         {
@@ -365,6 +427,14 @@ int BossThreat::BossCombat (MainObject& Player, TTF_Font* font_combat, SDL_Rende
         if (PCD == 0 && HP > 0 && Player.HP > 0)
         {
             Player.ShowBattleStat(font_combat,screen);
+            if (para > 0)
+            {
+                Para.Render(screen);
+            }
+            if (poison > 0)
+            {
+                Poison.Render(screen);
+            }
             Notifi.SetText("Your turn");
             Notifi.LoadFromRenderText(font_noti,screen);
             while (SDL_PollEvent(&event))
@@ -396,6 +466,7 @@ int BossThreat::BossCombat (MainObject& Player, TTF_Font* font_combat, SDL_Rende
                                 BaseObject SLASH;
                                 SLASH.LoadImg("img/Slash_img.png", screen);
                                 SLASH.SetRect(GetRect().x + 0.75*TILE_SIZE,GetRect().y + 1.5*TILE_SIZE);
+                                if (type == 1) SLASH.SetRect(GetRect().x +0.15*TILE_SIZE,GetRect().y + 0.95*TILE_SIZE);
                                 SLASH.SetRectWH(128,128);
                                 SLASH.Render(screen);
                                 Notifi.Free();
@@ -416,12 +487,13 @@ int BossThreat::BossCombat (MainObject& Player, TTF_Font* font_combat, SDL_Rende
                                 Notifi.LoadFromRenderText(font_noti, screen);
                                 defense = 2;
                             }
-                            else if (i==2 && attack)
+                            else if (i==2 && Player.HP_potion >0)
                             {
                                 Notifi.Free();
                                 Notifi.SetText("You chose Heal");
                                 Notifi.LoadFromRenderText(font_noti, screen);
                                 Player.HP += Player.maxHP/10;
+                                Player.HP_potion--;
                                 std::string x = "+" + std::to_string(Player.maxHP/10);
                                 PHeal.SetText(x);
                                 PHeal.LoadFromRenderText(font_noti,screen);
@@ -430,7 +502,7 @@ int BossThreat::BossCombat (MainObject& Player, TTF_Font* font_combat, SDL_Rende
                                 {
                                     Player.HP = Player.maxHP;
                                 }
-                            } else if (i==2 && !attack)
+                            } else if (i==2 && Player.HP_potion <=0)
                             {
                                 continue;
                             }
@@ -442,8 +514,17 @@ int BossThreat::BossCombat (MainObject& Player, TTF_Font* font_combat, SDL_Rende
                                 Mix_HaltMusic();
                                 running = false;
                             }
-                            PCD += Player.SPEED;
-                            defense--; effect--;
+                            if (para > 0)
+                            {
+                                PCD = Player.SPEED*1.5;
+                            } else PCD = Player.SPEED;
+                            if (poison > 0)
+                            {
+                                Player.HP -= Player.maxHP*3/100;
+                                PoisonDmg.LoadFromRenderText(font_noti, screen);
+                                PoisonDmg.RenderText(screen,Player.GetRect().x, Player.GetRect().y - 64);
+                            }
+                            defense--; para--; poison--;
                         }
                     }
                 }
@@ -458,7 +539,7 @@ int BossThreat::BossCombat (MainObject& Player, TTF_Font* font_combat, SDL_Rende
                         {
                             if(!Button_status[i])
                             {
-                                if (!(i==2 && !attack)){
+                                if (!(i==2 && Player.HP_potion <=0)){
                                     Button_status[i] = 1;
                                     Button[i].Free();
                                     Button[i].SetColor(But_color[1]);
@@ -492,10 +573,10 @@ int BossThreat::BossCombat (MainObject& Player, TTF_Font* font_combat, SDL_Rende
             {
                 SDL_GetMouseState(&x,&y);
                 if (x>=pos[2].x && x<=pos[2].x + Button[2].GetWidth() &&
-                    y>=pos[2].y && y<=pos[2].y + Button[2].GetHeight() && !attack)
+                    y>=pos[2].y && y<=pos[2].y + Button[2].GetHeight() && Player.HP_potion <=0)
                 {
                     Notifi.Free();
-                    Notifi.SetText("Enemy not attacked!");
+                    Notifi.SetText("Not enough potion!");
                     Notifi.LoadFromRenderText(font_noti, screen);
                     Notifi.RenderText(screen, 4.5*TILE_SIZE, 50);
                 }else Notifi.RenderText(screen, 7*TILE_SIZE, 50);
@@ -517,11 +598,46 @@ int BossThreat::BossCombat (MainObject& Player, TTF_Font* font_combat, SDL_Rende
                 int damgage; int skill = dist_skill(gen);
                 if ((skill ==1 || skill == 18 || skill == 3) && count_turn > 2)
                 {
-                    damgage = Skill_3();
+                    Notifi.Free();
+                    Notifi.SetText("Opponent chose Ultimate!!!");
+                    Notifi.LoadFromRenderText(font_noti, screen);
+                    if (EF2(gen))
+                    {
+                        if (type == 1) poison = 2;
+                        else if (type == 2 || type == 5)
+                        {
+                            para = 2;
+                            if (EF(gen)) poison=2;
+                        }
+                        else if (type == 3) para = 2;
+                    }
+                    damgage = ATK*2;
                     count_turn=0;
                 }
-                else if (skill%2 == 1) damgage=Skill_2();
-                else damgage = Skill_1();
+                else if (skill%2 == 1)
+                {
+                    Notifi.Free();
+                    Notifi.SetText("Opponent chose Skill!");
+                    Notifi.LoadFromRenderText(font_noti, screen);
+                    damgage=1.5*ATK;
+                    if (EF(gen))
+                    {
+                        if (type == 1) poison = 2;
+                        else if (type == 2 || type == 5)
+                        {
+                            para = 2;
+                            if (EF(gen)) poison = 1;
+                        }
+                        else if (type == 3) para = 2;
+                    }
+                }
+                else
+                {
+                    Notifi.Free();
+                    Notifi.SetText("Opponent chose Normal_attack");
+                    Notifi.LoadFromRenderText(font_noti, screen);
+                    damgage = ATK;
+                }
                 damgage = damgage*(84+dist_rngdmg(gen))/100;
 
                 if(dist_crit(gen) == 1) damgage*=2;

@@ -60,6 +60,7 @@ private:
 
     SDL_Rect frame_clip[12];
     int frame_num;
+    int frame_delay = 0;
 
     int mapvalue_x;
     int mapvalue_y;

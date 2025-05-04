@@ -33,9 +33,9 @@ const int RENDER_DRAW_COLOR = 0;
 
 #define LEVEL_1 389
 #define LEVEL_1_5 375
-#define LEVEL_2 300
-#define LEVEL_3 200
-#define LEVEL_4 100
+#define LEVEL_2 295
+#define LEVEL_3 235
+#define LEVEL_4 175
 
 #define BLANK_MAP 0
 #define FLOOR 1
@@ -43,6 +43,7 @@ const int RENDER_DRAW_COLOR = 0;
 #define DOOR_OPEN 16
 #define KEY 17
 #define TREASURE 18
+#define CHEST 22
 
 namespace Common_Func
 {

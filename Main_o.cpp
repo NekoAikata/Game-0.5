@@ -6,7 +6,7 @@ MainObject::MainObject()
     x_val = 0;
     y_val = 0;
     x_pos = 6*TILE_SIZE;
-    y_pos = 396*TILE_SIZE;
+    y_pos = 300*TILE_SIZE;
 
     width_frame = 0;
     height_frame = 0;
@@ -29,7 +29,7 @@ MainObject::MainObject()
     HP_potion=0;
 
     maxHP = 100;
-    ATK = 200;
+    ATK = 20;
     SPEED = 25;
     HP=maxHP;
     have_sword = false;
@@ -360,11 +360,15 @@ void MainObject::CheckMap(Map& map_data)
                 map_data.tile[y1][x2] = FLOOR;
                 map_data.tile[y2][x2] = FLOOR;
                 map_data.tile[389][6] = DOOR_OPEN;
+            } else if (val1 == CHEST || val2 == CHEST)
+            {
+                map_data.tile[y1][x2] = BLANK_MAP;
+                map_data.tile[y2][x2] = BLANK_MAP;
             }
             else
             {
-                if ((val1 !=BLANK_MAP && val1 != FLOOR && val1 !=DOOR_OPEN) ||
-                    (val2 !=BLANK_MAP && val2 != FLOOR && val2 !=DOOR_OPEN))
+                if ((val1 !=BLANK_MAP && val1 != FLOOR && val1 !=DOOR_OPEN && val1 !=31) ||
+                    (val2 !=BLANK_MAP && val2 != FLOOR && val2 !=DOOR_OPEN && val2 != 31))
                 {
                     x_pos = x2*TILE_SIZE - width_frame + 5;
                     x_val=0;
@@ -384,11 +388,15 @@ void MainObject::CheckMap(Map& map_data)
                 map_data.tile[y1][x1] = FLOOR;
                 map_data.tile[y2][x1] = FLOOR;
                 map_data.tile[389][6] = DOOR_OPEN;
+            } else if (val3 == CHEST || val4 == CHEST)
+            {
+                map_data.tile[y1][x1] = BLANK_MAP;
+                map_data.tile[y2][x1] = BLANK_MAP;
             }
             else
             {
-                if ((val3 !=BLANK_MAP && val3 != FLOOR && val3 !=DOOR_OPEN) ||
-                    (val4 !=BLANK_MAP && val4 != FLOOR && val4 !=DOOR_OPEN))
+                if ((val3 !=BLANK_MAP && val3 != FLOOR && val3 !=DOOR_OPEN && val3 != 31) ||
+                    (val4 !=BLANK_MAP && val4 != FLOOR && val4 !=DOOR_OPEN && val4 != 31))
                 {
                     x_pos = x1*TILE_SIZE+30;
                     x_val = 0;
@@ -423,11 +431,15 @@ void MainObject::CheckMap(Map& map_data)
                 map_data.tile[y2][x2] = FLOOR;
                 map_data.tile[y2][x1] = FLOOR;
                 map_data.tile[389][6] = DOOR_OPEN;
+            } else if (val2 == CHEST || val4 == CHEST)
+            {
+                map_data.tile[y2][x2] = BLANK_MAP;
+                map_data.tile[y2][x1] = BLANK_MAP;
             }
             else
             {
-                if ((val2 != BLANK_MAP && val2 !=FLOOR && val2 !=DOOR_OPEN) ||
-                    (val4 != BLANK_MAP && val4 !=FLOOR && val4 !=DOOR_OPEN))
+                if ((val2 != BLANK_MAP && val2 !=FLOOR && val2 !=DOOR_OPEN && val2 != 31) ||
+                    (val4 != BLANK_MAP && val4 !=FLOOR && val4 !=DOOR_OPEN && val4 != 31))
                 {
                     y_pos = y2*TILE_SIZE - height_frame + 5;
                     y_val=0;
@@ -448,11 +460,15 @@ void MainObject::CheckMap(Map& map_data)
                 map_data.tile[y1][x1] = FLOOR;
                 map_data.tile[y1][x2] = FLOOR;
                 map_data.tile[389][6] = DOOR_OPEN;
+            } else if (val1 ==  CHEST|| val3 == CHEST)
+            {
+                map_data.tile[y1][x1] = BLANK_MAP;
+                map_data.tile[y1][x2] = BLANK_MAP;
             }
             else
             {
-                if ((val1 !=BLANK_MAP && val1 !=FLOOR && val1 !=DOOR_OPEN) ||
-                    (val3 !=BLANK_MAP && val3 !=FLOOR && val3 !=DOOR_OPEN))
+                if ((val1 !=BLANK_MAP && val1 !=FLOOR && val1 !=DOOR_OPEN && val1 != 31) ||
+                    (val3 !=BLANK_MAP && val3 !=FLOOR && val3 !=DOOR_OPEN && val3 != 31))
                 {
                     y_pos = y2*TILE_SIZE - 30;
                     y_val = 0;
@@ -545,9 +561,9 @@ void MainObject::MapMove(Map& map_data)
         }
     } else
     {
-        if (map_data.start_y + SCREEN_HEIGHT > LEVEL_4*TILE_SIZE)
+        if (map_data.start_y + SCREEN_HEIGHT > LEVEL_4*TILE_SIZE + TILE_SIZE)
         {
-            map_data.start_y = LEVEL_4*TILE_SIZE - SCREEN_HEIGHT;
+            map_data.start_y = LEVEL_4*TILE_SIZE - SCREEN_HEIGHT + TILE_SIZE;
         }
     }
 }

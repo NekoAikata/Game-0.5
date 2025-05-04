@@ -6,6 +6,7 @@
 #include "ThreatObject.h"
 #include "Text.h"
 #include "BossThreat.h"
+#include "Explosion.h"
 
 BaseObject background;
 TTF_Font* font_time = nullptr;
@@ -174,6 +175,7 @@ void Fade(SDL_Renderer* screen, int& level, TTF_Font* font)
         Zone.LoadFromRenderText(font,screen);
         Zone.RenderText(screen, SCREEN_WIDTH/2 - Zone.GetWidth()/2, SCREEN_HEIGHT/2 - Zone.GetHeight()/2);
         SDL_RenderPresent(screen);
+        SDL_Delay(50);
         SDL_RenderClear(screen);
     }
     SDL_RenderClear(screen);
@@ -192,7 +194,16 @@ void FadeOut(SDL_Renderer* screen, int& level, TTF_Font* font)
         Zone.SetText("Village");
     } else if (level == 3)
     {
-        Zone.SetText("Cave");
+        Zone.SetText("Field");
+    } else if (level == 4)
+    {
+        Zone.SetText("Cave Entrance");
+    } else if (level == 5)
+    {
+        Zone.SetText("Deep Cave");
+    } else
+    {
+        Zone.SetText("Castle_Outside");
     }
     for (int i = 10;i >= 1; i--)
     {
@@ -203,6 +214,7 @@ void FadeOut(SDL_Renderer* screen, int& level, TTF_Font* font)
         Zone.LoadFromRenderText(font,screen);
         Zone.RenderText(screen, SCREEN_WIDTH/2 - Zone.GetWidth()/2, SCREEN_HEIGHT/2 - Zone.GetHeight()/2);
         SDL_RenderPresent(screen);
+        SDL_Delay(50);
         SDL_RenderClear(screen);
     }
 }
@@ -212,11 +224,11 @@ int main(int argc, char* argv[])
     std::random_device rd;
     std::mt19937 gen(std::time(0) ^ reinterpret_cast<uintptr_t>(&gen));
 
-    std::bernoulli_distribution TDL1(0.01);
-    std::bernoulli_distribution TDL2(0.05);
-    std::bernoulli_distribution TDL3(0.08);
-    std::bernoulli_distribution TDL4(0.11);
-    std::bernoulli_distribution TDL5(0.15);
+    std::bernoulli_distribution TDL1(0.05);
+    std::bernoulli_distribution TDL2(0.1);
+    std::bernoulli_distribution TDL3(0.2);
+    std::bernoulli_distribution TDL4(0.4);
+    std::bernoulli_distribution TDL5(0.6);
 
     bool running = true;
     while (running){
@@ -252,6 +264,9 @@ int main(int argc, char* argv[])
 
         std::vector <ThreatObject*> list_threats = MakeThreatList();
         std::vector <BossThreat*> list_boss = MakeBossThreatList();
+
+        ExplosionObject exp_threat;
+        //bool tRet =
 
         bool quitG = false;
 
@@ -328,6 +343,12 @@ int main(int argc, char* argv[])
                     {
                         attack = false;
                     }
+                    if (event.key.keysym.sym == SDLK_k && Player1.HP_potion > 0)
+                    {
+                        Player1.HP_potion--;
+                        if (Player1.HP + Player1.maxHP/10 > Player1.maxHP) Player1.HP = Player1.maxHP;
+                        else Player1.HP +=Player1.maxHP/10;
+                    }
                 }
                 Player1.HandleEvent(event, renderer);
             }
@@ -339,7 +360,9 @@ int main(int argc, char* argv[])
 
             Player1.HandleSlash(renderer);
             Player1.SetMapXY(map_data.start_x, map_data.start_y);
+            float Player_y = Player1.GetYPos();
 
+            SetLevelAndBG(Player_y, level, renderer, font_title);
             for (int i = 0;i < list_boss.size(); i++)
             {
                 BossThreat* boss_object = list_boss[i];
@@ -537,10 +560,16 @@ int main(int argc, char* argv[])
             Player1.HandleXP();
 
             //Show Stat_game
-            SDL_Rect fill_rect = {SCREEN_WIDTH-160, 0, 160, 120};
+            SDL_Rect fill_rect = {SCREEN_WIDTH-160, 0, 160, 135};
             SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
             SDL_SetRenderDrawColor(renderer, 0, 0, 0, 128);
             SDL_RenderFillRect(renderer, &fill_rect);
+
+            Text_object potionShow;
+            std::string potion = "Heal_potion: " + std::to_string(Player1.HP_potion);
+            potionShow.SetText(potion);
+            potionShow.LoadFromRenderText(font_time, renderer);
+            potionShow.RenderText(renderer, SCREEN_WIDTH -128, 115);
 
             std::string str_time = "Time: ";
             int current_time = (Run_time.get_tick() + Run_time.Store_pause)/1000;
@@ -553,7 +582,7 @@ int main(int argc, char* argv[])
 
             Player1.ShowStat(font_time, renderer);
 
-            float Player_y = Player1.GetYPos();
+
             if (intro){
                 if(MOVE){
                     Noti.SetText("Use W,A,S,D to move");
@@ -587,16 +616,19 @@ int main(int argc, char* argv[])
                             Noti.SetText("Use sword to hit them!");
                             Noti.LoadFromRenderText(font_noti,renderer);
                             Noti.RenderText(renderer,3.5*TILE_SIZE,30);
+                        } else if(Player1.killed_threat == 0)
+                        {
+                            Noti.SetText("Kill them, you gain XP, HP, Potion (Press K to use)");
+                            Noti.LoadFromRenderText(font_noti,renderer);
+                            Noti.RenderText(renderer,2*TILE_SIZE,30);
                         } else
                         {
-                            Noti.SetText("After kill them, you gain XP and HP");
+                            Noti.SetText("Let's test combat system with Lumberjack");
                             Noti.LoadFromRenderText(font_noti,renderer);
                             Noti.RenderText(renderer,2*TILE_SIZE,30);
                         }
                 } else {intro = false;}
             }
-
-            SetLevelAndBG(Player_y, level, renderer, font_title);
 
             SDL_RenderPresent(renderer);
             int real_timer = fps_timer.get_tick();
@@ -940,9 +972,9 @@ std::vector<ThreatObject*> MakeThreatList ()
         ThreatObject* p_threat = (dynamic_threat + i);
         if (p_threat != NULL)
         {
+            p_threat->SetType(type);
             p_threat->LoadImg("img//threat_slime.png",renderer);
             p_threat->Clip();
-            p_threat->SetType(type);
             p_threat->SetInputL(type);
             p_threat->HP = HP;
             p_threat->ATK = ATK;
@@ -969,9 +1001,9 @@ std::vector<ThreatObject*> MakeThreatList ()
         ThreatObject* p_threat = (threats + i);
         if (p_threat != NULL)
         {
+            p_threat->SetType(type);
             p_threat->LoadImg("img//threat_slime.png",renderer);
             p_threat->Clip();
-            p_threat->SetType(type);
             p_threat->SetInputL(type);
             p_threat->HP = HP;
             p_threat->ATK = ATK;
@@ -992,12 +1024,17 @@ std::vector <BossThreat*> MakeBossThreatList ()
     std::ifstream OpenFile;
     OpenFile.open("map//BossThreat.txt");
     float a; int b; double x;
-    for (int i = 0;i<5;++i)
+    for (int i = 0;i<6;++i)
     {
         BossThreat* p_boss = new BossThreat;
-        p_boss->LoadImg("img//King_Pig.png", renderer);
-        p_boss->Clip();
         OpenFile >> b; p_boss->SetType(b);
+        if (i==0) p_boss->LoadImg("img//MiniLumberjack.png", renderer);
+        if (i==1) p_boss->LoadImg("img//Mushroom.png", renderer);
+        if (i==2) p_boss->LoadImg("img//rat.png", renderer);
+        if (i==3) p_boss->LoadImg("img//spider.png", renderer);
+        if (i==4) p_boss->LoadImg("img//skeleton.png", renderer);
+        if (i==5) p_boss->LoadImg("img//King_Pig.png", renderer);
+        p_boss->Clip();
         OpenFile >> a; p_boss->SetXpos(a*TILE_SIZE);
         OpenFile >> a; p_boss->SetYpos(a*TILE_SIZE);
         OpenFile >> b; p_boss->HP = b; p_boss->maxHP = b;

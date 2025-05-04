@@ -3,42 +3,50 @@
 	<iostream>
 	<SDL.h>
 
-1745847882 source:c:\users\admin\documents\code test\game 0.5\main.cpp
+1746391688 source:c:\users\admin\documents\code test\game 0.5\main.cpp
 	"Game_Stat.h"
 	"BObject.h"
 	"Map.h"
 	"Main_o.h"
 	"Timer.h"
 	"ThreatObject.h"
+	"Text.h"
+	"BossThreat.h"
+	"Explosion.h"
 
 1742109564 c:\users\admin\documents\code test\game 0.5\game.h
 	<SDL.h>
 	<SDL_image.h>
 
-1745846678 c:\users\admin\documents\code test\game 0.5\game_stat.h
+1746356849 c:\users\admin\documents\code test\game 0.5\game_stat.h
 	<SDL.h>
 	<SDL_image.h>
+	<SDL_ttf.h>
+	<SDL_mixer.h>
 	<string>
 	<iostream>
 	<vector>
+	<random>
+	<ctime>
+	"Text.h"
 
-1743407938 c:\users\admin\documents\code test\game 0.5\bobject.h
+1746348797 c:\users\admin\documents\code test\game 0.5\bobject.h
 	"Game_Stat.h"
 	<string>
 
-1743430079 source:c:\users\admin\documents\code test\game 0.5\bobject.cpp
+1746348797 source:c:\users\admin\documents\code test\game 0.5\bobject.cpp
 	"BObject.h"
 
-1742139131 source:c:\users\admin\documents\code test\game 0.5\game_stat.cpp
+1746348797 source:c:\users\admin\documents\code test\game 0.5\game_stat.cpp
 	"Game_Stat.h"
 	<iostream>
 
-1743335806 c:\users\admin\documents\code test\game 0.5\map.h
+1746348797 c:\users\admin\documents\code test\game 0.5\map.h
 	"Game_Stat.h"
 	"BObject.h"
 	<fstream>
 
-1743408866 source:c:\users\admin\documents\code test\game 0.5\map.cpp
+1746373815 source:c:\users\admin\documents\code test\game 0.5\map.cpp
 	"Map.h"
 
 1746084233 source:d:\quoc anh\game-0.5\bobject.cpp
@@ -79,20 +87,21 @@
 	"Slash.h"
 	"Text.h"
 
-1745847815 c:\users\admin\documents\code test\game 0.5\main_o.h
+1746370653 c:\users\admin\documents\code test\game 0.5\main_o.h
 	"BObject.h"
 	"Game_Stat.h"
 	"Slash.h"
+	"Text.h"
 
-1745845012 source:c:\users\admin\documents\code test\game 0.5\main_o.cpp
+1746387681 source:c:\users\admin\documents\code test\game 0.5\main_o.cpp
 	"Main_o.h"
 	"Timer.h"
 
-1743410018 source:c:\users\admin\documents\code test\game 0.5\timer.cpp
+1746348797 source:c:\users\admin\documents\code test\game 0.5\timer.cpp
 	"Timer.h"
 	"Game_Stat.h"
 
-1743409958 c:\users\admin\documents\code test\game 0.5\timer.h
+1746348797 c:\users\admin\documents\code test\game 0.5\timer.h
 
 1746158855 source:d:\quoc anh\game-0.5\main.cpp
 	"Game_Stat.h"
@@ -121,12 +130,13 @@
 1745331089 source:c:\users\admin\documents\code test\game 0.5\slash.cpp
 	"Slash.h"
 
-1745847882 source:c:\users\admin\documents\code test\game 0.5\threatobject.cpp
+1746387086 source:c:\users\admin\documents\code test\game 0.5\threatobject.cpp
 	"ThreatObject.h"
 
-1745848272 c:\users\admin\documents\code test\game 0.5\threatobject.h
+1746386657 c:\users\admin\documents\code test\game 0.5\threatobject.h
 	"BObject.h"
 	"Game_Stat.h"
+	"BulletObject.h"
 
 1746087361 d:\quoc anh\game-0.5\threatobject.h
 	"BObject.h"
@@ -322,5 +332,36 @@
 
 1746195828 source:d:\quoc_anh\game_0.5\timer.cpp
 	"Timer.h"
+	"Game_Stat.h"
+
+1746348797 c:\users\admin\documents\code test\game 0.5\text.h
+	"Game_Stat.h"
+
+1746391491 source:c:\users\admin\documents\code test\game 0.5\bossthreat.cpp
+	"BossThreat.h"
+
+1746364669 c:\users\admin\documents\code test\game 0.5\bossthreat.h
+	"BObject.h"
+	"Game_Stat.h"
+	"Main_o.h"
+	"Text.h"
+	"Map.h"
+	"Timer.h"
+
+1746348797 source:c:\users\admin\documents\code test\game 0.5\text.cpp
+	"Text.h"
+
+1746385815 source:c:\users\admin\documents\code test\game 0.5\bulletobject.cpp
+	"BulletObject.h"
+
+1746385796 c:\users\admin\documents\code test\game 0.5\bulletobject.h
+	"Game_Stat.h"
+	"BObject.h"
+
+1746391674 source:c:\users\admin\documents\code test\game 0.5\explosion.cpp
+	"Explosion.h"
+
+1746391653 c:\users\admin\documents\code test\game 0.5\explosion.h
+	"BObject.h"
 	"Game_Stat.h"
 
