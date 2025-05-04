@@ -239,7 +239,7 @@ int BossThreat::BossCombat (MainObject& Player, TTF_Font* font_combat, SDL_Rende
     {
         if (PCD > 0 && BCD > 0 && HP > 0 && Player.HP > 0) {PCD--; BCD--;}
 
-        background.LoadImg("img//grass.png", screen);
+        background.LoadImg("img//Battle_1.png", screen);
         background.SetRect(0,0);
         background.SetRectWH(SCREEN_WIDTH, SCREEN_HEIGHT);
         background.Render(screen);

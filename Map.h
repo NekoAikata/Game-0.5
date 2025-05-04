@@ -5,7 +5,7 @@
 #include "BObject.h"
 #include <fstream>
 
-#define MAX_TILE 20
+#define MAX_TILE 40
 
 class Tile : public BaseObject
 {

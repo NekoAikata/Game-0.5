@@ -53,6 +53,9 @@ public:
     void SetAttack (const bool& x) {BasicAttack.set_attack(x);}
     void ResetFrameNum () {frame_num = 0;}
 
+    int killed_threat;
+    bool finish_game;
+
     int HP;
     int maxHP;
 

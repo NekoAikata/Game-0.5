@@ -6,7 +6,7 @@ MainObject::MainObject()
     x_val = 0;
     y_val = 0;
     x_pos = 6*TILE_SIZE;
-    y_pos = 378*TILE_SIZE;
+    y_pos = 396*TILE_SIZE;
 
     width_frame = 0;
     height_frame = 0;
@@ -28,12 +28,14 @@ MainObject::MainObject()
 
     HP_potion=0;
 
-    maxHP = 1;
+    maxHP = 100;
     ATK = 200;
     SPEED = 25;
     HP=maxHP;
     have_sword = false;
     battle = false;
+    finish_game = false;
+    killed_threat = 0;
 }
 
 MainObject::~MainObject()
@@ -294,10 +296,8 @@ void MainObject::UpdateImg(SDL_Renderer* des)
     }
     if (battle)
     {
-        if (BasicAttack.get_status())
-        {
-            LoadImg("img//player_slashright.png",des);
-        }else {LoadImg("img//player_battle.png", des);}
+
+        LoadImg("img//player_battle.png", des);
     }
 }
 
@@ -591,6 +591,7 @@ void MainObject::UpdateBattleStatus (const bool& x)
     Store_action.left = 0;
     Store_action.right = 0;
     Store_action.down = 0;
+    BasicAttack.set_attack(false);
 }
 
 void MainObject::HandleXP()

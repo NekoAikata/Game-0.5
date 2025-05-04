@@ -74,15 +74,15 @@ bool InitDataSuccess()
 bool LoadBG(const int& level, SDL_Renderer* screen)
 {
     std::string path; bool ret;
-    if (level == 1 || level == 3 || level == 5)
+    if (level == 1 || level == 2 || level == 3)
     {
         path = "img//grass2.png";
-    } else if (level == 2)
+    } else if (level == 4 || level == 5)
     {
-        path = "";
-    } else if (level == 4)
+        path = "img//ground.png";
+    } else if (level == 6)
     {
-        path = "";
+        path = "img//grass1.png";
     }
     ret = background.LoadImg(path, renderer);
     background.SetRect(0,0);
@@ -130,13 +130,82 @@ void close1()
     IMG_Quit();
 }
 
+int HandleEndGame(int current_time, MainObject Player1, bool& quitG);
+
 std::vector<ThreatObject*> MakeThreatList ();
 
 std::vector<BossThreat*> MakeBossThreatList ();
 
-void SetLevelAndBG(const float& y_pos, int& level);
+void SetLevelAndBG(const float& y_pos, int& level, SDL_Renderer* screen, TTF_Font* font);
 
 int Menu(SDL_Renderer* screen, TTF_Font* font_time, bool Start, TTF_Font* font_title);
+
+void Fade(SDL_Renderer* screen, int& level, TTF_Font* font)
+{
+    SDL_RenderClear(screen);
+    Text_object Zone;
+    Zone.SetColor(255, 255, 255);
+    if (level == 1)
+    {
+        Zone.SetText("Home");
+    } else if (level == 2)
+    {
+        Zone.SetText("Village");
+    } else if (level == 3)
+    {
+        Zone.SetText("Field");
+    } else if (level == 4)
+    {
+        Zone.SetText("Cave Entrance");
+    } else if (level == 5)
+    {
+        Zone.SetText("Deep Cave");
+    } else
+    {
+        Zone.SetText("???");
+    }
+    for (int i = 1;i <= 10;++i)
+    {
+        LoadBG(level,screen);
+        SDL_Rect x = {0,0,SCREEN_WIDTH,SCREEN_HEIGHT};
+        SDL_SetRenderDrawBlendMode(screen,SDL_BLENDMODE_BLEND);
+        SDL_SetRenderDrawColor(screen, 0, 0, 0, 25*i);
+        SDL_RenderFillRect(screen, &x);
+        Zone.LoadFromRenderText(font,screen);
+        Zone.RenderText(screen, SCREEN_WIDTH/2 - Zone.GetWidth()/2, SCREEN_HEIGHT/2 - Zone.GetHeight()/2);
+        SDL_RenderPresent(screen);
+        SDL_RenderClear(screen);
+    }
+    SDL_RenderClear(screen);
+}
+
+void FadeOut(SDL_Renderer* screen, int& level, TTF_Font* font)
+{
+    SDL_RenderClear(screen);
+    Text_object Zone;
+    Zone.SetColor(255, 255, 255);
+    if (level == 1)
+    {
+        Zone.SetText("Home");
+    } else if (level == 2)
+    {
+        Zone.SetText("Village");
+    } else if (level == 3)
+    {
+        Zone.SetText("Cave");
+    }
+    for (int i = 10;i >= 1; i--)
+    {
+        LoadBG(level, screen);
+        SDL_Rect x = {0,0,SCREEN_WIDTH,SCREEN_HEIGHT};
+        SDL_SetRenderDrawColor(screen, 0, 0, 0, 25*i);
+        SDL_RenderFillRect(screen, &x);
+        Zone.LoadFromRenderText(font,screen);
+        Zone.RenderText(screen, SCREEN_WIDTH/2 - Zone.GetWidth()/2, SCREEN_HEIGHT/2 - Zone.GetHeight()/2);
+        SDL_RenderPresent(screen);
+        SDL_RenderClear(screen);
+    }
+}
 
 int main(int argc, char* argv[])
 {
@@ -394,10 +463,10 @@ int main(int argc, char* argv[])
                                     {
                                         hit_threat = true;
                                     }
-                                    (list_threats[i]->HP)-=Player1.ATK;
+                                    list_threats[i]->HP -=Player1.ATK;
                                     Dmg.LoadFromRenderText(font_slash, renderer);
                                     Dmg.RenderText(renderer, TRect.x -40, TRect.y -40);
-                                    if ((list_threats[i]->HP) == 0)
+                                    if ((list_threats[i]->HP) < 0)
                                     {
                                         if (!killed_threat)
                                         {
@@ -411,6 +480,7 @@ int main(int argc, char* argv[])
                                         if (x==3){if (TDL4(gen)) Player1.HP_potion++;}
                                         if (x==4){if (TDL5(gen)) Player1.HP_potion++;}
                                         Player1.xp+=list_threats[i]->XP_drop;
+                                        Player1.killed_threat++;
                                         if (Player1.HP + (list_threats[i]->HP_drop) > Player1.maxHP) Player1.HP = Player1.maxHP;
                                         else Player1.HP +=list_threats[i]->HP_drop;
                                         std::string y = std::to_string(list_threats[i]->HP_drop);
@@ -526,6 +596,7 @@ int main(int argc, char* argv[])
                 } else {intro = false;}
             }
 
+            SetLevelAndBG(Player_y, level, renderer, font_title);
 
             SDL_RenderPresent(renderer);
             int real_timer = fps_timer.get_tick();
@@ -539,10 +610,136 @@ int main(int argc, char* argv[])
                     SDL_Delay(delay_time);
                 }
             }
+
+            //Handle lose outside
+            if (Player1.HP <= 0)
+            {
+                int i = HandleEndGame(current_time, Player1, quitG);
+                if (i==1)
+                {
+                    running = false;
+                }
+            }
         }
         close1();
     }
     close();
+    return 0;
+}
+
+int HandleEndGame(int current_time, MainObject Player1, bool& quitG){
+    bool space_present = false;int check = 0;
+    Timer space_countdown;
+    BaseObject Lose;
+    Text_object Loser, Space_noti, Stat;
+    Stat.SetColor(255,255,255);
+    Space_noti.SetText("Press Space_bar to continue");
+    Space_noti.SetColor(255,255,255);
+    if (!Player1.finish_game){
+        Loser.SetText("You Lose!");
+        Loser.SetColor(255, 255, 255);
+        Lose.LoadImg("img/player_dead.png", renderer);
+        SDL_Rect frame_clip[3];
+        int check = 0;
+        for (int i = 0;i < 3;++i)
+        {
+            frame_clip[i].x = i*((Lose.GetRect().w)/3);
+            frame_clip[i].y = 0;
+            frame_clip[i].w = (Lose.GetRect().w)/3;
+            frame_clip[i].h = Lose.GetRect().h;
+        }
+        for (int i = 0;i < 3;++i)
+        {
+            SDL_RenderClear(renderer);
+            SDL_Rect RenderQuad = {Player1.GetRect().x - 32, Player1.GetRect().y - 32, 192, 128};
+            SDL_RenderCopy(renderer, Lose.GetTexture(), &frame_clip[i], &RenderQuad);
+            SDL_RenderPresent(renderer);
+            SDL_Delay(300);
+        }
+    }
+    Loser.LoadFromRenderText(font_title, renderer);
+    Loser.RenderText(renderer, SCREEN_WIDTH/2 - Loser.GetWidth()/2, 0);
+    SDL_RenderPresent(renderer);
+    while (!quitG)
+    {
+        if (space_countdown.start_check())space_countdown.start();
+        if (space_countdown.get_tick() > 2000 && !space_present)
+        {
+            Space_noti.LoadFromRenderText(font_menu, renderer);
+            Space_noti.RenderText(renderer,SCREEN_WIDTH/2 - Space_noti.GetWidth()/2, SCREEN_HEIGHT - Space_noti.GetHeight());
+            SDL_RenderPresent(renderer);
+            space_present = true;
+        }
+        while (SDL_PollEvent(&event))
+        {
+            if (event.type == SDL_KEYDOWN)
+            {
+                if (event.key.keysym.sym == SDLK_SPACE)
+                {
+                    check++;
+                    space_countdown.stop();
+                    space_present = false;
+                    SDL_RenderClear(renderer);
+                }
+            }
+            if (event.type == SDL_QUIT)
+            {
+                quitG = true;
+                return 1;
+            }
+        }
+        if (check == 1)
+        {
+            Loser.SetText("Game_Statistics");
+            SDL_Rect Outline = {SCREEN_WIDTH/2 - 64 - 32, SCREEN_HEIGHT/2 - 32, 192, 128};
+            SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+            SDL_RenderDrawRect(renderer, &Outline);
+            Loser.LoadFromRenderText(Font_noti_2, renderer);
+            Loser.RenderText(renderer, SCREEN_WIDTH/2 - Loser.GetWidth()/2, Outline.y - Loser.GetHeight() -8);
+            int y_val = 0;
+
+            //Stat_end_game
+            std::string str_time = "Played_time: ";
+            int x = ((current_time/60)/60)/24; current_time -= (x*24*60*60);
+            str_time += std::to_string(x) + "d";
+            x = (current_time/60)/60; current_time -= (x*60*60);
+            str_time += std::to_string(x) + "h";
+            x = current_time/60; current_time -= (x*60);
+            str_time += std::to_string(x) + "m";
+            str_time += std::to_string(current_time) + "s";
+            Stat.SetText(str_time);
+            Stat.LoadFromRenderText(font_time, renderer);
+            y_val += Stat.GetHeight() + 10;
+            Stat.RenderText(renderer, Outline.x + 16, Outline.y + y_val);
+            Stat.Free();
+            Stat.SetText("Level: " + std::to_string(Player1.level));
+            Stat.LoadFromRenderText(font_time, renderer);
+            y_val += Stat.GetHeight() + 10;
+            Stat.RenderText(renderer, Outline.x + 16, Outline.y + y_val);
+            Stat.Free();
+            Stat.SetText("Killed_threats: " + std::to_string(Player1.killed_threat));
+            Stat.LoadFromRenderText(font_time, renderer);
+            y_val += Stat.GetHeight() + 10;
+            Stat.RenderText(renderer, Outline.x + 16, Outline.y + y_val);
+            SDL_RenderPresent(renderer);
+            check++;
+        } else if (check == 2)
+        {
+            if (space_countdown.start_check())space_countdown.start();
+            if (space_countdown.get_tick() > 2000 && !space_present)
+            {
+                Space_noti.LoadFromRenderText(font_menu, renderer);
+                Space_noti.RenderText(renderer,SCREEN_WIDTH/2 - Space_noti.GetWidth()/2, SCREEN_HEIGHT - Space_noti.GetHeight());
+                SDL_RenderPresent(renderer);
+                space_present = true;
+            }
+        }
+        else if (check == 3)
+        {
+            Mix_HaltMusic();
+            quitG = true;
+        }
+    }
     return 0;
 }
 
@@ -665,9 +862,48 @@ int Menu(SDL_Renderer* screen, TTF_Font* font_time, bool Start, TTF_Font* font_t
     }
 }
 
-void SetLevelAndBG(float y_pos, int level)
+void SetLevelAndBG(const float& y_pos, int& level, SDL_Renderer* screen, TTF_Font* font)
 {
+    if (y_pos >= LEVEL_1*TILE_SIZE && y_pos <= 400*TILE_SIZE && level != 1)
+    {
+        level = 1;
+        Fade(screen, level, font);
+        FadeOut(screen, level, font);
+        LoadBG(level, screen);
+    } else if (y_pos >= LEVEL_1_5*TILE_SIZE && y_pos < LEVEL_1*TILE_SIZE && level != 2)
+    {
+        level = 2;
+        Fade(screen, level, font);
+        FadeOut(screen, level, font);
+        LoadBG(level, screen);
 
+    } else if (y_pos >= LEVEL_2*TILE_SIZE && y_pos < LEVEL_1_5*TILE_SIZE && level != 3)
+    {
+        level = 3;
+        Fade(screen, level, font);
+        FadeOut(screen, level, font);
+        LoadBG(level, screen);
+
+    } else if (y_pos >= LEVEL_3*TILE_SIZE && y_pos < LEVEL_2*TILE_SIZE && level != 4)
+    {
+        level = 4;
+        Fade(screen, level, font);
+        FadeOut(screen, level, font);
+        LoadBG(level, screen);
+
+    } else if (y_pos >= LEVEL_4*TILE_SIZE && y_pos < LEVEL_3*TILE_SIZE && level != 5)
+    {
+        level = 5;
+        Fade(screen, level, font);
+        FadeOut(screen, level, font);
+        LoadBG(level, screen);
+    } else if (y_pos < LEVEL_4*TILE_SIZE && level != 6)
+    {
+        level = 6;
+        Fade(screen, level, font);
+        FadeOut(screen, level, font);
+        LoadBG(level, screen);
+    }
 }
 
 std::vector<ThreatObject*> MakeThreatList ()
