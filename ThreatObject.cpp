@@ -2,6 +2,7 @@
 
 ThreatObject::ThreatObject()
 {
+    maxHP = 0;
     HP = 0;
     ATK = 0;
     HP_drop = 0;
@@ -15,6 +16,8 @@ ThreatObject::ThreatObject()
     width_frame = 0;
     height_frame = 0;
     frame_num = 0;
+    frame_delay = 0;
+
     mapvalue_x;
     mapvalue_y;
     x_pos__respawn = 0;
@@ -45,7 +48,8 @@ bool ThreatObject::LoadImg (std::string path, SDL_Renderer* screen)
     {
         if (type == 3)
         {width_frame = rect.w/9;}
-        if (type == 1 || type == 4 || type == 5) width_frame = rect.w/4;
+        if (type == 0 || type == 1 || type == 4 || type == 5 || type == 9 || type == 10) width_frame = rect.w/4;
+        if (type == 2 || type == 6 || type == 7 || type == 8) width_frame = rect.w/3;
     }
 
     return ret;
@@ -119,10 +123,11 @@ void ThreatObject::Clip()
 
 void ThreatObject::Show(SDL_Renderer* des)
 {
-	frame_num++;
-    if (frame_num >= 4 && (type == 1 || type == 0 || type == 4 || type == 5) ||
+    frame_delay++;
+    if (frame_delay > FRAME_DELAY) {frame_num++; frame_delay =0;}
+    if (frame_num >= 4 && (type == 1 || type == 0 || type == 4 || type == 5 || type == 9 || type == 10) ||
         (frame_num >= 9 && (type == 3)) ||
-        (frame_num >= 3 && (type == 6)))
+        (frame_num >= 3 && (type == 2 || type == 6 || type == 7 || type == 8)))
     {
         frame_num = 0;
     }
@@ -143,20 +148,23 @@ void ThreatObject::DoThreat (Map& map_data)
         x_val = 0;
         y_val = 0;
 
-        if (Input_type.left == 1)
+        if (frame_delay == 0)
         {
-            x_val-=THREAT_SPEED;
-        } else if (Input_type.right == 1)
-        {
-            x_val+=THREAT_SPEED;
-        } else if (Input_type.up == 1)
-        {
-            y_val-=THREAT_SPEED;
-        } else if  (Input_type.down == 1)
-        {
-            y_val+=THREAT_SPEED;
+            if (Input_type.left == 1)
+            {
+                x_val-=THREAT_SPEED;
+            } else if (Input_type.right == 1)
+            {
+                x_val+=THREAT_SPEED;
+            } else if (Input_type.up == 1)
+            {
+                y_val-=THREAT_SPEED;
+            } else if  (Input_type.down == 1)
+            {
+                y_val+=THREAT_SPEED;
+            }
+            CheckMap (map_data);
         }
-        CheckMap (map_data);
     }
     else if (revive_time > 0)
     {
@@ -167,7 +175,7 @@ void ThreatObject::DoThreat (Map& map_data)
             y_val = 0;
             x_pos = x_pos__respawn;
             y_pos = y_pos_respawn;
-            HP=150;
+            HP=maxHP;
         }
     }
 }
@@ -260,31 +268,43 @@ void ThreatObject::CheckMap (Map& map_data)
 
 void ThreatObject::Move (SDL_Renderer* screen)
 {
-    if (type == 1 || type == 3)
+    if (type == 1 || type == 3 || type == 6 || type == 7 || type == 9)
     {
-        if (x_pos > animation_right)
+        if (x_pos >= animation_right)
         {
             Input_type.left = 1;
             Input_type.right = 0;
             if (type == 1) LoadImg("img//threat_slime.png", screen);
             if (type == 3) LoadImg("img//spider_left.png", screen);
-        } else if (x_pos < animation_left)
+            if (type == 6) LoadImg ("img//Mush_2_left.png", screen);
+            if (type == 7) LoadImg ("img//Mush_1_left.png", screen);
+            if (type == 9) LoadImg ("img//golem_left.png", screen);
+        } else if (x_pos <= animation_left)
         {
             Input_type.right = 1;
             Input_type.left = 0;
             if (type == 1) LoadImg ("img//threat_slime.png", screen);
             if (type == 3) LoadImg ("img//spider_right.png", screen);
+            if (type == 6) LoadImg ("img//Mush_2_right.png", screen);
+            if (type == 7) LoadImg ("img//Mush_1_right.png", screen);
+            if (type == 9) LoadImg ("img//golem_right.png", screen);
         }
     }
-    else if (type == 2)
+    else if (type == 2 || type == 8 || type == 10)
     {
-        if (y_pos > animation_down){
+        if (y_pos >= animation_down){
             Input_type.down = 0;
             Input_type.up = 1;
-        } else if (y_pos < animation_up)
+            if (type == 2) LoadImg("img//Mush_2_up.png", screen);
+            if (type == 8) LoadImg("img//Mush_1_up.png", screen);
+            if (type == 10) LoadImg("img//slime_up.png", screen);
+        } else if (y_pos <= animation_up)
         {
             Input_type.down = 1;
             Input_type.up = 0;
+            if (type == 2) LoadImg("img//Mush_2_down.png", screen);
+            if (type == 8) LoadImg("img//Mush_1_down.png", screen);
+            if (type == 10) LoadImg("img//threat_slime.png", screen);
         }
     }
     else if (type == 0 || type == 4 || type == 5)
@@ -300,7 +320,7 @@ void ThreatObject::InitBullet (BulletObject* p_bullet, SDL_Renderer*screen)
         bool ret = p_bullet->LoadImgBullet(screen);
         p_bullet->set_is_move(true);
         p_bullet->set_bullet_dir(BulletObject::DIR_LEFT);
-        p_bullet->SetRect(x_pos, y_pos);
+        p_bullet->SetRect(rect.x, rect.y);
         p_bullet->set_x_val(15);
         bullet_list.push_back(p_bullet);
     }
@@ -315,12 +335,19 @@ void ThreatObject::MakeBullet(SDL_Renderer* screen, const int& x_limit, const in
         {
             if (p_bullet->get_is_move())
             {
-                p_bullet->HandleMove(x_limit, y_limit);
-                p_bullet->Render(screen);
+                    p_bullet->HandleMove(x_limit, y_limit);
+                    p_bullet->Render(screen);
             } else
             {
                 p_bullet->set_is_move(true);
-                p_bullet->SetRect(x_pos, y_pos);
+                p_bullet->SetRect(rect.x, rect.y);
+            }
+            if (type == 4)
+            {
+                p_bullet->set_bullet_dir(21);
+            } else if (type == 5)
+            {
+                p_bullet->set_bullet_dir(20);
             }
         }
     }

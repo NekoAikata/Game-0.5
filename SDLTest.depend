@@ -3,7 +3,7 @@
 	<iostream>
 	<SDL.h>
 
-1746391688 source:c:\users\admin\documents\code test\game 0.5\main.cpp
+1746462046 source:c:\users\admin\documents\code test\game 0.5\main.cpp
 	"Game_Stat.h"
 	"BObject.h"
 	"Map.h"
@@ -12,13 +12,12 @@
 	"ThreatObject.h"
 	"Text.h"
 	"BossThreat.h"
-	"Explosion.h"
 
 1742109564 c:\users\admin\documents\code test\game 0.5\game.h
 	<SDL.h>
 	<SDL_image.h>
 
-1746356849 c:\users\admin\documents\code test\game 0.5\game_stat.h
+1746452569 c:\users\admin\documents\code test\game 0.5\game_stat.h
 	<SDL.h>
 	<SDL_image.h>
 	<SDL_ttf.h>
@@ -41,12 +40,12 @@
 	"Game_Stat.h"
 	<iostream>
 
-1746348797 c:\users\admin\documents\code test\game 0.5\map.h
+1746441682 c:\users\admin\documents\code test\game 0.5\map.h
 	"Game_Stat.h"
 	"BObject.h"
 	<fstream>
 
-1746373815 source:c:\users\admin\documents\code test\game 0.5\map.cpp
+1746460013 source:c:\users\admin\documents\code test\game 0.5\map.cpp
 	"Map.h"
 
 1746084233 source:d:\quoc anh\game-0.5\bobject.cpp
@@ -87,13 +86,13 @@
 	"Slash.h"
 	"Text.h"
 
-1746370653 c:\users\admin\documents\code test\game 0.5\main_o.h
+1746451106 c:\users\admin\documents\code test\game 0.5\main_o.h
 	"BObject.h"
 	"Game_Stat.h"
 	"Slash.h"
 	"Text.h"
 
-1746387681 source:c:\users\admin\documents\code test\game 0.5\main_o.cpp
+1746459466 source:c:\users\admin\documents\code test\game 0.5\main_o.cpp
 	"Main_o.h"
 	"Timer.h"
 
@@ -130,10 +129,10 @@
 1745331089 source:c:\users\admin\documents\code test\game 0.5\slash.cpp
 	"Slash.h"
 
-1746387086 source:c:\users\admin\documents\code test\game 0.5\threatobject.cpp
+1746462046 source:c:\users\admin\documents\code test\game 0.5\threatobject.cpp
 	"ThreatObject.h"
 
-1746386657 c:\users\admin\documents\code test\game 0.5\threatobject.h
+1746460808 c:\users\admin\documents\code test\game 0.5\threatobject.h
 	"BObject.h"
 	"Game_Stat.h"
 	"BulletObject.h"
@@ -339,7 +338,7 @@
 1746348797 c:\users\admin\documents\code test\game 0.5\text.h
 	"Game_Stat.h"
 
-1746391491 source:c:\users\admin\documents\code test\game 0.5\bossthreat.cpp
+1746392885 source:c:\users\admin\documents\code test\game 0.5\bossthreat.cpp
 	"BossThreat.h"
 
 1746364669 c:\users\admin\documents\code test\game 0.5\bossthreat.h
@@ -353,7 +352,7 @@
 1746348797 source:c:\users\admin\documents\code test\game 0.5\text.cpp
 	"Text.h"
 
-1746385815 source:c:\users\admin\documents\code test\game 0.5\bulletobject.cpp
+1746462064 source:c:\users\admin\documents\code test\game 0.5\bulletobject.cpp
 	"BulletObject.h"
 
 1746385796 c:\users\admin\documents\code test\game 0.5\bulletobject.h

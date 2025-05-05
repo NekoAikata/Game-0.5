@@ -31,8 +31,8 @@ public:
 
     void UpdateBattleStatus (const bool& x);
 
-    void DoPlayer(Map& map_data);
-    void CheckMap(Map& map_data);
+    void DoPlayer(Map& map_data, TTF_Font* font_noti, SDL_Renderer* screen);
+    void CheckMap(Map& map_data, TTF_Font* font_noti, SDL_Renderer* screen);
     void SetMapXY(const int x, const int y) {mapvalue_x = x; mapvalue_y = y;}
     void MapMove(Map& map_data);
 
@@ -45,6 +45,7 @@ public:
     void SetXPos(const float& x) {x_pos = x;}
     void SetYPos(const float& x) {y_pos = x;}
     float GetYPos() {return y_pos;}
+    float GetXPos() {return x_pos;}
 
     void ShowStat(TTF_Font* font, SDL_Renderer* screen);
     void ShowBattleStat (TTF_Font* font, SDL_Renderer* screen);

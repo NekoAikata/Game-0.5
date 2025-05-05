@@ -17,7 +17,7 @@ static SDL_Window* window = NULL;
 static SDL_Renderer* renderer = NULL;
 static SDL_Event event;
 
-const int FRAME_PER_SECOND = 24;
+const int FRAME_PER_SECOND = 30;
 const int SCREEN_WIDTH = 896;
 const int SCREEN_HEIGHT = 704;
 const int BPP = 32;
@@ -29,13 +29,13 @@ const int RENDER_DRAW_COLOR = 0;
 
 #define TILE_SIZE 64
 #define MAX_MAP_X 14
-#define MAX_MAP_Y 400
+#define MAX_MAP_Y 350
 
-#define LEVEL_1 389
-#define LEVEL_1_5 375
-#define LEVEL_2 295
-#define LEVEL_3 235
-#define LEVEL_4 175
+#define LEVEL_1 339
+#define LEVEL_1_5 325
+#define LEVEL_2 245
+#define LEVEL_3 185
+#define LEVEL_4 125
 
 #define BLANK_MAP 0
 #define FLOOR 1

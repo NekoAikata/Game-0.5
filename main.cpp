@@ -6,7 +6,6 @@
 #include "ThreatObject.h"
 #include "Text.h"
 #include "BossThreat.h"
-#include "Explosion.h"
 
 BaseObject background;
 TTF_Font* font_time = nullptr;
@@ -203,7 +202,7 @@ void FadeOut(SDL_Renderer* screen, int& level, TTF_Font* font)
         Zone.SetText("Deep Cave");
     } else
     {
-        Zone.SetText("Castle_Outside");
+        Zone.SetText("???");
     }
     for (int i = 10;i >= 1; i--)
     {
@@ -233,7 +232,7 @@ int main(int argc, char* argv[])
     bool running = true;
     while (running){
         int level = 1;
-        Timer fps_timer, Threatt_timer, Slash_cooldown, Run_time;
+        Timer fps_timer, Threatt_timer, Slash_cooldown, Run_time, Tree;
 
         Text_object Noti;
         Text_object PMinus, PHeal, Dmg;
@@ -265,9 +264,6 @@ int main(int argc, char* argv[])
         std::vector <ThreatObject*> list_threats = MakeThreatList();
         std::vector <BossThreat*> list_boss = MakeBossThreatList();
 
-        ExplosionObject exp_threat;
-        //bool tRet =
-
         bool quitG = false;
 
         bool intro = true;
@@ -279,6 +275,8 @@ int main(int argc, char* argv[])
 
         Text_object Time_game;
         Time_game.SetColor(255, 255, 255);
+
+        Tree.start();
 
 
         int i = Menu(renderer, font_menu, 1, font_title);
@@ -381,6 +379,7 @@ int main(int argc, char* argv[])
                     threat_object->SetMapXY(map_data.start_x, map_data.start_y);
                     threat_object->Move(renderer);
                     threat_object->DoThreat(map_data);
+                    threat_object->MakeBullet(renderer, SCREEN_WIDTH, SCREEN_HEIGHT);
                     if (threat_object->GetRevTime() == 0){
                         threat_object->Show(renderer);
                     }
@@ -426,6 +425,7 @@ int main(int argc, char* argv[])
                                 list_boss.erase (list_boss.begin() + i);
                                 Player1.UpdateImg(renderer);
                                 Player1.Clip();
+                                Player1.HP_potion +=5;
                                 if(Mix_PlayingMusic() == 0)
                                 {
                                     Mix_PlayMusic(BGM, -1);
@@ -555,13 +555,25 @@ int main(int argc, char* argv[])
                 }
             }
 
-            Player1.DoPlayer(map_data);
+            Player1.DoPlayer(map_data, font_noti, renderer);
 
-            Game_map.SetMap(map_data);
-            Game_map.DrawMap(renderer);
+            if (level == 3)
+            {
+                Player1.FreeSlash();
+                Player1.Show(renderer);
 
-            Player1.FreeSlash();
-            Player1.Show(renderer);
+                Game_map.SetMap(map_data);
+                Game_map.DrawMap(renderer);
+            }
+            else
+            {
+                Game_map.SetMap(map_data);
+                Game_map.DrawMap(renderer);
+
+                Player1.FreeSlash();
+                Player1.Show(renderer);
+            }
+
 
             Player1.HandleXP();
 
@@ -588,6 +600,7 @@ int main(int argc, char* argv[])
 
             Player1.ShowStat(font_time, renderer);
 
+            std::cout << Player1.GetXPos()/64 << ' ' << Player_y/64 << std::endl;
 
             if (intro){
                 if(MOVE){
@@ -604,14 +617,14 @@ int main(int argc, char* argv[])
                     Noti.SetText("Use J to attack with sword");
                     Noti.LoadFromRenderText(font_noti,renderer);
                     Noti.RenderText(renderer,3*TILE_SIZE,30);
-                } else if (map_data.tile[390][1] == KEY)
+                } else if (map_data.tile[340][1] == KEY)
                 {
                     Noti.SetText("Get key and try small threats!");
                     Noti.LoadFromRenderText(font_noti,renderer);
                     Noti.RenderText(renderer,3*TILE_SIZE,30);
                 } else if (!killed_threat){
-                    if(Player_y <= 389*TILE_SIZE &&
-                        Player_y >= 377*TILE_SIZE)
+                    if(Player_y <= 339*TILE_SIZE &&
+                        Player_y >= 327*TILE_SIZE)
                         if (!threat_hit && !hit_threat)
                         {
                             Noti.SetText("You got hit when threat come close!");
@@ -659,6 +672,17 @@ int main(int argc, char* argv[])
                 }
             }
         }
+        for (int i = 0; i < list_threats.size(); ++i)
+        {
+            ThreatObject* p_threat = list_threats[i];
+            if(p_threat)
+            {
+                p_threat->Free();
+                p_threat = NULL;
+            }
+        }
+        list_threats.clear();
+
         close1();
     }
     close();
@@ -975,7 +999,7 @@ std::vector<ThreatObject*> MakeThreatList ()
             p_threat->LoadImg("img//threat_slime.png",renderer);
             p_threat->Clip();
             p_threat->SetInputL(type);
-            p_threat->HP = HP;
+            p_threat->HP = HP; p_threat->maxHP = p_threat->HP;
             p_threat->ATK = ATK;
             p_threat->XP_drop = XP_drop;
             p_threat->HP_drop = HP_drop;
@@ -1005,7 +1029,7 @@ std::vector<ThreatObject*> MakeThreatList ()
             p_threat->LoadImg("img//threat_slime.png",renderer);
             p_threat->Clip();
             p_threat->SetInputL(type);
-            p_threat->HP = HP;
+            p_threat->HP = HP; p_threat->maxHP = p_threat->HP;
             p_threat->ATK = ATK;
             p_threat->XP_drop = XP_drop;
             p_threat->HP_drop = HP_drop;
@@ -1032,7 +1056,7 @@ std::vector<ThreatObject*> MakeThreatList ()
             p_threat->LoadImg("img//spider_left.png",renderer);
             p_threat->Clip();
             p_threat->SetInputL(1);
-            p_threat->HP = HP;
+            p_threat->HP = HP; p_threat->maxHP = p_threat->HP;
             p_threat->ATK = ATK;
             p_threat->XP_drop = XP_drop;
             p_threat->HP_drop = HP_drop;
@@ -1062,7 +1086,11 @@ std::vector<ThreatObject*> MakeThreatList ()
             p_threat->LoadImg("img//spider_shoot_left.png",renderer);
             p_threat->Clip();
             p_threat->SetInputL(0);
-            p_threat->HP = HP;
+
+            BulletObject* p_bullet = new BulletObject();
+            p_threat->InitBullet(p_bullet, renderer);
+
+            p_threat->HP = HP; p_threat->maxHP = p_threat->HP;
             p_threat->ATK = ATK;
             p_threat->XP_drop = XP_drop;
             p_threat->HP_drop = HP_drop;
@@ -1073,7 +1101,7 @@ std::vector<ThreatObject*> MakeThreatList ()
     }
 
     //Spider_shoot_right
-    ThreatObject* threat_type_2 = new ThreatObject[SPIDER_SHOOT_RIGHT_NUM];
+    ThreatObject* threat_type_5 = new ThreatObject[SPIDER_SHOOT_RIGHT_NUM];
     OpenFile >> type;
     OpenFile >> HP;
     OpenFile >> ATK;
@@ -1082,14 +1110,18 @@ std::vector<ThreatObject*> MakeThreatList ()
 
     for (int i =0; i < SPIDER_SHOOT_RIGHT_NUM;i++)
     {
-        ThreatObject* p_threat = (threat_type_2 + i);
+        ThreatObject* p_threat = (threat_type_5 + i);
         if (p_threat != NULL)
         {
             p_threat->SetType(type);
             p_threat->LoadImg("img//spider_shoot_right.png",renderer);
             p_threat->Clip();
             p_threat->SetInputL(0);
-            p_threat->HP = HP;
+
+            BulletObject* p_bullet = new BulletObject();
+            p_threat->InitBullet(p_bullet, renderer);
+
+            p_threat->HP = HP; p_threat->maxHP = p_threat->HP;
             p_threat->ATK = ATK;
             p_threat->XP_drop = XP_drop;
             p_threat->HP_drop = HP_drop;
@@ -1099,8 +1131,98 @@ std::vector<ThreatObject*> MakeThreatList ()
         }
     }
 
-    //Mush_move_UD
-    ThreatObject* threat_type_6 = new ThreatObject[MUSH_MOVE_UD_NUM];
+    //Mush_2_move_UD
+    ThreatObject* threat_type_2 = new ThreatObject[RMUSH_MOVE_UD_NUM];
+    OpenFile >> type;
+    OpenFile >> HP;
+    OpenFile >> ATK;
+    OpenFile >> HP_drop;
+    OpenFile >> XP_drop;
+
+    for (int i = 0;i<RMUSH_MOVE_UD_NUM;i++)
+    {
+        ThreatObject* p_threat = (threat_type_2 + i);
+        if (p_threat != NULL)
+        {
+            p_threat->SetType(type);
+            p_threat->LoadImg("img//Mush_2_down.png", renderer);
+            p_threat->Clip();
+            p_threat->SetInputD(1);
+            p_threat->HP = HP; p_threat->maxHP = p_threat->HP;
+            p_threat->ATK = ATK;
+            p_threat->XP_drop = XP_drop;
+            p_threat->HP_drop = HP_drop;
+            OpenFile >> x; p_threat->SetXpos(x*TILE_SIZE);
+            OpenFile >> x; p_threat->SetYpos(x*TILE_SIZE);
+            OpenFile >> a >> b;
+            p_threat->SetBorderY(a*TILE_SIZE,b*TILE_SIZE);
+            p_threat->SetXYposRes();
+            list_threats.push_back(p_threat);
+        }
+    }
+
+    //Mush_2_move_LR
+    ThreatObject* threat_type_6 = new ThreatObject[RMUSH_MOVE_LR_NUM];
+    OpenFile >> type;
+    OpenFile >> HP;
+    OpenFile >> ATK;
+    OpenFile >> HP_drop;
+    OpenFile >> XP_drop;
+
+    for (int i = 0;i < RMUSH_MOVE_LR_NUM;i++)
+    {
+        ThreatObject* p_threat = (threat_type_6 + i);
+        if (p_threat != NULL)
+        {
+            p_threat->SetType(type);
+            p_threat->LoadImg("img//Mush_2_left.png",renderer);
+            p_threat->Clip();
+            p_threat->SetInputL(1);
+            p_threat->HP = HP; p_threat->maxHP = p_threat->HP;
+            p_threat->ATK = ATK;
+            p_threat->XP_drop = XP_drop;
+            p_threat->HP_drop = HP_drop;
+            OpenFile >> x; p_threat->SetXpos(x*TILE_SIZE);
+            OpenFile >> x; p_threat->SetYpos(x*TILE_SIZE);
+            OpenFile >> a >> b;
+            p_threat->SetBorderX(a*TILE_SIZE,b*TILE_SIZE);
+            p_threat->SetXYposRes();
+            list_threats.push_back(p_threat);
+        }
+    }
+
+    //Mush_1_LR
+    ThreatObject* threat_type_7 = new ThreatObject[MUSH_MOVE_LR_NUM];
+    OpenFile >> type;
+    OpenFile >> HP;
+    OpenFile >> ATK;
+    OpenFile >> HP_drop;
+    OpenFile >> XP_drop;
+
+    for (int i = 0;i < MUSH_MOVE_LR_NUM;i++)
+    {
+        ThreatObject* p_threat = (threat_type_7 + i);
+        if (p_threat != NULL)
+        {
+            p_threat->SetType(type);
+            p_threat->LoadImg("img//Mush_1_left.png",renderer);
+            p_threat->Clip();
+            p_threat->SetInputL(1);
+            p_threat->HP = HP; p_threat->maxHP = p_threat->HP;
+            p_threat->ATK = ATK;
+            p_threat->XP_drop = XP_drop;
+            p_threat->HP_drop = HP_drop;
+            OpenFile >> x; p_threat->SetXpos(x*TILE_SIZE);
+            OpenFile >> x; p_threat->SetYpos(x*TILE_SIZE);
+            OpenFile >> a >> b;
+            p_threat->SetBorderX(a*TILE_SIZE,b*TILE_SIZE);
+            p_threat->SetXYposRes();
+            list_threats.push_back(p_threat);
+        }
+    }
+
+    //Mush_1_move_UD
+    ThreatObject* threat_type_8 = new ThreatObject[MUSH_MOVE_UD_NUM];
     OpenFile >> type;
     OpenFile >> HP;
     OpenFile >> ATK;
@@ -1109,14 +1231,44 @@ std::vector<ThreatObject*> MakeThreatList ()
 
     for (int i = 0;i<MUSH_MOVE_UD_NUM;i++)
     {
-        ThreatObject* p_threat = (threat_type_6 + i);
+        ThreatObject* p_threat = (threat_type_8 + i);
         if (p_threat != NULL)
         {
             p_threat->SetType(type);
-            p_threat->LoadImg("img//spider_left.png",renderer);
+            p_threat->LoadImg("img//Mush_1_down.png", renderer);
             p_threat->Clip();
             p_threat->SetInputD(1);
-            p_threat->HP = HP;
+            p_threat->HP = HP; p_threat->maxHP = p_threat->HP;
+            p_threat->ATK = ATK;
+            p_threat->XP_drop = XP_drop;
+            p_threat->HP_drop = HP_drop;
+            OpenFile >> x; p_threat->SetXpos(x*TILE_SIZE);
+            OpenFile >> x; p_threat->SetYpos(x*TILE_SIZE);
+            OpenFile >> a >> b;
+            p_threat->SetBorderY(a*TILE_SIZE,b*TILE_SIZE);
+            p_threat->SetXYposRes();
+            list_threats.push_back(p_threat);
+        }
+    }
+
+    //Mini_golem
+    ThreatObject* threat_type_9 = new ThreatObject[GOLEM_NUM];
+    OpenFile >> type;
+    OpenFile >> HP;
+    OpenFile >> ATK;
+    OpenFile >> HP_drop;
+    OpenFile >> XP_drop;
+
+    for (int i = 0;i < GOLEM_NUM;i++)
+    {
+        ThreatObject* p_threat = (threat_type_9 + i);
+        if (p_threat != NULL)
+        {
+            p_threat->SetType(type);
+            p_threat->LoadImg("img//golem_left.png",renderer);
+            p_threat->Clip();
+            p_threat->SetInputL(1);
+            p_threat->HP = HP; p_threat->maxHP = p_threat->HP;
             p_threat->ATK = ATK;
             p_threat->XP_drop = XP_drop;
             p_threat->HP_drop = HP_drop;
@@ -1124,6 +1276,36 @@ std::vector<ThreatObject*> MakeThreatList ()
             OpenFile >> x; p_threat->SetYpos(x*TILE_SIZE);
             OpenFile >> a >> b;
             p_threat->SetBorderX(a*TILE_SIZE,b*TILE_SIZE);
+            p_threat->SetXYposRes();
+            list_threats.push_back(p_threat);
+        }
+    }
+
+    //Slime_UD
+    ThreatObject* threat_type_10 = new ThreatObject[MUSH_MOVE_UD_NUM];
+    OpenFile >> type;
+    OpenFile >> HP;
+    OpenFile >> ATK;
+    OpenFile >> HP_drop;
+    OpenFile >> XP_drop;
+
+    for (int i = 0;i<MUSH_MOVE_UD_NUM;i++)
+    {
+        ThreatObject* p_threat = (threat_type_10 + i);
+        if (p_threat != NULL)
+        {
+            p_threat->SetType(type);
+            p_threat->LoadImg("img//threat_slime.png", renderer);
+            p_threat->Clip();
+            p_threat->SetInputD(1);
+            p_threat->HP = HP; p_threat->maxHP = p_threat->HP;
+            p_threat->ATK = ATK;
+            p_threat->XP_drop = XP_drop;
+            p_threat->HP_drop = HP_drop;
+            OpenFile >> x; p_threat->SetXpos(x*TILE_SIZE);
+            OpenFile >> x; p_threat->SetYpos(x*TILE_SIZE);
+            OpenFile >> a >> b;
+            p_threat->SetBorderY(a*TILE_SIZE,b*TILE_SIZE);
             p_threat->SetXYposRes();
             list_threats.push_back(p_threat);
         }

@@ -17,7 +17,7 @@ BulletObject::~BulletObject()
 bool BulletObject::LoadImgBullet(SDL_Renderer* des)
 {
     bool ret = false;
-    ret = LoadImg("img//spider_bullet", des);
+    ret = LoadImg("img//spider_bullet.png", des);
     return ret;
 }
 

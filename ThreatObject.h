@@ -5,17 +5,20 @@
 #include "Game_Stat.h"
 #include "BulletObject.h"
 
-#define THREAT_SPEED 4
+#define THREAT_SPEED 6
+#define FRAME_DELAY 3
 
-#define SLIME_IDLE_NUM 20
-#define SLIME_MOVE_NUM 20
-#define SPIDER_MOVE_NUM 5
-#define SPIDER_SHOOT_LEFT_NUM 5
-#define SPIDER_SHOOT_RIGHT_NUM 5
-#define MUSH_MOVE_UD_NUM 5
-#define MUSH_MOVE_LR_NUM 5
-#define RMUSH_MOVE_UD_NUM 5
+#define SLIME_IDLE_NUM 5
+#define SLIME_MOVE_NUM 8
+#define SPIDER_MOVE_NUM 15
+#define SPIDER_SHOOT_LEFT_NUM 7
+#define SPIDER_SHOOT_RIGHT_NUM 7
+#define MUSH_MOVE_UD_NUM 7
+#define MUSH_MOVE_LR_NUM 7
+#define RMUSH_MOVE_UD_NUM 9
 #define RMUSH_MOVE_LR_NUM 5
+#define GOLEM_NUM 12
+#define SLIME_UD 7
 
 class ThreatObject : public BaseObject
 {
@@ -51,6 +54,7 @@ public:
     void SetInputD (const int& IpDown) {Input_type.down = IpDown;}
     void Move (SDL_Renderer* screen);
 
+    int maxHP;
     int HP;
     int ATK;
 
@@ -80,6 +84,7 @@ private:
 
     SDL_Rect frame_clip[12];
     int frame_num;
+    int frame_delay;
 
     int mapvalue_x;
     int mapvalue_y;

@@ -6,7 +6,7 @@ MainObject::MainObject()
     x_val = 0;
     y_val = 0;
     x_pos = 6*TILE_SIZE;
-    y_pos = 389*TILE_SIZE;
+    y_pos = 178*TILE_SIZE;
 
     width_frame = 0;
     height_frame = 0;
@@ -301,7 +301,7 @@ void MainObject::UpdateImg(SDL_Renderer* des)
     }
 }
 
-void MainObject::DoPlayer(Map& map_data)
+void MainObject::DoPlayer(Map& map_data, TTF_Font* font_noti, SDL_Renderer* screen)
 {
     x_val = 0;
     y_val = 0;
@@ -325,11 +325,11 @@ void MainObject::DoPlayer(Map& map_data)
     {
         level++;
     }
-    CheckMap(map_data);
+    CheckMap(map_data, font_noti, screen);
     MapMove(map_data);
 }
 
-void MainObject::CheckMap(Map& map_data)
+void MainObject::CheckMap(Map& map_data, TTF_Font* font_noti, SDL_Renderer* screen)
 {
     int x1 = 0, x2 = 0;
     int y1 = 0, y2 = 0;
@@ -345,6 +345,10 @@ void MainObject::CheckMap(Map& map_data)
     int val3 = map_data.tile[y1][x1];
     int val4 = map_data.tile[y2][x1];
 
+    Text_object Noti;
+    std::mt19937 gen(std::time(0) ^ reinterpret_cast<uintptr_t>(&gen));
+    std::uniform_int_distribution<int> dist_reward(1,3);
+
     if (x1 >=0 && x2 <= MAX_MAP_X && y1 >=0 && y2 <= MAX_MAP_Y)
     {
         if (x_val > 0)
@@ -353,22 +357,49 @@ void MainObject::CheckMap(Map& map_data)
             {
                 map_data.tile[y1][x2] = FLOOR;
                 map_data.tile[y2][x2] = FLOOR;
-                map_data.tile[390][1] = KEY;
+                map_data.tile[340][1] = KEY;
                 have_sword = true;
             } else if (val1 == KEY || val2 == KEY)
             {
                 map_data.tile[y1][x2] = FLOOR;
                 map_data.tile[y2][x2] = FLOOR;
-                map_data.tile[389][6] = DOOR_OPEN;
+                map_data.tile[339][6] = DOOR_OPEN;
             } else if (val1 == CHEST || val2 == CHEST)
             {
+                int i = dist_reward(gen);
+                if (i==1)
+                {
+                    maxHP *=1.5;
+                    HP*=1.5;
+                    Noti.SetText("Your HP x1.5");
+                    Noti.LoadFromRenderText(font_noti,screen);
+                    Noti.RenderText(screen, SCREEN_WIDTH/2 - Noti.GetWidth()/2, SCREEN_HEIGHT/2 - Noti.GetHeight()/2);
+                    SDL_RenderPresent(screen);
+                    SDL_Delay(1000);
+                } else if (i==2)
+                {
+                    ATK *= 1.3;
+                    Noti.SetText("Your ATK x1.3");
+                    Noti.LoadFromRenderText(font_noti,screen);
+                    Noti.RenderText(screen, SCREEN_WIDTH/2 - Noti.GetWidth()/2, SCREEN_HEIGHT/2 - Noti.GetHeight()/2);
+                    SDL_RenderPresent(screen);
+                    SDL_Delay(1000);
+                } else
+                {
+                    SPEED-=4;
+                    Noti.SetText("Your Speed -4");
+                    Noti.LoadFromRenderText(font_noti,screen);
+                    Noti.RenderText(screen, SCREEN_WIDTH/2 - Noti.GetWidth()/2, SCREEN_HEIGHT/2 - Noti.GetHeight()/2);
+                    SDL_RenderPresent(screen);
+                    SDL_Delay(1000);
+                }
                 map_data.tile[y1][x2] = BLANK_MAP;
                 map_data.tile[y2][x2] = BLANK_MAP;
             }
             else
             {
-                if ((val1 !=BLANK_MAP && val1 != FLOOR && val1 !=DOOR_OPEN && val1 !=31) ||
-                    (val2 !=BLANK_MAP && val2 != FLOOR && val2 !=DOOR_OPEN && val2 != 31))
+                if ((val1 !=BLANK_MAP && val1 != FLOOR && val1 !=DOOR_OPEN && val1 !=31 && val1 != 49 & val1 != 50) ||
+                    (val2 !=BLANK_MAP && val2 != FLOOR && val2 !=DOOR_OPEN && val2 != 31&& val2 != 49 & val2 != 50))
                 {
                     x_pos = x2*TILE_SIZE - width_frame + 5;
                     x_val=0;
@@ -381,22 +412,49 @@ void MainObject::CheckMap(Map& map_data)
             {
                 map_data.tile[y1][x1] = FLOOR;
                 map_data.tile[y2][x1] = FLOOR;
-                map_data.tile[390][1] = KEY;
+                map_data.tile[340][1] = KEY;
                 have_sword = true;
             } else if (val3 == KEY || val4 == KEY)
             {
                 map_data.tile[y1][x1] = FLOOR;
                 map_data.tile[y2][x1] = FLOOR;
-                map_data.tile[389][6] = DOOR_OPEN;
+                map_data.tile[339][6] = DOOR_OPEN;
             } else if (val3 == CHEST || val4 == CHEST)
             {
+                int i = dist_reward(gen);
+                if (i==1)
+                {
+                    maxHP *=1.5;
+                    HP*=1.5;
+                    Noti.SetText("Your HP x1.5");
+                    Noti.LoadFromRenderText(font_noti,screen);
+                    Noti.RenderText(screen, SCREEN_WIDTH/2 - Noti.GetWidth()/2, SCREEN_HEIGHT/2 - Noti.GetHeight()/2);
+                    SDL_RenderPresent(screen);
+                    SDL_Delay(1000);
+                } else if (i==2)
+                {
+                    ATK *= 1.3;
+                    Noti.SetText("Your ATK x1.3");
+                    Noti.LoadFromRenderText(font_noti,screen);
+                    Noti.RenderText(screen, SCREEN_WIDTH/2 - Noti.GetWidth()/2, SCREEN_HEIGHT/2 - Noti.GetHeight()/2);
+                    SDL_RenderPresent(screen);
+                    SDL_Delay(1000);
+                } else
+                {
+                    SPEED-=4;
+                    Noti.SetText("Your Speed -4");
+                    Noti.LoadFromRenderText(font_noti,screen);
+                    Noti.RenderText(screen, SCREEN_WIDTH/2 - Noti.GetWidth()/2, SCREEN_HEIGHT/2 - Noti.GetHeight()/2);
+                    SDL_RenderPresent(screen);
+                    SDL_Delay(1000);
+                }
                 map_data.tile[y1][x1] = BLANK_MAP;
                 map_data.tile[y2][x1] = BLANK_MAP;
             }
             else
             {
-                if ((val3 !=BLANK_MAP && val3 != FLOOR && val3 !=DOOR_OPEN && val3 != 31) ||
-                    (val4 !=BLANK_MAP && val4 != FLOOR && val4 !=DOOR_OPEN && val4 != 31))
+                if ((val3 !=BLANK_MAP && val3 != FLOOR && val3 !=DOOR_OPEN && val3 != 31 && val3 != 49 & val3 != 50) ||
+                    (val4 !=BLANK_MAP && val4 != FLOOR && val4 !=DOOR_OPEN && val4 != 31 && val4 != 49 & val4 != 50))
                 {
                     x_pos = x1*TILE_SIZE+30;
                     x_val = 0;
@@ -424,22 +482,49 @@ void MainObject::CheckMap(Map& map_data)
             {
                 map_data.tile[y2][x2] = FLOOR;
                 map_data.tile[y2][x1] = FLOOR;
-                map_data.tile[390][1] = KEY;
+                map_data.tile[340][1] = KEY;
                 have_sword = true;
             } else if (val2 == KEY || val4 == KEY)
             {
                 map_data.tile[y2][x2] = FLOOR;
                 map_data.tile[y2][x1] = FLOOR;
-                map_data.tile[389][6] = DOOR_OPEN;
+                map_data.tile[339][6] = DOOR_OPEN;
             } else if (val2 == CHEST || val4 == CHEST)
             {
+                int i = dist_reward(gen);
+                if (i==1)
+                {
+                    maxHP *=1.5;
+                    HP*=1.5;
+                    Noti.SetText("Your HP x1.5");
+                    Noti.LoadFromRenderText(font_noti,screen);
+                    Noti.RenderText(screen, SCREEN_WIDTH/2 - Noti.GetWidth()/2, SCREEN_HEIGHT/2 - Noti.GetHeight()/2);
+                    SDL_RenderPresent(screen);
+                    SDL_Delay(1000);
+                } else if (i==2)
+                {
+                    ATK *= 1.3;
+                    Noti.SetText("Your ATK x1.3");
+                    Noti.LoadFromRenderText(font_noti,screen);
+                    Noti.RenderText(screen, SCREEN_WIDTH/2 - Noti.GetWidth()/2, SCREEN_HEIGHT/2 - Noti.GetHeight()/2);
+                    SDL_RenderPresent(screen);
+                    SDL_Delay(1000);
+                } else
+                {
+                    SPEED-=4;
+                    Noti.SetText("Your Speed -4");
+                    Noti.LoadFromRenderText(font_noti,screen);
+                    Noti.RenderText(screen, SCREEN_WIDTH/2 - Noti.GetWidth()/2, SCREEN_HEIGHT/2 - Noti.GetHeight()/2);
+                    SDL_RenderPresent(screen);
+                    SDL_Delay(1000);
+                }
                 map_data.tile[y2][x2] = BLANK_MAP;
                 map_data.tile[y2][x1] = BLANK_MAP;
             }
             else
             {
-                if ((val2 != BLANK_MAP && val2 !=FLOOR && val2 !=DOOR_OPEN && val2 != 31) ||
-                    (val4 != BLANK_MAP && val4 !=FLOOR && val4 !=DOOR_OPEN && val4 != 31))
+                if ((val2 != BLANK_MAP && val2 !=FLOOR && val2 !=DOOR_OPEN && val2 != 31&& val2 != 49 & val2 != 50) ||
+                    (val4 != BLANK_MAP && val4 !=FLOOR && val4 !=DOOR_OPEN && val4 != 31&& val4 != 49 & val4 != 50))
                 {
                     y_pos = y2*TILE_SIZE - height_frame + 5;
                     y_val=0;
@@ -452,23 +537,50 @@ void MainObject::CheckMap(Map& map_data)
             {
                 map_data.tile[y1][x1] = FLOOR;
                 map_data.tile[y1][x2] = FLOOR;
-                map_data.tile[390][1] = KEY;
+                map_data.tile[340][1] = KEY;
                 have_sword = true;
             }
             else if (val1 ==  KEY|| val3 == KEY)
             {
                 map_data.tile[y1][x1] = FLOOR;
                 map_data.tile[y1][x2] = FLOOR;
-                map_data.tile[389][6] = DOOR_OPEN;
+                map_data.tile[339][6] = DOOR_OPEN;
             } else if (val1 ==  CHEST|| val3 == CHEST)
             {
+                int i = dist_reward(gen);
+                if (i==1)
+                {
+                    maxHP *=1.5;
+                    HP*=1.5;
+                    Noti.SetText("Your HP x1.5");
+                    Noti.LoadFromRenderText(font_noti,screen);
+                    Noti.RenderText(screen, SCREEN_WIDTH/2 - Noti.GetWidth()/2, SCREEN_HEIGHT/2 - Noti.GetHeight()/2);
+                    SDL_RenderPresent(screen);
+                    SDL_Delay(1000);
+                } else if (i==2)
+                {
+                    ATK *= 1.3;
+                    Noti.SetText("Your ATK x1.3");
+                    Noti.LoadFromRenderText(font_noti,screen);
+                    Noti.RenderText(screen, SCREEN_WIDTH/2 - Noti.GetWidth()/2, SCREEN_HEIGHT/2 - Noti.GetHeight()/2);
+                    SDL_RenderPresent(screen);
+                    SDL_Delay(1000);
+                } else
+                {
+                    SPEED-=4;
+                    Noti.SetText("Your Speed -4");
+                    Noti.LoadFromRenderText(font_noti,screen);
+                    Noti.RenderText(screen, SCREEN_WIDTH/2 - Noti.GetWidth()/2, SCREEN_HEIGHT/2 - Noti.GetHeight()/2);
+                    SDL_RenderPresent(screen);
+                    SDL_Delay(1000);
+                }
                 map_data.tile[y1][x1] = BLANK_MAP;
                 map_data.tile[y1][x2] = BLANK_MAP;
             }
             else
             {
-                if ((val1 !=BLANK_MAP && val1 !=FLOOR && val1 !=DOOR_OPEN && val1 != 31) ||
-                    (val3 !=BLANK_MAP && val3 !=FLOOR && val3 !=DOOR_OPEN && val3 != 31))
+                if ((val1 !=BLANK_MAP && val1 !=FLOOR && val1 !=DOOR_OPEN && val1 != 31 && val1 != 49 & val1 != 50) ||
+                    (val3 !=BLANK_MAP && val3 !=FLOOR && val3 !=DOOR_OPEN && val3 != 31 && val3 != 49 & val3 != 50))
                 {
                     y_pos = y2*TILE_SIZE - 30;
                     y_val = 0;
