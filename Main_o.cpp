@@ -6,7 +6,7 @@ MainObject::MainObject()
     x_val = 0;
     y_val = 0;
     x_pos = 6*TILE_SIZE;
-    y_pos = 300*TILE_SIZE;
+    y_pos = 389*TILE_SIZE;
 
     width_frame = 0;
     height_frame = 0;
@@ -28,7 +28,7 @@ MainObject::MainObject()
 
     HP_potion=0;
 
-    maxHP = 100;
+    maxHP = 1000;
     ATK = 20;
     SPEED = 25;
     HP=maxHP;

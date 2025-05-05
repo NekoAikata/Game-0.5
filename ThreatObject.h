@@ -6,6 +6,17 @@
 #include "BulletObject.h"
 
 #define THREAT_SPEED 4
+
+#define SLIME_IDLE_NUM 20
+#define SLIME_MOVE_NUM 20
+#define SPIDER_MOVE_NUM 5
+#define SPIDER_SHOOT_LEFT_NUM 5
+#define SPIDER_SHOOT_RIGHT_NUM 5
+#define MUSH_MOVE_UD_NUM 5
+#define MUSH_MOVE_LR_NUM 5
+#define RMUSH_MOVE_UD_NUM 5
+#define RMUSH_MOVE_LR_NUM 5
+
 class ThreatObject : public BaseObject
 {
 public:
@@ -37,6 +48,7 @@ public:
     void SetBorderX (const int& aBord, const int& bBord) {animation_left = aBord; animation_right = bBord;}
     void SetBorderY (const int& aBord, const int& bBord) {animation_up = aBord; animation_down = bBord;}
     void SetInputL (const int& IpLeft) {Input_type.left = IpLeft;}
+    void SetInputD (const int& IpDown) {Input_type.down = IpDown;}
     void Move (SDL_Renderer* screen);
 
     int HP;
@@ -66,7 +78,7 @@ private:
     int width_frame;
     int height_frame;
 
-    SDL_Rect frame_clip[6];
+    SDL_Rect frame_clip[12];
     int frame_num;
 
     int mapvalue_x;

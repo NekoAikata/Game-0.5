@@ -39,10 +39,13 @@ bool ThreatObject::LoadImg (std::string path, SDL_Renderer* screen)
 {
 	bool ret = BaseObject::LoadImg(path, screen);
 
+	height_frame = rect.h;
+
     if (ret)
     {
-        height_frame = rect.h;
-        width_frame = rect.w/4;
+        if (type == 3)
+        {width_frame = rect.w/9;}
+        if (type == 1 || type == 4 || type == 5) width_frame = rect.w/4;
     }
 
     return ret;
@@ -71,16 +74,59 @@ void ThreatObject::Clip()
         frame_clip[3].y = 0;
         frame_clip[3].h = height_frame;
         frame_clip[3].w = width_frame;
+
+        frame_clip[4].x = 4*width_frame;
+        frame_clip[4].y = 0;
+        frame_clip[4].h = height_frame;
+        frame_clip[4].w = width_frame;
+
+        frame_clip[5].x = 5*width_frame;
+        frame_clip[5].y = 0;
+        frame_clip[5].h = height_frame;
+        frame_clip[5].w = width_frame;
+
+        frame_clip[6].x = 6*width_frame;
+        frame_clip[6].y = 0;
+        frame_clip[6].h = height_frame;
+        frame_clip[6].w = width_frame;
+
+        frame_clip[7].x = 7*width_frame;
+        frame_clip[7].y = 0;
+        frame_clip[7].h = height_frame;
+        frame_clip[7].w = width_frame;
+
+        frame_clip[8].x = 8*width_frame;
+        frame_clip[8].y = 0;
+        frame_clip[8].h = height_frame;
+        frame_clip[8].w = width_frame;
+
+        frame_clip[9].x = 9*width_frame;
+        frame_clip[9].y = 0;
+        frame_clip[9].h = height_frame;
+        frame_clip[9].w = width_frame;
+
+        frame_clip[10].x = 10*width_frame;
+        frame_clip[10].y = 0;
+        frame_clip[10].h = height_frame;
+        frame_clip[10].w = width_frame;
+
+        frame_clip[11].x = 11*width_frame;
+        frame_clip[11].y = 0;
+        frame_clip[11].h = height_frame;
+        frame_clip[11].w = width_frame;
     }
 }
 
 void ThreatObject::Show(SDL_Renderer* des)
 {
 	frame_num++;
-    if (frame_num >= 4)
+    if (frame_num >= 4 && (type == 1 || type == 0 || type == 4 || type == 5) ||
+        (frame_num >= 9 && (type == 3)) ||
+        (frame_num >= 3 && (type == 6)))
     {
         frame_num = 0;
     }
+
     rect.x = x_pos - mapvalue_x;
     rect.y = y_pos - mapvalue_y;
 
@@ -214,25 +260,34 @@ void ThreatObject::CheckMap (Map& map_data)
 
 void ThreatObject::Move (SDL_Renderer* screen)
 {
-    if (type == 1)
+    if (type == 1 || type == 3)
     {
         if (x_pos > animation_right)
         {
             Input_type.left = 1;
             Input_type.right = 0;
-            LoadImg("img//threat_slime.png", screen);
+            if (type == 1) LoadImg("img//threat_slime.png", screen);
+            if (type == 3) LoadImg("img//spider_left.png", screen);
         } else if (x_pos < animation_left)
         {
             Input_type.right = 1;
             Input_type.left = 0;
-            LoadImg ("img//threat_slime.png", screen);
+            if (type == 1) LoadImg ("img//threat_slime.png", screen);
+            if (type == 3) LoadImg ("img//spider_right.png", screen);
         }
     }
     else if (type == 2)
     {
-
+        if (y_pos > animation_down){
+            Input_type.down = 0;
+            Input_type.up = 1;
+        } else if (y_pos < animation_up)
+        {
+            Input_type.down = 1;
+            Input_type.up = 0;
+        }
     }
-    else if (type == 0)
+    else if (type == 0 || type == 4 || type == 5)
     {
         ;
     }

@@ -416,6 +416,12 @@ int main(int argc, char* argv[])
                             if (result == 1){
                                 Player1.UpdateBattleStatus(false);
                                 Player1.xp += list_boss[i]->XP_drop;
+                                if (list_boss[i]->GetType() == 5)
+                                {
+                                    Player1.HP = 0;
+                                    Player1.finish_game = true;
+                                    continue;
+                                }
                                 list_boss[i]->Free();
                                 list_boss.erase (list_boss.begin() + i);
                                 Player1.UpdateImg(renderer);
@@ -660,6 +666,7 @@ int main(int argc, char* argv[])
 }
 
 int HandleEndGame(int current_time, MainObject Player1, bool& quitG){
+    SDL_RenderClear(renderer);
     bool space_present = false;int check = 0;
     Timer space_countdown;
     BaseObject Lose;
@@ -688,13 +695,17 @@ int HandleEndGame(int current_time, MainObject Player1, bool& quitG){
             SDL_RenderPresent(renderer);
             SDL_Delay(300);
         }
+    } else
+    {
+        Loser.SetText("You saved the King!");
+        Loser.SetColor(255, 255, 255);
     }
     Loser.LoadFromRenderText(font_title, renderer);
     Loser.RenderText(renderer, SCREEN_WIDTH/2 - Loser.GetWidth()/2, 0);
     SDL_RenderPresent(renderer);
     while (!quitG)
     {
-        if (space_countdown.start_check())space_countdown.start();
+        if (!space_countdown.start_check())space_countdown.start();
         if (space_countdown.get_tick() > 2000 && !space_present)
         {
             Space_noti.LoadFromRenderText(font_menu, renderer);
@@ -757,7 +768,7 @@ int HandleEndGame(int current_time, MainObject Player1, bool& quitG){
             check++;
         } else if (check == 2)
         {
-            if (space_countdown.start_check())space_countdown.start();
+            if (!space_countdown.start_check())space_countdown.start();
             if (space_countdown.get_tick() > 2000 && !space_present)
             {
                 Space_noti.LoadFromRenderText(font_menu, renderer);
@@ -943,33 +954,21 @@ std::vector<ThreatObject*> MakeThreatList ()
     std::vector<ThreatObject*> list_threats;
     std::ifstream OpenFile;
     OpenFile.open("map//threat.txt");
-    ThreatObject* test_threat = new ThreatObject;
-        test_threat->LoadImg("img//threat_slime.png",renderer);
-        test_threat->Clip();
-        int a,b; float x;
-        int type, HP, ATK, HP_drop, XP_drop;
-        OpenFile >> type;
-        test_threat->SetType(type);
-        test_threat->SetInputL(type);
-        OpenFile >> x; test_threat->SetXpos(x*TILE_SIZE);
-        OpenFile >> x; test_threat->SetYpos(x*TILE_SIZE);
-        OpenFile >> a; test_threat->HP = a;
-        OpenFile >> a; test_threat->ATK = a;
-        OpenFile >> a; test_threat->HP_drop = a;
-        OpenFile >> a; test_threat->XP_drop = a;
-        test_threat->SetXYposRes();
-        list_threats.push_back(test_threat);
 
-    ThreatObject* dynamic_threat = new ThreatObject[20];
+    int type, HP, ATK, HP_drop, XP_drop;
+    int a,b; float x;
+
+    //Slime_move
+    ThreatObject* threat_type_1 = new ThreatObject[SLIME_MOVE_NUM];
     OpenFile >> type;
     OpenFile >> HP;
     OpenFile >> ATK;
     OpenFile >> HP_drop;
     OpenFile >> XP_drop;
 
-    for (int i = 0;i<20;i++)
+    for (int i = 0;i < SLIME_MOVE_NUM;i++)
     {
-        ThreatObject* p_threat = (dynamic_threat + i);
+        ThreatObject* p_threat = (threat_type_1 + i);
         if (p_threat != NULL)
         {
             p_threat->SetType(type);
@@ -989,16 +988,17 @@ std::vector<ThreatObject*> MakeThreatList ()
         }
     }
 
-    ThreatObject* threats = new ThreatObject[20];
+    //Slime_idle
+    ThreatObject* threat_type_0 = new ThreatObject[SLIME_IDLE_NUM];
     OpenFile >> type;
     OpenFile >> HP;
     OpenFile >> ATK;
     OpenFile >> HP_drop;
     OpenFile >> XP_drop;
 
-    for (int i =0; i < 20;i++)
+    for (int i =0; i < SLIME_IDLE_NUM;i++)
     {
-        ThreatObject* p_threat = (threats + i);
+        ThreatObject* p_threat = (threat_type_0 + i);
         if (p_threat != NULL)
         {
             p_threat->SetType(type);
@@ -1011,6 +1011,120 @@ std::vector<ThreatObject*> MakeThreatList ()
             p_threat->HP_drop = HP_drop;
             OpenFile >> x; p_threat->SetXpos(x*TILE_SIZE);
             OpenFile >> x; p_threat->SetYpos(x*TILE_SIZE);
+            list_threats.push_back(p_threat);
+        }
+    }
+
+    //Spider_move
+    ThreatObject* threat_type_3 = new ThreatObject[SPIDER_MOVE_NUM];
+    OpenFile >> type;
+    OpenFile >> HP;
+    OpenFile >> ATK;
+    OpenFile >> HP_drop;
+    OpenFile >> XP_drop;
+
+    for (int i = 0;i < SPIDER_MOVE_NUM;i++)
+    {
+        ThreatObject* p_threat = (threat_type_3 + i);
+        if (p_threat != NULL)
+        {
+            p_threat->SetType(type);
+            p_threat->LoadImg("img//spider_left.png",renderer);
+            p_threat->Clip();
+            p_threat->SetInputL(1);
+            p_threat->HP = HP;
+            p_threat->ATK = ATK;
+            p_threat->XP_drop = XP_drop;
+            p_threat->HP_drop = HP_drop;
+            OpenFile >> x; p_threat->SetXpos(x*TILE_SIZE);
+            OpenFile >> x; p_threat->SetYpos(x*TILE_SIZE);
+            OpenFile >> a >> b;
+            p_threat->SetBorderX(a*TILE_SIZE,b*TILE_SIZE);
+            p_threat->SetXYposRes();
+            list_threats.push_back(p_threat);
+        }
+    }
+
+    //Spider_shoot_left
+    ThreatObject* threat_type_4 = new ThreatObject[SPIDER_SHOOT_LEFT_NUM];
+    OpenFile >> type;
+    OpenFile >> HP;
+    OpenFile >> ATK;
+    OpenFile >> HP_drop;
+    OpenFile >> XP_drop;
+
+    for (int i =0; i < SPIDER_SHOOT_LEFT_NUM;i++)
+    {
+        ThreatObject* p_threat = (threat_type_4 + i);
+        if (p_threat != NULL)
+        {
+            p_threat->SetType(type);
+            p_threat->LoadImg("img//spider_shoot_left.png",renderer);
+            p_threat->Clip();
+            p_threat->SetInputL(0);
+            p_threat->HP = HP;
+            p_threat->ATK = ATK;
+            p_threat->XP_drop = XP_drop;
+            p_threat->HP_drop = HP_drop;
+            OpenFile >> x; p_threat->SetXpos(x*TILE_SIZE);
+            OpenFile >> x; p_threat->SetYpos(x*TILE_SIZE);
+            list_threats.push_back(p_threat);
+        }
+    }
+
+    //Spider_shoot_right
+    ThreatObject* threat_type_2 = new ThreatObject[SPIDER_SHOOT_RIGHT_NUM];
+    OpenFile >> type;
+    OpenFile >> HP;
+    OpenFile >> ATK;
+    OpenFile >> HP_drop;
+    OpenFile >> XP_drop;
+
+    for (int i =0; i < SPIDER_SHOOT_RIGHT_NUM;i++)
+    {
+        ThreatObject* p_threat = (threat_type_2 + i);
+        if (p_threat != NULL)
+        {
+            p_threat->SetType(type);
+            p_threat->LoadImg("img//spider_shoot_right.png",renderer);
+            p_threat->Clip();
+            p_threat->SetInputL(0);
+            p_threat->HP = HP;
+            p_threat->ATK = ATK;
+            p_threat->XP_drop = XP_drop;
+            p_threat->HP_drop = HP_drop;
+            OpenFile >> x; p_threat->SetXpos(x*TILE_SIZE);
+            OpenFile >> x; p_threat->SetYpos(x*TILE_SIZE);
+            list_threats.push_back(p_threat);
+        }
+    }
+
+    //Mush_move_UD
+    ThreatObject* threat_type_6 = new ThreatObject[MUSH_MOVE_UD_NUM];
+    OpenFile >> type;
+    OpenFile >> HP;
+    OpenFile >> ATK;
+    OpenFile >> HP_drop;
+    OpenFile >> XP_drop;
+
+    for (int i = 0;i<MUSH_MOVE_UD_NUM;i++)
+    {
+        ThreatObject* p_threat = (threat_type_6 + i);
+        if (p_threat != NULL)
+        {
+            p_threat->SetType(type);
+            p_threat->LoadImg("img//spider_left.png",renderer);
+            p_threat->Clip();
+            p_threat->SetInputD(1);
+            p_threat->HP = HP;
+            p_threat->ATK = ATK;
+            p_threat->XP_drop = XP_drop;
+            p_threat->HP_drop = HP_drop;
+            OpenFile >> x; p_threat->SetXpos(x*TILE_SIZE);
+            OpenFile >> x; p_threat->SetYpos(x*TILE_SIZE);
+            OpenFile >> a >> b;
+            p_threat->SetBorderX(a*TILE_SIZE,b*TILE_SIZE);
+            p_threat->SetXYposRes();
             list_threats.push_back(p_threat);
         }
     }
