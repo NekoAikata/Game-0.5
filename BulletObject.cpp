@@ -18,6 +18,7 @@ bool BulletObject::LoadImgBullet(SDL_Renderer* des)
 {
     bool ret = false;
     ret = LoadImg("img//spider_bullet.png", des);
+    SetRectWH(32,32);
     return ret;
 }
 

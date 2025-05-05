@@ -6,7 +6,7 @@ MainObject::MainObject()
     x_val = 0;
     y_val = 0;
     x_pos = 6*TILE_SIZE;
-    y_pos = 178*TILE_SIZE;
+    y_pos = 345*TILE_SIZE;
 
     width_frame = 0;
     height_frame = 0;
@@ -28,9 +28,9 @@ MainObject::MainObject()
 
     HP_potion=0;
 
-    maxHP = 1000;
+    maxHP = 100;
     ATK = 20;
-    SPEED = 25;
+    SPEED = 125;
     HP=maxHP;
     have_sword = false;
     battle = false;
@@ -729,8 +729,9 @@ void MainObject::HandleXP()
         level++;
         xp=xp - xp_cap;
         xp_cap += level*10;
-        maxHP += level*5;
-        ATK += level*2/5;
+        maxHP += level*3;
+        if (level %2 ==0) ATK ++;
+        if  (level%5 == 0) SPEED--;
     }
 }
 

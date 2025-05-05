@@ -335,6 +335,7 @@ void ThreatObject::MakeBullet(SDL_Renderer* screen, const int& x_limit, const in
         {
             if (p_bullet->get_is_move())
             {
+                    p_bullet->SetRect(p_bullet->GetRect().x, rect.y);
                     p_bullet->HandleMove(x_limit, y_limit);
                     p_bullet->Render(screen);
             } else

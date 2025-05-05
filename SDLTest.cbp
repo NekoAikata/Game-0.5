@@ -38,8 +38,6 @@
 		<Unit filename="BossThreat.h" />
 		<Unit filename="BulletObject.cpp" />
 		<Unit filename="BulletObject.h" />
-		<Unit filename="Explosion.cpp" />
-		<Unit filename="Explosion.h" />
 		<Unit filename="Game_Stat.cpp" />
 		<Unit filename="Game_Stat.h" />
 		<Unit filename="Main_o.cpp" />

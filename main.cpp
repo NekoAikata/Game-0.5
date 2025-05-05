@@ -374,6 +374,7 @@ int main(int argc, char* argv[])
             for (int i = 0;i < list_threats.size(); i++)
             {
                 ThreatObject* threat_object = list_threats[i];
+
                 if (threat_object != NULL)
                 {
                     threat_object->SetMapXY(map_data.start_x, map_data.start_y);
@@ -459,6 +460,30 @@ int main(int argc, char* argv[])
                 for (int i=0; i < list_threats.size(); ++i)
                 {
                     ThreatObject* threat_check = list_threats[i];
+                    if (list_threats[i]->GetType() == 4 || list_threats[i]->GetType() == 5)
+                    {
+                        std::vector<BulletObject*> bullet_list = threat_check->get_bullet_list();
+                        for (int j =0;j < bullet_list.size(); ++j)
+                        {
+                            BulletObject* bullet_check = bullet_list[j];
+                            if (bullet_check !=NULL)
+                            {
+                                SDL_Rect BLRect =bullet_check->GetRect();
+                                if(Common_Func::CheckCollision(PRect, BLRect))
+                                {
+                                   std::string w = std::to_string(list_threats[i]->ATK);
+                                    w = "-" + w;
+                                    Player1.HP-=list_threats[i]->ATK;
+                                    PMinus.SetText(w);
+                                    PMinus.LoadFromRenderText(font_slash,renderer);
+                                    PMinus.RenderText(renderer,PRect.x + PRect.w -10,PRect.y - 20);
+                                    bullet_check->set_is_move(false);
+                                    bullet_list.erase(bullet_list.begin() + j);
+                                    bullet_check = NULL;
+                                }
+                            }
+                        }
+                    }
                     if (list_threats[i]->GetRevTime() >= 975)
                     {
                         std::string y = std::to_string(list_threats[i]->HP_drop);

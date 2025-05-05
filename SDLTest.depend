@@ -3,7 +3,7 @@
 	<iostream>
 	<SDL.h>
 
-1746462046 source:c:\users\admin\documents\code test\game 0.5\main.cpp
+1746485242 source:c:\users\admin\documents\code test\game 0.5\main.cpp
 	"Game_Stat.h"
 	"BObject.h"
 	"Map.h"
@@ -129,7 +129,7 @@
 1745331089 source:c:\users\admin\documents\code test\game 0.5\slash.cpp
 	"Slash.h"
 
-1746462046 source:c:\users\admin\documents\code test\game 0.5\threatobject.cpp
+1746466459 source:c:\users\admin\documents\code test\game 0.5\threatobject.cpp
 	"ThreatObject.h"
 
 1746460808 c:\users\admin\documents\code test\game 0.5\threatobject.h
@@ -352,7 +352,7 @@
 1746348797 source:c:\users\admin\documents\code test\game 0.5\text.cpp
 	"Text.h"
 
-1746462064 source:c:\users\admin\documents\code test\game 0.5\bulletobject.cpp
+1746466524 source:c:\users\admin\documents\code test\game 0.5\bulletobject.cpp
 	"BulletObject.h"
 
 1746385796 c:\users\admin\documents\code test\game 0.5\bulletobject.h
